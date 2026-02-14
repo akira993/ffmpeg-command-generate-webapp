@@ -1,0 +1,77 @@
+{
+	"common": {
+		"copy": "コピー",
+		"copied": "コピーしました",
+		"reset": "リセット",
+		"input": "入力",
+		"output": "出力",
+		"apply": "適用"
+	},
+	"header": {
+		"title": "FFmpeg コマンドジェネレーター",
+		"subtitle": "GUIで簡単にFFmpegコマンドを生成"
+	},
+	"mode": {
+		"preset": "プリセット",
+		"advanced": "アドバンスド"
+	},
+	"preset": {
+		"videoConvert": {
+			"name": "動画フォーマット変換",
+			"desc": "MP4, WebM, MOV, AVI間のフォーマット変換"
+		},
+		"videoCompress": {
+			"name": "動画圧縮",
+			"desc": "CRFやビットレートを指定してファイルサイズを削減"
+		},
+		"audioExtract": {
+			"name": "音声抽出",
+			"desc": "動画から音声のみを抽出（MP3, AAC, WAV, FLAC）"
+		},
+		"audioConvert": {
+			"name": "音声変換",
+			"desc": "音声ファイルのフォーマット変換"
+		},
+		"videoTrim": {
+			"name": "動画トリム",
+			"desc": "開始/終了時刻を指定して動画を切り出し"
+		},
+		"gifGenerate": {
+			"name": "GIF生成",
+			"desc": "動画からアニメーションGIFを生成（高品質パレット付き）"
+		},
+		"imageConvert": {
+			"name": "画像変換・リサイズ",
+			"desc": "画像のフォーマット変換、リサイズ、品質調整"
+		}
+	},
+	"form": {
+		"filename": "ファイル名",
+		"format": "フォーマット",
+		"codec": "コーデック",
+		"resolution": "解像度",
+		"framerate": "フレームレート",
+		"bitrate": "ビットレート",
+		"crf": "CRF（品質）",
+		"sampleRate": "サンプルレート",
+		"channels": "チャンネル",
+		"startTime": "開始時刻",
+		"endTime": "終了時刻",
+		"duration": "持続時間",
+		"noVideo": "映像なし",
+		"noAudio": "音声なし",
+		"stripMetadata": "メタデータ削除",
+		"copyStreams": "ストリームコピー（再エンコードなし）",
+		"preset": "エンコーダプリセット",
+		"overwrite": "上書き"
+	},
+	"command": {
+		"generated": "生成されたコマンド",
+		"empty": "オプションを設定してください",
+		"copied": "コマンドをコピーしました"
+	},
+	"footer": {
+		"description": "FFmpegコマンドをGUIで簡単に生成するWebアプリ",
+		"github": "GitHub"
+	}
+}
