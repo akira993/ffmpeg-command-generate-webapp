@@ -27,7 +27,9 @@ src/
 │   │   └── common/
 │   │       ├── LanguageSwitcher.svelte
 │   │       ├── ThemeToggle.svelte
-│   │       └── ModeSwitch.svelte
+│   │       ├── ModeSwitch.svelte
+│   │       ├── DropZone.svelte         # D&D ファイル/フォルダ入力
+│   │       └── PathGuideModal.svelte   # コマンド実行方法ガイド
 │   ├── ffmpeg/
 │   │   ├── types.ts          # 型定義
 │   │   ├── builder.ts        # コマンド生成ロジック
