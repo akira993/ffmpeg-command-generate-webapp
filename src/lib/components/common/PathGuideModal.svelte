@@ -8,8 +8,19 @@
 	import { t } from '$lib/i18n';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Button } from '$lib/components/ui/button';
+	import DownloadIcon from '@lucide/svelte/icons/download';
 
 	let open = $state(false);
+	let installGuideOpen = $state(false);
+
+	function openInstallGuide() {
+		open = false;
+		// 少し遅延させてモーダルの閉じアニメーション後に開く
+		setTimeout(() => {
+			const btn = document.querySelector<HTMLButtonElement>('[data-install-guide-trigger]');
+			btn?.click();
+		}, 200);
+	}
 </script>
 
 <Dialog.Root bind:open>
@@ -59,6 +70,21 @@
 						<dd>{$t('pathGuide.tipLinux')}</dd>
 					</div>
 				</dl>
+			</div>
+
+			<!-- FFmpegインストールへの導線 -->
+			<div class="rounded-md border border-primary/20 bg-primary/5 p-3">
+				<p class="text-xs text-muted-foreground">
+					<DownloadIcon size={12} class="mr-1 inline" />
+					{$t('pathGuide.installPrompt')}
+					<button
+						type="button"
+						class="font-medium text-primary underline-offset-4 hover:underline"
+						onclick={openInstallGuide}
+					>
+						{$t('pathGuide.installLink')}
+					</button>
+				</p>
 			</div>
 
 			<!-- 注意書き -->
