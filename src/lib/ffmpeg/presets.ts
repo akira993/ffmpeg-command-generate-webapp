@@ -10,7 +10,7 @@
  */
 
 import type { PresetDefinition, PresetId } from './types';
-import { AVIF_DEFAULTS, SVT_AV1_DEFAULTS } from './codecs';
+import { AVIF_DEFAULTS, SVT_AV1_DEFAULTS, WEBP_DEFAULTS } from './codecs';
 
 // ============================================================
 // プリセット定義
@@ -46,6 +46,36 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 			'input.filename',
 			'output.filename',
 			'video.crf',
+			'filter.scale.width',
+			'filter.scale.height'
+		]
+	},
+
+	// ----------------------------------------------------------------
+	// 画像変換・圧縮（WebP）
+	// ----------------------------------------------------------------
+	'image-webp': {
+		id: 'image-webp',
+		icon: '🌐',
+		nameKey: 'preset.imageWebp.name',
+		descriptionKey: 'preset.imageWebp.desc',
+		category: 'image',
+		defaults: {
+			input: { filename: 'input.png' },
+			output: { filename: 'output.webp', overwrite: true },
+			video: {
+				codec: WEBP_DEFAULTS.codec,
+				quality: WEBP_DEFAULTS.quality,
+				noVideo: false
+			},
+			audio: { noAudio: true },
+			filter: {},
+			misc: { stripMetadata: false, copyStreams: false }
+		},
+		editableFields: [
+			'input.filename',
+			'output.filename',
+			'video.quality',
 			'filter.scale.width',
 			'filter.scale.height'
 		]
