@@ -106,7 +106,29 @@
 		"tipMac": "Finderでフォルダを右クリック →「フォルダに新規ターミナルタブ」",
 		"tipWindows": "エクスプローラーのアドレスバーに「cmd」と入力してEnter",
 		"tipLinux": "ファイルマネージャでフォルダを右クリック →「ターミナルで開く」",
-		"warning": "ブラウザのセキュリティ制限により、ファイルのフルパスは取得できません。コマンドはファイル名のみで生成されるため、ファイルがあるディレクトリで実行してください。"
+		"warning": "ブラウザのセキュリティ制限により、ファイルのフルパスは取得できません。コマンドはファイル名のみで生成されるため、ファイルがあるディレクトリで実行してください。",
+		"installPrompt": "FFmpegがまだインストールされていない場合は",
+		"installLink": "インストールガイド"
+	},
+	"installGuide": {
+		"buttonLabel": "FFmpegの導入",
+		"title": "FFmpegのインストール方法",
+		"description": "このツールを使うには、お使いのPCにFFmpegがインストールされている必要があります。",
+		"mac": {
+			"homebrewTitle": "ステップ1: Homebrewを導入（未導入の場合）",
+			"homebrewDesc": "macOSのパッケージマネージャ「Homebrew」を使うのが最も簡単です。ターミナルで以下を実行してください。",
+			"installTitle": "ステップ2: FFmpegをインストール"
+		},
+		"windows": {
+			"wingetTitle": "方法1: winget（推奨・Windows 10以降）",
+			"wingetDesc": "PowerShellまたはコマンドプロンプトで以下を実行してください。",
+			"chocoTitle": "方法2: Chocolatey",
+			"manualTitle": "方法3: 手動ダウンロード",
+			"manualDesc": "以下のサイトからビルド済みバイナリをダウンロードし、PATHに追加してください。"
+		},
+		"verifyTitle": "インストール確認",
+		"verifyDesc": "インストール後、ターミナルで以下を実行してバージョンが表示されればOKです。",
+		"officialSite": "その他のOS・詳細は公式サイトをご覧ください"
 	},
 	"footer": {
 		"description": "FFmpegコマンドをGUIで簡単に生成するWebアプリ",

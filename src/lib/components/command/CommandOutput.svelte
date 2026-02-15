@@ -14,6 +14,7 @@
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { Button } from '$lib/components/ui/button';
 	import PathGuideModal from '$lib/components/common/PathGuideModal.svelte';
+	import FfmpegInstallGuide from '$lib/components/common/FfmpegInstallGuide.svelte';
 
 	let copied = $state(false);
 
@@ -58,6 +59,7 @@
 			{$t('command.generated')}
 		</h3>
 		<div class="flex items-center gap-2">
+			<FfmpegInstallGuide />
 			<PathGuideModal />
 			<Button
 				variant={copied ? 'default' : 'outline'}

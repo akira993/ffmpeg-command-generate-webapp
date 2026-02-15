@@ -106,7 +106,29 @@
 		"tipMac": "Right-click folder in Finder → 'New Terminal Tab at Folder'",
 		"tipWindows": "Type 'cmd' in Explorer's address bar and press Enter",
 		"tipLinux": "Right-click folder in file manager → 'Open in Terminal'",
-		"warning": "Due to browser security restrictions, the full file path cannot be obtained. Commands are generated with filenames only, so please run them in the directory where your files are located."
+		"warning": "Due to browser security restrictions, the full file path cannot be obtained. Commands are generated with filenames only, so please run them in the directory where your files are located.",
+		"installPrompt": "If FFmpeg is not installed yet, see the",
+		"installLink": "Installation Guide"
+	},
+	"installGuide": {
+		"buttonLabel": "Install FFmpeg",
+		"title": "How to Install FFmpeg",
+		"description": "FFmpeg must be installed on your computer to use the generated commands.",
+		"mac": {
+			"homebrewTitle": "Step 1: Install Homebrew (if not installed)",
+			"homebrewDesc": "The easiest way on macOS is using the Homebrew package manager. Run this in your terminal:",
+			"installTitle": "Step 2: Install FFmpeg"
+		},
+		"windows": {
+			"wingetTitle": "Option 1: winget (Recommended, Windows 10+)",
+			"wingetDesc": "Run the following in PowerShell or Command Prompt:",
+			"chocoTitle": "Option 2: Chocolatey",
+			"manualTitle": "Option 3: Manual Download",
+			"manualDesc": "Download pre-built binaries from the site below and add to your PATH."
+		},
+		"verifyTitle": "Verify Installation",
+		"verifyDesc": "After installing, run the following in your terminal. If the version is displayed, you're all set.",
+		"officialSite": "For other OSes and details, visit the official site"
 	},
 	"footer": {
 		"description": "A web app to easily generate FFmpeg commands with a GUI",
