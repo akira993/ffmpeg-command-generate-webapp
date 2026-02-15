@@ -1,92 +1,233 @@
+/* ============================================================
+ * FFmpeg Command Generator — Design Tokens
+ *
+ * Rules:
+ *   1. Colors: oklch() ONLY (no hex, rgb, hsl)
+ *   2. Gradients: "in oklab" interpolation
+ *   3. Font sizes: clamp() based tokens
+ *   4. Token naming: role-based (--color-bg, --color-surface, …)
+ *
+ * Light theme: Pale-tone / pastel
+ * Dark  theme: Cyberpunk (neon accents on deep dark)
+ * ============================================================ */
+
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
-@theme inline {
-	--color-background: oklch(1 0 0);
-	--color-foreground: oklch(0.141 0.005 285.823);
-	--color-card: oklch(1 0 0);
-	--color-card-foreground: oklch(0.141 0.005 285.823);
-	--color-popover: oklch(1 0 0);
-	--color-popover-foreground: oklch(0.141 0.005 285.823);
-	--color-primary: oklch(0.205 0.006 285.885);
-	--color-primary-foreground: oklch(0.985 0.002 247.839);
-	--color-secondary: oklch(0.968 0.003 264.542);
-	--color-secondary-foreground: oklch(0.205 0.006 285.885);
-	--color-muted: oklch(0.968 0.003 264.542);
-	--color-muted-foreground: oklch(0.557 0.014 285.938);
-	--color-accent: oklch(0.968 0.003 264.542);
-	--color-accent-foreground: oklch(0.205 0.006 285.885);
-	--color-destructive: oklch(0.577 0.245 27.325);
-	--color-destructive-foreground: oklch(0.985 0.002 247.839);
-	--color-border: oklch(0.92 0.004 264.531);
-	--color-input: oklch(0.92 0.004 264.531);
-	--color-ring: oklch(0.141 0.005 285.823);
-	--color-chart-1: oklch(0.646 0.222 41.116);
-	--color-chart-2: oklch(0.6 0.118 184.704);
-	--color-chart-3: oklch(0.398 0.07 227.392);
-	--color-chart-4: oklch(0.828 0.189 84.429);
-	--color-chart-5: oklch(0.769 0.188 70.08);
-	--color-sidebar: oklch(0.985 0.002 247.839);
-	--color-sidebar-foreground: oklch(0.141 0.005 285.823);
-	--color-sidebar-primary: oklch(0.205 0.006 285.885);
-	--color-sidebar-primary-foreground: oklch(0.985 0.002 247.839);
-	--color-sidebar-accent: oklch(0.968 0.003 264.542);
-	--color-sidebar-accent-foreground: oklch(0.205 0.006 285.885);
-	--color-sidebar-border: oklch(0.92 0.004 264.531);
-	--color-sidebar-ring: oklch(0.141 0.005 285.823);
+/* ============================================================
+ * 1. Theme token registration + Light defaults (Pale-tone)
+ *
+ *    @theme registers tokens for Tailwind utilities as CSS variables.
+ *    Using @theme (not inline) so bg-background compiles to
+ *    var(--color-background), enabling .dark overrides.
+ * ============================================================ */
+@theme {
+	/* --- Semantic background / surface --- */
+	--color-background: oklch(0.985 0.006 290);
+	--color-foreground: oklch(0.22 0.01 280);
+	--color-card: oklch(0.995 0.003 290);
+	--color-card-foreground: oklch(0.22 0.01 280);
+	--color-popover: oklch(0.995 0.003 290);
+	--color-popover-foreground: oklch(0.22 0.01 280);
 
+	/* --- Primary (soft lavender) --- */
+	--color-primary: oklch(0.55 0.14 290);
+	--color-primary-foreground: oklch(0.99 0.005 290);
+
+	/* --- Secondary (pale rose) --- */
+	--color-secondary: oklch(0.94 0.025 350);
+	--color-secondary-foreground: oklch(0.35 0.06 350);
+
+	/* --- Muted (neutral pale) --- */
+	--color-muted: oklch(0.955 0.008 280);
+	--color-muted-foreground: oklch(0.50 0.02 280);
+
+	/* --- Accent (pale mint) --- */
+	--color-accent: oklch(0.94 0.03 170);
+	--color-accent-foreground: oklch(0.30 0.06 170);
+
+	/* --- Destructive (soft coral) --- */
+	--color-destructive: oklch(0.62 0.20 25);
+	--color-destructive-foreground: oklch(0.99 0.005 25);
+
+	/* --- Border / input / ring --- */
+	--color-border: oklch(0.90 0.015 290);
+	--color-input: oklch(0.90 0.015 290);
+	--color-ring: oklch(0.55 0.14 290);
+
+	/* --- Chart palette (pastel rainbow) --- */
+	--color-chart-1: oklch(0.72 0.14 25);
+	--color-chart-2: oklch(0.72 0.10 170);
+	--color-chart-3: oklch(0.60 0.12 260);
+	--color-chart-4: oklch(0.78 0.14 80);
+	--color-chart-5: oklch(0.68 0.16 330);
+
+	/* --- Sidebar --- */
+	--color-sidebar: oklch(0.975 0.008 290);
+	--color-sidebar-foreground: oklch(0.22 0.01 280);
+	--color-sidebar-primary: oklch(0.55 0.14 290);
+	--color-sidebar-primary-foreground: oklch(0.99 0.005 290);
+	--color-sidebar-accent: oklch(0.94 0.03 170);
+	--color-sidebar-accent-foreground: oklch(0.30 0.06 170);
+	--color-sidebar-border: oklch(0.90 0.015 290);
+	--color-sidebar-ring: oklch(0.55 0.14 290);
+
+	/* --- Radius --- */
 	--radius-sm: calc(var(--radius) - 4px);
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
 	--radius-xl: calc(var(--radius) + 4px);
+
+	/* --- Typography (clamp-based fluid) --- */
+	--text-xs: clamp(0.6875rem, 0.65rem + 0.1vw, 0.75rem);
+	--text-sm: clamp(0.8125rem, 0.775rem + 0.15vw, 0.875rem);
+	--text-base: clamp(0.9375rem, 0.9rem + 0.2vw, 1rem);
+	--text-lg: clamp(1.0625rem, 1rem + 0.3vw, 1.125rem);
+	--text-xl: clamp(1.1875rem, 1.1rem + 0.4vw, 1.25rem);
+	--text-2xl: clamp(1.375rem, 1.25rem + 0.5vw, 1.5rem);
+	--text-3xl: clamp(1.75rem, 1.6rem + 0.65vw, 1.875rem);
 }
 
+/* ============================================================
+ * 1b. Icon color tokens (not managed by Tailwind utilities)
+ *
+ *     Defined in :root / .dark for proper inheritance.
+ * ============================================================ */
 :root {
 	--radius: 0.625rem;
+	font-size: var(--text-base);
+
+	/* --- Preset icon accent colors (pale) --- */
+	--color-icon-emerald: oklch(0.70 0.13 160);
+	--color-icon-emerald-bg: oklch(0.94 0.04 160);
+	--color-icon-teal: oklch(0.68 0.10 185);
+	--color-icon-teal-bg: oklch(0.94 0.03 185);
+	--color-icon-violet: oklch(0.58 0.18 295);
+	--color-icon-violet-bg: oklch(0.93 0.04 295);
+	--color-icon-blue: oklch(0.60 0.16 255);
+	--color-icon-blue-bg: oklch(0.93 0.04 255);
+	--color-icon-pink: oklch(0.65 0.18 350);
+	--color-icon-pink-bg: oklch(0.94 0.04 350);
+	--color-icon-amber: oklch(0.75 0.14 75);
+	--color-icon-amber-bg: oklch(0.95 0.04 75);
+	--color-icon-rose: oklch(0.62 0.19 15);
+	--color-icon-rose-bg: oklch(0.94 0.04 15);
+	--color-icon-orange: oklch(0.72 0.16 55);
+	--color-icon-orange-bg: oklch(0.95 0.04 55);
 }
 
+/* ============================================================
+ * 2. Dark theme tokens (Cyberpunk)
+ *
+ *    Deep blue-black backgrounds with neon magenta / cyan accents.
+ * ============================================================ */
 .dark {
-	--color-background: oklch(0.141 0.005 285.823);
-	--color-foreground: oklch(0.985 0.002 247.839);
-	--color-card: oklch(0.141 0.005 285.823);
-	--color-card-foreground: oklch(0.985 0.002 247.839);
-	--color-popover: oklch(0.141 0.005 285.823);
-	--color-popover-foreground: oklch(0.985 0.002 247.839);
-	--color-primary: oklch(0.985 0.002 247.839);
-	--color-primary-foreground: oklch(0.205 0.006 285.885);
-	--color-secondary: oklch(0.205 0.006 285.885);
-	--color-secondary-foreground: oklch(0.985 0.002 247.839);
-	--color-muted: oklch(0.205 0.006 285.885);
-	--color-muted-foreground: oklch(0.557 0.014 285.938);
-	--color-accent: oklch(0.205 0.006 285.885);
-	--color-accent-foreground: oklch(0.985 0.002 247.839);
-	--color-destructive: oklch(0.396 0.141 25.723);
-	--color-destructive-foreground: oklch(0.985 0.002 247.839);
-	--color-border: oklch(0.205 0.006 285.885);
-	--color-input: oklch(0.205 0.006 285.885);
-	--color-ring: oklch(0.871 0.006 286.286);
-	--color-chart-1: oklch(0.488 0.243 264.376);
-	--color-chart-2: oklch(0.696 0.17 162.48);
-	--color-chart-3: oklch(0.769 0.188 70.08);
-	--color-chart-4: oklch(0.627 0.265 303.9);
-	--color-chart-5: oklch(0.645 0.246 16.439);
-	--color-sidebar: oklch(0.141 0.005 285.823);
-	--color-sidebar-foreground: oklch(0.985 0.002 247.839);
-	--color-sidebar-primary: oklch(0.488 0.243 264.376);
-	--color-sidebar-primary-foreground: oklch(0.985 0.002 247.839);
-	--color-sidebar-accent: oklch(0.205 0.006 285.885);
-	--color-sidebar-accent-foreground: oklch(0.985 0.002 247.839);
-	--color-sidebar-border: oklch(0.205 0.006 285.885);
-	--color-sidebar-ring: oklch(0.871 0.006 286.286);
+	/* --- Background / surface --- */
+	--color-background: oklch(0.13 0.02 280);
+	--color-foreground: oklch(0.92 0.01 260);
+	--color-card: oklch(0.16 0.025 280);
+	--color-card-foreground: oklch(0.92 0.01 260);
+	--color-popover: oklch(0.16 0.025 280);
+	--color-popover-foreground: oklch(0.92 0.01 260);
+
+	/* --- Primary (neon magenta) --- */
+	--color-primary: oklch(0.72 0.25 330);
+	--color-primary-foreground: oklch(0.13 0.02 280);
+
+	/* --- Secondary (deep indigo) --- */
+	--color-secondary: oklch(0.22 0.04 280);
+	--color-secondary-foreground: oklch(0.85 0.03 280);
+
+	/* --- Muted (dark slate) --- */
+	--color-muted: oklch(0.22 0.03 280);
+	--color-muted-foreground: oklch(0.60 0.02 280);
+
+	/* --- Accent (neon cyan) --- */
+	--color-accent: oklch(0.78 0.15 195);
+	--color-accent-foreground: oklch(0.13 0.02 280);
+
+	/* --- Destructive (neon red) --- */
+	--color-destructive: oklch(0.58 0.24 20);
+	--color-destructive-foreground: oklch(0.95 0.01 20);
+
+	/* --- Border / input / ring --- */
+	--color-border: oklch(0.28 0.04 280);
+	--color-input: oklch(0.28 0.04 280);
+	--color-ring: oklch(0.72 0.25 330);
+
+	/* --- Chart palette (neon) --- */
+	--color-chart-1: oklch(0.72 0.25 330);
+	--color-chart-2: oklch(0.78 0.15 195);
+	--color-chart-3: oklch(0.75 0.18 135);
+	--color-chart-4: oklch(0.68 0.22 290);
+	--color-chart-5: oklch(0.80 0.20 60);
+
+	/* --- Sidebar --- */
+	--color-sidebar: oklch(0.12 0.02 280);
+	--color-sidebar-foreground: oklch(0.92 0.01 260);
+	--color-sidebar-primary: oklch(0.72 0.25 330);
+	--color-sidebar-primary-foreground: oklch(0.13 0.02 280);
+	--color-sidebar-accent: oklch(0.78 0.15 195);
+	--color-sidebar-accent-foreground: oklch(0.13 0.02 280);
+	--color-sidebar-border: oklch(0.28 0.04 280);
+	--color-sidebar-ring: oklch(0.72 0.25 330);
+
+	/* --- Preset icon accent colors (neon glow) --- */
+	--color-icon-emerald: oklch(0.78 0.18 155);
+	--color-icon-emerald-bg: oklch(0.22 0.05 155);
+	--color-icon-teal: oklch(0.78 0.15 185);
+	--color-icon-teal-bg: oklch(0.22 0.04 185);
+	--color-icon-violet: oklch(0.68 0.22 295);
+	--color-icon-violet-bg: oklch(0.20 0.06 295);
+	--color-icon-blue: oklch(0.72 0.18 255);
+	--color-icon-blue-bg: oklch(0.20 0.05 255);
+	--color-icon-pink: oklch(0.72 0.25 340);
+	--color-icon-pink-bg: oklch(0.22 0.06 340);
+	--color-icon-amber: oklch(0.82 0.18 80);
+	--color-icon-amber-bg: oklch(0.22 0.05 80);
+	--color-icon-rose: oklch(0.70 0.22 15);
+	--color-icon-rose-bg: oklch(0.22 0.06 15);
+	--color-icon-orange: oklch(0.78 0.18 55);
+	--color-icon-orange-bg: oklch(0.22 0.05 55);
 }
 
+/* ============================================================
+ * 3. Base layer
+ * ============================================================ */
 @layer base {
 	* {
 		@apply border-border;
 	}
 	body {
 		@apply bg-background text-foreground;
+		transition: background-color 0.3s ease, color 0.3s ease;
+	}
+	h1 { font-size: var(--text-2xl); }
+	h2 { font-size: var(--text-xl); }
+	h3 { font-size: var(--text-lg); }
+	h4 { font-size: var(--text-base); }
+	p, li, label { font-size: var(--text-sm); }
+	small, .text-xs { font-size: var(--text-xs); }
+}
+
+/* ============================================================
+ * 4. Utility: gradient helper (in oklab interpolation)
+ * ============================================================ */
+@layer utilities {
+	.gradient-primary {
+		background: linear-gradient(
+			135deg in oklab,
+			oklch(0.55 0.14 290),
+			oklch(0.65 0.18 330)
+		);
+	}
+	.dark .gradient-primary {
+		background: linear-gradient(
+			135deg in oklab,
+			oklch(0.72 0.25 330),
+			oklch(0.78 0.15 195)
+		);
 	}
 }
