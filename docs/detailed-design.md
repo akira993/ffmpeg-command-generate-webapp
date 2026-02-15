@@ -26,10 +26,11 @@ src/
 │   │   │   └── MiscSection.svelte
 │   │   └── common/
 │   │       ├── LanguageSwitcher.svelte
-│   │       ├── ThemeToggle.svelte
+│   │       ├── ThemeToggle.svelte        # Lucide Sun/Moon アイコン使用
 │   │       ├── ModeSwitch.svelte
-│   │       ├── DropZone.svelte         # D&D ファイル/フォルダ入力
-│   │       └── PathGuideModal.svelte   # コマンド実行方法ガイド
+│   │       ├── DropZone.svelte           # D&D ファイル/フォルダ入力
+│   │       ├── PathGuideModal.svelte     # コマンド実行方法ガイド
+│   │       └── FfmpegInstallGuide.svelte # FFmpegインストールガイド（OS別タブ）
 │   ├── ffmpeg/
 │   │   ├── types.ts          # 型定義
 │   │   ├── builder.ts        # コマンド生成ロジック
@@ -151,11 +152,13 @@ type PresetId =
   | 'audio-convert'
   | 'video-trim'
   | 'gif-generate'
-  | 'image-convert';
+  | 'image-convert'
+  | 'image-webp';
 
 interface PresetDefinition {
   id: PresetId;
-  icon: string;                   // 表示アイコン
+  icon: string;                   // Lucide アイコン名（ICON_MAPのキー）
+  iconColor: string;              // アイコンカラーキー（emerald, teal, violet等）
   nameKey: string;                // i18n翻訳キー（名前）
   descriptionKey: string;         // i18n翻訳キー（説明）
   defaults: Partial<FFmpegOptions>;  // デフォルト値
@@ -163,6 +166,23 @@ interface PresetDefinition {
   category: 'video' | 'audio' | 'image';
 }
 ```
+
+### 2.4 アイコンシステム
+
+プリセットカードでは **@lucide/svelte** ライブラリのアイコンを使用。
+
+| icon キー | Lucide コンポーネント | iconColor | 用途 |
+|-----------|---------------------|-----------|------|
+| `image` | Image | emerald | 画像圧縮(AVIF) |
+| `globe` | Globe | teal | 画像圧縮(WebP) |
+| `archive` | Archive | violet | 動画圧縮 |
+| `clapperboard` | Clapperboard | blue | 動画変換 |
+| `music` | Music | pink | 音声抽出 |
+| `repeat` | Repeat | amber | 音声変換 |
+| `scissors` | Scissors | rose | 動画トリム |
+| `film` | Film | orange | GIF生成 |
+
+アイコンカラーは CSS カスタムプロパティ `--color-icon-{key}` / `--color-icon-{key}-bg` で定義（`src/app.css` の `:root` / `.dark` 内）。
 
 ---
 
@@ -400,7 +420,7 @@ function isOptionEmpty(value: unknown): boolean
 | 項目 | 内容 |
 |------|------|
 | Props | なし (storeから取得) |
-| 責務 | 生成コマンドの表示とクリップボードコピー機能 |
+| 責務 | 生成コマンドの表示とクリップボードコピー機能。FfmpegInstallGuide・PathGuideModal・Copyボタンをヘッダーに配置 |
 
 ### 5.6 `ModeSwitch`
 | 項目 | 内容 |
@@ -418,7 +438,20 @@ function isOptionEmpty(value: unknown): boolean
 | 項目 | 内容 |
 |------|------|
 | Props | なし |
-| 責務 | ダーク/ライトテーマ切替。localStorageに保存 |
+| 責務 | ダーク/ライトテーマ切替。Lucide Sun/Moonアイコン使用。localStorageに保存 |
+
+### 5.9 `PathGuideModal`
+| 項目 | 内容 |
+|------|------|
+| Props | なし |
+| 責務 | コマンドの実行方法をステップガイドで表示。OS別ターミナルの開き方Tips付き。インストールガイドへのリンクあり |
+
+### 5.10 `FfmpegInstallGuide`
+| 項目 | 内容 |
+|------|------|
+| Props | なし |
+| 責務 | FFmpegのインストール方法をOS別タブ（macOS/Windows/Linux）で案内。インストール確認コマンド・公式サイトリンク付き |
+| 外部API | `export function show()` — 外部からモーダルを開く |
 
 ---
 
@@ -515,6 +548,26 @@ export function resetOptions(): void { ... }
     "generated": "生成されたコマンド",
     "empty": "オプションを設定してください",
     "copied": "コマンドをコピーしました"
+  },
+  "pathGuide": {
+    "buttonLabel": "実行方法",
+    "title": "コマンドの実行方法",
+    "description": "...",
+    "step1-4": "...",
+    "tipTitle": "...", "tipMac": "...", "tipWindows": "...", "tipLinux": "...",
+    "warning": "...",
+    "installPrompt": "FFmpegがまだインストールされていない場合は",
+    "installLink": "インストールガイド"
+  },
+  "installGuide": {
+    "buttonLabel": "FFmpegの導入",
+    "title": "FFmpegのインストール方法",
+    "description": "...",
+    "mac": { "homebrewTitle": "...", "homebrewDesc": "...", "installTitle": "..." },
+    "windows": { "wingetTitle": "...", "wingetDesc": "...", "chocoTitle": "...", "manualTitle": "...", "manualDesc": "..." },
+    "verifyTitle": "インストール確認",
+    "verifyDesc": "...",
+    "officialSite": "..."
   }
 }
 ```

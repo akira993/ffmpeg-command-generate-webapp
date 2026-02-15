@@ -156,12 +156,13 @@ App (+layout.svelte)
 ├── Header
 │   ├── Logo
 │   ├── LanguageSwitcher
-│   └── ThemeToggle
+│   └── ThemeToggle (Lucide Sun/Moon)
+├── DropZone (D&D ファイル/フォルダ入力)
 ├── ModeSwitch
 ├── Main Content (+page.svelte)
 │   ├── PresetMode
 │   │   ├── PresetGrid
-│   │   │   └── PresetCard (×7)
+│   │   │   └── PresetCard (×8, Lucide アイコン + oklch カラー)
 │   │   └── PresetCustomizer
 │   └── AdvancedMode
 │       └── AdvancedForm
@@ -172,6 +173,8 @@ App (+layout.svelte)
 │           ├── FilterSection
 │           └── MiscSection
 ├── CommandOutput
+│   ├── FfmpegInstallGuide (FFmpegインストール案内モーダル)
+│   ├── PathGuideModal (コマンド実行方法ガイドモーダル)
 │   ├── CommandDisplay
 │   └── CopyButton
 └── Footer
@@ -274,12 +277,24 @@ SvelteKitのファイルベースルーティングを使用。現段階では�
 ## 8. テーマ（ダーク/ライト）設計
 
 ### 8.1 実装方針
-- Tailwind CSS の `dark:` バリアントを使用
+- Tailwind CSS v4 の `@custom-variant dark` を使用（`.dark *` セレクタ）
 - `<html>` タグに `class="dark"` を切替
 - OS設定（`prefers-color-scheme`）を初期値として検出
 - ユーザー選択は `localStorage` に保存
+- FOUC防止: `app.html` の `<head>` にインラインスクリプトで初回描画前に `.dark` 適用
 
-### 8.2 切替フロー
-1. 初回アクセス: `localStorage` をチェック → なければOS設定を検出
-2. テーマ適用: `<html>` の `class` を更新
-3. ユーザー切替: トグルクリック → `localStorage` 保存 → class更新
+### 8.2 テーマデザイン
+- **ライト**: ペールトーン風（高明度・低彩度のoklch値）
+- **ダーク**: サイバーパンク風（ネオンマゼンタ/シアンのoklch値）
+- 詳細は `docs/css-design.md` を参照
+
+### 8.3 切替フロー
+1. 初回アクセス: `app.html` のインラインスクリプトが `localStorage` → OS設定の順に判定
+2. テーマ適用: `<html>` の `class` を更新（FOUC防止）
+3. ユーザー切替: ThemeToggle クリック → `localStorage` 保存 → class更新
+
+### 8.4 CSS ルール
+- 色指定: `oklch()` のみ使用（hex/rgb/hsl 禁止、CI/CDで強制）
+- グラデーション: `in oklab` 補間必須
+- フォント: `clamp()` ベースのフルイドタイポグラフィ
+- 詳細は `docs/css-design.md` を参照
