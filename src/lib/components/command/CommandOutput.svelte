@@ -9,7 +9,7 @@
 -->
 <script lang="ts">
 	import { t } from '$lib/i18n';
-	import { commandStore } from '$lib/stores/command';
+	import { commandStore } from '$lib/stores/command.svelte';
 	import type { ScriptType } from '$lib/ffmpeg/types';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { Button } from '$lib/components/ui/button';

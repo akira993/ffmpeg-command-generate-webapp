@@ -10,7 +10,7 @@
 -->
 <script lang="ts">
 	import { t } from '$lib/i18n';
-	import { commandStore } from '$lib/stores/command';
+	import { commandStore } from '$lib/stores/command.svelte';
 	import DropZone from '$lib/components/common/DropZone.svelte';
 	import ModeSwitch from '$lib/components/common/ModeSwitch.svelte';
 	import PresetGrid from '$lib/components/preset/PresetGrid.svelte';
