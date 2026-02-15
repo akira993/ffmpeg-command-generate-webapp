@@ -22,7 +22,8 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 	// ----------------------------------------------------------------
 	'image-convert': {
 		id: 'image-convert',
-		icon: '🖼️',
+		icon: 'image',
+		iconColor: 'emerald',
 		nameKey: 'preset.imageConvert.name',
 		descriptionKey: 'preset.imageConvert.desc',
 		category: 'image',
@@ -56,7 +57,8 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 	// ----------------------------------------------------------------
 	'image-webp': {
 		id: 'image-webp',
-		icon: '🌐',
+		icon: 'globe',
+		iconColor: 'teal',
 		nameKey: 'preset.imageWebp.name',
 		descriptionKey: 'preset.imageWebp.desc',
 		category: 'image',
@@ -86,7 +88,8 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 	// ----------------------------------------------------------------
 	'video-compress': {
 		id: 'video-compress',
-		icon: '📦',
+		icon: 'archive',
+		iconColor: 'violet',
 		nameKey: 'preset.videoCompress.name',
 		descriptionKey: 'preset.videoCompress.desc',
 		category: 'video',
@@ -123,7 +126,8 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 	// ----------------------------------------------------------------
 	'video-convert': {
 		id: 'video-convert',
-		icon: '🎬',
+		icon: 'clapperboard',
+		iconColor: 'blue',
 		nameKey: 'preset.videoConvert.name',
 		descriptionKey: 'preset.videoConvert.desc',
 		category: 'video',
@@ -148,7 +152,8 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 	// ----------------------------------------------------------------
 	'audio-extract': {
 		id: 'audio-extract',
-		icon: '🎵',
+		icon: 'music',
+		iconColor: 'pink',
 		nameKey: 'preset.audioExtract.name',
 		descriptionKey: 'preset.audioExtract.desc',
 		category: 'audio',
@@ -173,7 +178,8 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 	// ----------------------------------------------------------------
 	'audio-convert': {
 		id: 'audio-convert',
-		icon: '🔄',
+		icon: 'repeat',
+		iconColor: 'amber',
 		nameKey: 'preset.audioConvert.name',
 		descriptionKey: 'preset.audioConvert.desc',
 		category: 'audio',
@@ -199,7 +205,8 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 	// ----------------------------------------------------------------
 	'video-trim': {
 		id: 'video-trim',
-		icon: '✂️',
+		icon: 'scissors',
+		iconColor: 'rose',
 		nameKey: 'preset.videoTrim.name',
 		descriptionKey: 'preset.videoTrim.desc',
 		category: 'video',
@@ -226,7 +233,8 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 	// ----------------------------------------------------------------
 	'gif-generate': {
 		id: 'gif-generate',
-		icon: '🎞️',
+		icon: 'film',
+		iconColor: 'orange',
 		nameKey: 'preset.gifGenerate.name',
 		descriptionKey: 'preset.gifGenerate.desc',
 		category: 'video',

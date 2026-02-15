@@ -211,8 +211,10 @@ export type PresetCategory = 'video' | 'audio' | 'image';
 /** プリセット定義 */
 export interface PresetDefinition {
 	id: PresetId;
-	/** 表示アイコン */
+	/** 表示アイコン（Lucideアイコン名） */
 	icon: string;
+	/** アイコン背景色のTailwindクラス */
+	iconColor: string;
 	/** i18n翻訳キー（名前） */
 	nameKey: string;
 	/** i18n翻訳キー（説明） */
