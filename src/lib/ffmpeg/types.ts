@@ -65,6 +65,10 @@ export interface VideoOptions {
 	pixFmt?: PixelFormat;
 	/** 静止画モード (-still-picture 1) — AVIF用 */
 	stillPicture?: boolean;
+	/** 品質 (-quality) — libwebp用 (0-100, 高いほど高品質) */
+	quality?: number;
+	/** ロスレスモード (-lossless 1) — libwebp用 */
+	lossless?: boolean;
 }
 
 /** 音声設定 */
@@ -148,6 +152,7 @@ export type VideoCodec =
 	| 'libvpx-vp9' // VP9
 	| 'libaom-av1' // AV1 (libaom — 高品質/低速、AVIF静止画に最適)
 	| 'libsvtav1' // AV1 (SVT-AV1 — 高速/実用的、動画圧縮に最適)
+	| 'libwebp' // WebP
 	| 'copy'; // ストリームコピー
 
 /** 音声コーデック */
@@ -197,7 +202,8 @@ export type PresetId =
 	| 'audio-convert'
 	| 'video-trim'
 	| 'gif-generate'
-	| 'image-convert';
+	| 'image-convert'
+	| 'image-webp';
 
 /** プリセットカテゴリ */
 export type PresetCategory = 'video' | 'audio' | 'image';

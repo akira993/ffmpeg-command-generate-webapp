@@ -44,6 +44,10 @@
 		"imageConvert": {
 			"name": "Image Compression (AVIF)",
 			"desc": "Convert JPG/PNG to AVIF. High quality with significant size reduction"
+		},
+		"imageWebp": {
+			"name": "Image Compression (WebP)",
+			"desc": "Convert JPG/PNG to WebP. Wide compatibility with high compression"
 		}
 	},
 	"form": {
@@ -74,7 +78,8 @@
 		"fastest": "Fastest",
 		"audioBitrate": "Audio Bitrate",
 		"scaleWidth": "Width (px)",
-		"scaleHeight": "Height (px)"
+		"scaleHeight": "Height (px)",
+		"quality": "Quality"
 	},
 	"command": {
 		"generated": "Generated Command",

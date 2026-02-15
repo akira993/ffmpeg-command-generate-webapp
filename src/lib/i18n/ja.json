@@ -44,6 +44,10 @@
 		"imageConvert": {
 			"name": "画像圧縮（AVIF）",
 			"desc": "JPG/PNGをAVIFに変換。高品質で大幅にファイルサイズを削減"
+		},
+		"imageWebp": {
+			"name": "画像圧縮（WebP）",
+			"desc": "JPG/PNGをWebPに変換。広い互換性と高圧縮率を両立"
 		}
 	},
 	"form": {
@@ -74,7 +78,8 @@
 		"fastest": "最速",
 		"audioBitrate": "音声ビットレート",
 		"scaleWidth": "幅（px）",
-		"scaleHeight": "高さ（px）"
+		"scaleHeight": "高さ（px）",
+		"quality": "品質"
 	},
 	"command": {
 		"generated": "生成されたコマンド",

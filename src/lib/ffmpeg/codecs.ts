@@ -19,6 +19,7 @@ export const VIDEO_CODEC_LABELS: Record<VideoCodec, string> = {
 	'libvpx-vp9': 'VP9 (libvpx-vp9)',
 	'libaom-av1': 'AV1 (libaom — 高品質)',
 	libsvtav1: 'AV1 (SVT-AV1 — 高速)',
+	libwebp: 'WebP (libwebp)',
 	copy: 'コピー（再エンコードなし）'
 };
 
@@ -61,6 +62,7 @@ export const CODEC_FORMAT_COMPAT: Record<string, string[]> = {
 	'libvpx-vp9': ['webm', 'mkv'],
 	'libaom-av1': ['mp4', 'mkv', 'webm', 'avif'],
 	libsvtav1: ['mp4', 'mkv', 'webm'],
+	libwebp: ['webp'],
 	aac: ['mp4', 'mov', 'mkv', 'aac'],
 	libmp3lame: ['mp3', 'mkv'],
 	libopus: ['ogg', 'webm', 'mkv', 'opus'],
@@ -145,6 +147,26 @@ export const LIBAOM_AV1_DEFAULTS = {
 	aomParams: 'tune=0',
 	crfRange: { min: 0, max: 63 },
 	cpuUsedRange: { min: 0, max: 8 }
+} as const;
+
+// ============================================================
+// WebP（画像圧縮）推奨パラメータ
+// ============================================================
+
+/**
+ * WebP画像圧縮の推奨設定
+ *
+ * libwebp は -quality で品質を制御（0-100, 高いほど高品質）。
+ * CRFではなくqualityパラメータを使用する。
+ * -lossless 1 でロスレス圧縮も可能。
+ *
+ * @see https://www.ffmpeg.org/ffmpeg-codecs.html#libwebp
+ */
+export const WEBP_DEFAULTS = {
+	codec: 'libwebp' as VideoCodec,
+	quality: 75,
+	/** quality範囲: 0(最低品質) ~ 100(最高品質) */
+	qualityRange: { min: 0, max: 100 }
 } as const;
 
 // ============================================================

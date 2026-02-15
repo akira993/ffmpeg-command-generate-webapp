@@ -170,6 +170,16 @@ function buildVideoOptions(options: FFmpegOptions): string[] {
 		parts.push('-aom-params', v.aomParams);
 	}
 
+	// libwebp quality
+	if (v.quality !== undefined) {
+		parts.push('-quality', String(v.quality));
+	}
+
+	// libwebp lossless
+	if (v.lossless) {
+		parts.push('-lossless', '1');
+	}
+
 	// libaom cpu-used
 	if (v.cpuUsed !== undefined) {
 		parts.push('-cpu-used', String(v.cpuUsed));

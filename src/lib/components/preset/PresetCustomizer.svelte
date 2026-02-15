@@ -8,7 +8,7 @@
 	import { t } from '$lib/i18n';
 	import { commandStore } from '$lib/stores/command.svelte';
 	import { PRESETS } from '$lib/ffmpeg/presets';
-	import { AVIF_DEFAULTS, SVT_AV1_DEFAULTS, H264_DEFAULTS } from '$lib/ffmpeg/codecs';
+	import { AVIF_DEFAULTS, SVT_AV1_DEFAULTS, H264_DEFAULTS, WEBP_DEFAULTS } from '$lib/ffmpeg/codecs';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Slider } from '$lib/components/ui/slider';
@@ -94,6 +94,23 @@
 						/>
 						<p class="text-xs text-muted-foreground">
 							{crfRange.min} ({$t('form.crfBest')}) — {crfRange.max} ({$t('form.crfWorst')})
+						</p>
+
+					<!-- WebP Qualityスライダー -->
+					{:else if field === 'video.quality'}
+						<Label for={field}>
+							{$t('form.quality')}: {getOptionValue(field) ?? 75}
+						</Label>
+						<Slider
+							type="single"
+							value={[Number(getOptionValue(field) ?? 75)]}
+							min={WEBP_DEFAULTS.qualityRange.min}
+							max={WEBP_DEFAULTS.qualityRange.max}
+							step={1}
+							onValueChange={(v: number[]) => handleSliderChange(field, v)}
+						/>
+						<p class="text-xs text-muted-foreground">
+							0 ({$t('form.crfWorst')}) — 100 ({$t('form.crfBest')})
 						</p>
 
 					<!-- SVT-AV1 プリセットスライダー -->
