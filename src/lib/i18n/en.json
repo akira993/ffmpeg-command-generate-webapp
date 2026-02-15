@@ -5,7 +5,8 @@
 		"reset": "Reset",
 		"input": "Input",
 		"output": "Output",
-		"apply": "Apply"
+		"apply": "Apply",
+		"settings": "Settings"
 	},
 	"header": {
 		"title": "FFmpeg Command Generator",
@@ -21,8 +22,8 @@
 			"desc": "Convert between MP4, WebM, MOV, AVI formats"
 		},
 		"videoCompress": {
-			"name": "Video Compression",
-			"desc": "Reduce file size with CRF or bitrate settings"
+			"name": "Video Compression (AV1)",
+			"desc": "High-efficiency compression with SVT-AV1. ~50% smaller than H.264"
 		},
 		"audioExtract": {
 			"name": "Audio Extraction",
@@ -41,18 +42,22 @@
 			"desc": "Generate animated GIF from video (high-quality with palette)"
 		},
 		"imageConvert": {
-			"name": "Image Conversion & Resize",
-			"desc": "Convert image formats, resize, and adjust quality"
+			"name": "Image Compression (AVIF)",
+			"desc": "Convert JPG/PNG to AVIF. High quality with significant size reduction"
 		}
 	},
 	"form": {
 		"filename": "Filename",
+		"inputFilename": "Input Filename",
+		"outputFilename": "Output Filename",
 		"format": "Format",
 		"codec": "Codec",
 		"resolution": "Resolution",
 		"framerate": "Frame Rate",
 		"bitrate": "Bitrate",
 		"crf": "CRF (Quality)",
+		"crfBest": "Best quality",
+		"crfWorst": "Worst quality",
 		"sampleRate": "Sample Rate",
 		"channels": "Channels",
 		"startTime": "Start Time",
@@ -63,12 +68,40 @@
 		"stripMetadata": "Strip Metadata",
 		"copyStreams": "Stream Copy (no re-encoding)",
 		"preset": "Encoder Preset",
-		"overwrite": "Overwrite"
+		"overwrite": "Overwrite",
+		"encoderSpeed": "Encoding Speed",
+		"slowest": "Slowest / Best Quality",
+		"fastest": "Fastest",
+		"audioBitrate": "Audio Bitrate",
+		"scaleWidth": "Width (px)",
+		"scaleHeight": "Height (px)"
 	},
 	"command": {
 		"generated": "Generated Command",
-		"empty": "Configure options to generate a command",
+		"empty": "Select a preset or configure options to generate a command",
 		"copied": "Command copied to clipboard"
+	},
+	"dropzone": {
+		"title": "Drag & drop files or folders here",
+		"subtitle": "Or click to select files",
+		"filesDetected": " files detected",
+		"batchMode": "Batch Mode",
+		"clear": "Clear",
+		"moreFiles": "{{count}} more files"
+	},
+	"pathGuide": {
+		"buttonLabel": "How to Run",
+		"title": "How to Run the Command",
+		"description": "Steps to execute the generated FFmpeg command in your terminal",
+		"step1": "Copy the generated command using the Copy button",
+		"step2": "Open a terminal (command prompt)",
+		"step3": "Navigate to the folder containing your files:",
+		"step4": "Paste the copied command and press Enter",
+		"tipTitle": "Tips: Opening a Terminal",
+		"tipMac": "Right-click folder in Finder → 'New Terminal Tab at Folder'",
+		"tipWindows": "Type 'cmd' in Explorer's address bar and press Enter",
+		"tipLinux": "Right-click folder in file manager → 'Open in Terminal'",
+		"warning": "Due to browser security restrictions, the full file path cannot be obtained. Commands are generated with filenames only, so please run them in the directory where your files are located."
 	},
 	"footer": {
 		"description": "A web app to easily generate FFmpeg commands with a GUI",

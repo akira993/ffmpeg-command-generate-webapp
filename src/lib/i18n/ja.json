@@ -5,7 +5,8 @@
 		"reset": "リセット",
 		"input": "入力",
 		"output": "出力",
-		"apply": "適用"
+		"apply": "適用",
+		"settings": "設定"
 	},
 	"header": {
 		"title": "FFmpeg コマンドジェネレーター",
@@ -21,8 +22,8 @@
 			"desc": "MP4, WebM, MOV, AVI間のフォーマット変換"
 		},
 		"videoCompress": {
-			"name": "動画圧縮",
-			"desc": "CRFやビットレートを指定してファイルサイズを削減"
+			"name": "動画圧縮（AV1）",
+			"desc": "SVT-AV1で高効率圧縮。H.264比で約50%のファイルサイズ削減"
 		},
 		"audioExtract": {
 			"name": "音声抽出",
@@ -41,18 +42,22 @@
 			"desc": "動画からアニメーションGIFを生成（高品質パレット付き）"
 		},
 		"imageConvert": {
-			"name": "画像変換・リサイズ",
-			"desc": "画像のフォーマット変換、リサイズ、品質調整"
+			"name": "画像圧縮（AVIF）",
+			"desc": "JPG/PNGをAVIFに変換。高品質で大幅にファイルサイズを削減"
 		}
 	},
 	"form": {
 		"filename": "ファイル名",
+		"inputFilename": "入力ファイル名",
+		"outputFilename": "出力ファイル名",
 		"format": "フォーマット",
 		"codec": "コーデック",
 		"resolution": "解像度",
 		"framerate": "フレームレート",
 		"bitrate": "ビットレート",
 		"crf": "CRF（品質）",
+		"crfBest": "最高品質",
+		"crfWorst": "最低品質",
 		"sampleRate": "サンプルレート",
 		"channels": "チャンネル",
 		"startTime": "開始時刻",
@@ -63,12 +68,40 @@
 		"stripMetadata": "メタデータ削除",
 		"copyStreams": "ストリームコピー（再エンコードなし）",
 		"preset": "エンコーダプリセット",
-		"overwrite": "上書き"
+		"overwrite": "上書き",
+		"encoderSpeed": "エンコード速度",
+		"slowest": "最遅・高品質",
+		"fastest": "最速",
+		"audioBitrate": "音声ビットレート",
+		"scaleWidth": "幅（px）",
+		"scaleHeight": "高さ（px）"
 	},
 	"command": {
 		"generated": "生成されたコマンド",
-		"empty": "オプションを設定してください",
+		"empty": "プリセットを選択するか、オプションを設定してください",
 		"copied": "コマンドをコピーしました"
+	},
+	"dropzone": {
+		"title": "ファイルまたはフォルダをドラッグ＆ドロップ",
+		"subtitle": "またはクリックしてファイルを選択",
+		"filesDetected": "ファイル検出",
+		"batchMode": "一括処理",
+		"clear": "クリア",
+		"moreFiles": "他{{count}}ファイル"
+	},
+	"pathGuide": {
+		"buttonLabel": "実行方法",
+		"title": "コマンドの実行方法",
+		"description": "生成されたFFmpegコマンドをターミナルで実行する手順",
+		"step1": "生成されたコマンドをコピーボタンでコピー",
+		"step2": "ターミナル（端末）を開く",
+		"step3": "ファイルがあるフォルダに移動:",
+		"step4": "コピーしたコマンドを貼り付けて実行",
+		"tipTitle": "ヒント：ターミナルの開き方",
+		"tipMac": "Finderでフォルダを右クリック →「フォルダに新規ターミナルタブ」",
+		"tipWindows": "エクスプローラーのアドレスバーに「cmd」と入力してEnter",
+		"tipLinux": "ファイルマネージャでフォルダを右クリック →「ターミナルで開く」",
+		"warning": "ブラウザのセキュリティ制限により、ファイルのフルパスは取得できません。コマンドはファイル名のみで生成されるため、ファイルがあるディレクトリで実行してください。"
 	},
 	"footer": {
 		"description": "FFmpegコマンドをGUIで簡単に生成するWebアプリ",
