@@ -5,7 +5,7 @@
 -->
 <script lang="ts">
 	import { t } from '$lib/i18n';
-	import { commandStore } from '$lib/stores/command';
+	import { commandStore } from '$lib/stores/command.svelte';
 	import * as ToggleGroup from '$lib/components/ui/toggle-group';
 
 	function handleValueChange(value: string | undefined) {

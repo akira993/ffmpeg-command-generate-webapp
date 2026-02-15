@@ -6,7 +6,7 @@
 -->
 <script lang="ts">
 	import { t } from '$lib/i18n';
-	import { commandStore } from '$lib/stores/command';
+	import { commandStore } from '$lib/stores/command.svelte';
 	import { PRESETS } from '$lib/ffmpeg/presets';
 	import { AVIF_DEFAULTS, SVT_AV1_DEFAULTS, H264_DEFAULTS } from '$lib/ffmpeg/codecs';
 	import { Input } from '$lib/components/ui/input';

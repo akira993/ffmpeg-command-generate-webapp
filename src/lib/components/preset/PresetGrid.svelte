@@ -4,7 +4,7 @@
   全プリセットをカードのグリッドで表示し、選択状態を管理する。
 -->
 <script lang="ts">
-	import { commandStore } from '$lib/stores/command';
+	import { commandStore } from '$lib/stores/command.svelte';
 	import { getAllPresets } from '$lib/ffmpeg/presets';
 	import type { PresetId } from '$lib/ffmpeg/types';
 	import PresetCard from './PresetCard.svelte';
