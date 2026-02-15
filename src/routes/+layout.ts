@@ -18,8 +18,12 @@ export const load: LayoutLoad = async () => {
 		}
 	}
 
-	await loadTranslations(initLocale);
-	locale.set(initLocale);
+	try {
+		await loadTranslations(initLocale);
+		locale.set(initLocale);
+	} catch (e) {
+		console.error('i18n init error:', e);
+	}
 
 	return {};
 };
