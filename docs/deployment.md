@@ -5,6 +5,18 @@
 このプロジェクトは **Vercel** にデプロイされる SvelteKit アプリケーションです。
 GitHub の main ブランチへの push で自動的に本番デプロイが行われます。
 
+### デプロイ情報
+
+| 項目 | 値 |
+|------|-----|
+| Vercel チーム | `akiratakahashis-projects` |
+| プロダクションURL | https://ffmpeg-command-generate-webapp-jpkdns74r.vercel.app |
+| GitHub リポジトリ | `akira993/ffmpeg-command-generate-webapp` |
+| CI | GitHub Actions（`.github/workflows/ci.yml`） |
+| 自動デプロイ | main push → 本番、PR → プレビュー |
+
+> **注意**: Vercel チーム設定により SSO 認証が有効です。ブラウザで Vercel にログイン済みの場合のみ閲覧可能です。公開する場合は Vercel ダッシュボード → Settings → General → 「Vercel Authentication」を OFF にしてください。
+
 ---
 
 ## ローカル開発
@@ -37,49 +49,32 @@ npm run preview
 
 ## Vercel デプロイ
 
-### 初回セットアップ
+### セットアップ済み（GitHub 連携）
 
-1. **Vercel CLI のインストール**
+Vercel ダッシュボード（https://vercel.com/new?teamSlug=akiratakahashis-projects）から GitHub リポジトリを直接インポート済み。
 
-```bash
-npm i -g vercel
-```
-
-2. **ログイン**
-
-```bash
-vercel login
-```
-
-3. **プロジェクトのリンク**
-
-```bash
-cd /path/to/ffmpeg-command-generate-webapp
-vercel link
-```
-
-プロンプトに従い、GitHub リポジトリ `akira993/ffmpeg-command-generate-webapp` とリンクします。
-
-4. **プレビューデプロイ**
-
-```bash
-vercel
-```
-
-生成されたプレビュー URL でブラウザ確認します。
-
-5. **本番デプロイ**
-
-```bash
-vercel --prod
-```
-
-### GitHub 連携による自動デプロイ
-
-Vercel ダッシュボードで GitHub リポジトリを連携すると：
-
+**自動デプロイが有効:**
 - **main ブランチへの push** → 自動で本番デプロイ
 - **Pull Request** → 自動でプレビューデプロイ（PR コメントに URL が付与）
+
+### CLI からのデプロイ（オプション）
+
+```bash
+# Vercel CLI インストール
+npm i -g vercel
+
+# ログイン
+vercel login
+
+# プロジェクトリンク
+vercel link --scope akiratakahashis-projects
+
+# プレビューデプロイ
+vercel
+
+# 本番デプロイ
+vercel --prod
+```
 
 ### ビルド設定
 
@@ -116,9 +111,9 @@ Vercel ダッシュボードで GitHub リポジトリを連携すると：
 ```
 開発者が PR を作成
   ↓
-GitHub Actions: 型チェック + ビルド（CI）
+GitHub Actions: 型チェック + ビルド（CI）      ← .github/workflows/ci.yml
   ↓
-Vercel: プレビューデプロイ（PR コメントに URL）
+Vercel: プレビューデプロイ（PR コメントに URL） ← 自動
   ↓
 コードレビュー & 動作確認
   ↓
@@ -126,8 +121,14 @@ main にマージ
   ↓
 GitHub Actions: 型チェック + ビルド（CI）
   ↓
-Vercel: 本番デプロイ（自動）
+Vercel: 本番デプロイ（自動）                    ← akiratakahashis-projects チーム
 ```
+
+### 確認済みフロー（2025-02-15）
+
+1. ✅ `git push origin main` → GitHub Actions CI green（27秒）
+2. ✅ Vercel 自動デプロイ → `state: success`
+3. ✅ プロダクション URL: https://ffmpeg-command-generate-webapp-jpkdns74r.vercel.app
 
 ---
 
