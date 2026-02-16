@@ -31,7 +31,7 @@
 			</Button>
 		{/snippet}
 	</Dialog.Trigger>
-	<Dialog.Content class="max-h-[85vh] max-w-2xl overflow-y-auto">
+	<Dialog.Content class="max-h-[90vh] max-w-2xl">
 		<Dialog.Header>
 			<Dialog.Title>{$t('installGuide.title')}</Dialog.Title>
 			<Dialog.Description>
@@ -39,7 +39,7 @@
 			</Dialog.Description>
 		</Dialog.Header>
 
-		<div class="space-y-5 py-2">
+		<div class="max-h-[70vh] space-y-5 overflow-y-auto py-2">
 			<!-- OS別タブ -->
 			<Tabs.Root value="mac">
 				<Tabs.List class="grid w-full grid-cols-3">

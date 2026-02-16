@@ -13,10 +13,44 @@
 	import { commandStore } from '$lib/stores/command.svelte';
 	import type { FileInfo } from '$lib/ffmpeg/types';
 	import { Badge } from '$lib/components/ui/badge';
+	import FolderIcon from '@lucide/svelte/icons/folder';
 	import { Button } from '$lib/components/ui/button';
 
 	let isDragging = $state(false);
 	let fileInput: HTMLInputElement | undefined = $state();
+
+	/** 画像/動画ファイルからディメンションを取得 */
+	function getMediaDimensions(file: File): Promise<{ width: number; height: number } | null> {
+		return new Promise((resolve) => {
+			if (file.type.startsWith('image/')) {
+				const img = new Image();
+				const url = URL.createObjectURL(file);
+				img.onload = () => {
+					resolve({ width: img.naturalWidth, height: img.naturalHeight });
+					URL.revokeObjectURL(url);
+				};
+				img.onerror = () => {
+					resolve(null);
+					URL.revokeObjectURL(url);
+				};
+				img.src = url;
+			} else if (file.type.startsWith('video/')) {
+				const video = document.createElement('video');
+				const url = URL.createObjectURL(file);
+				video.onloadedmetadata = () => {
+					resolve({ width: video.videoWidth, height: video.videoHeight });
+					URL.revokeObjectURL(url);
+				};
+				video.onerror = () => {
+					resolve(null);
+					URL.revokeObjectURL(url);
+				};
+				video.src = url;
+			} else {
+				resolve(null);
+			}
+		});
+	}
 
 	// ドラッグオーバー時のスタイル制御
 	function handleDragOver(e: DragEvent) {
@@ -48,10 +82,12 @@
 				// フォールバック: 通常のファイル取得
 				const file = item.getAsFile();
 				if (file) {
+					const dims = await getMediaDimensions(file);
 					files.push({
 						name: file.name,
 						size: file.size,
-						type: file.type
+						type: file.type,
+						...(dims ? { width: dims.width, height: dims.height } : {})
 					});
 				}
 			}
@@ -69,11 +105,13 @@
 		if (entry.isFile) {
 			const fileEntry = entry as FileSystemFileEntry;
 			const file = await getFile(fileEntry);
+			const dims = await getMediaDimensions(file);
 			files.push({
 				name: file.name,
 				relativePath: parentPath ? `${parentPath}/${file.name}` : undefined,
 				size: file.size,
-				type: file.type
+				type: file.type,
+				...(dims ? { width: dims.width, height: dims.height } : {})
 			});
 		} else if (entry.isDirectory) {
 			const dirEntry = entry as FileSystemDirectoryEntry;
@@ -119,15 +157,20 @@
 		fileInput?.click();
 	}
 
-	function handleFileInput(e: Event) {
+	async function handleFileInput(e: Event) {
 		const input = e.target as HTMLInputElement;
 		if (!input.files) return;
 
-		const files: FileInfo[] = Array.from(input.files).map((f) => ({
-			name: f.name,
-			size: f.size,
-			type: f.type
-		}));
+		const files: FileInfo[] = [];
+		for (const f of Array.from(input.files)) {
+			const dims = await getMediaDimensions(f);
+			files.push({
+				name: f.name,
+				size: f.size,
+				type: f.type,
+				...(dims ? { width: dims.width, height: dims.height } : {})
+			});
+		}
 
 		if (files.length > 0) {
 			commandStore.setDroppedFiles(files);
@@ -161,7 +204,7 @@
 			role="button"
 			tabindex="0"
 		>
-			<span class="mb-2 text-3xl">📁</span>
+			<FolderIcon size={32} class="mb-2 text-muted-foreground" />
 			<p class="text-sm font-medium">
 				{$t('dropzone.title')}
 			</p>

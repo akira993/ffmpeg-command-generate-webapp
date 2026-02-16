@@ -9,6 +9,7 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Button } from '$lib/components/ui/button';
 	import DownloadIcon from '@lucide/svelte/icons/download';
+	import InfoIcon from '@lucide/svelte/icons/info';
 
 	let open = $state(false);
 	let installGuideOpen = $state(false);
@@ -27,7 +28,8 @@
 	<Dialog.Trigger>
 		{#snippet child({ props })}
 			<Button variant="outline" size="sm" {...props}>
-				ℹ️ {$t('pathGuide.buttonLabel')}
+				<InfoIcon size={14} class="mr-1" />
+				{$t('pathGuide.buttonLabel')}
 			</Button>
 		{/snippet}
 	</Dialog.Trigger>

@@ -7,6 +7,28 @@
 - 実行方法モーダルからインストールガイドへの導線
 - オンボーディングUXドキュメント (`docs/onboarding-guide.md`)
 
+## [0.4.0] - 2026-02-16
+
+### Added
+- コーデック・コンテナ・音声ビットレートのドロップダウン選択（動画/音声系プリセット）
+- アスペクト比ロック機能（D&D時に自動計算、デフォルトON）
+- D&Dでメディアの幅/高さを自動取得し設定に反映
+- HTML lang属性を言語切替に連動（JA/EN）
+
+### Fixed
+- FFmpegインストールガイドモーダルがスクロールできない問題を修正
+- 実行方法モーダルのmacOSヒントを正しい手順に修正（サービスメニュー経由）
+- AVIFコマンドの`-still-picture`オプションを削除（ffmpeg 8.x互換性）
+- CRF/品質/エンコード速度スライダーがコマンドに反映されない問題を修正
+  - `$state` Proxy で `structuredClone` が使えない問題を `JSON.parse/JSON.stringify` で解決
+  - bits-ui Slider `onValueChange` のシグネチャ修正（配列→単数値）
+  - `getOptionValue` のリアクティビティ修正（`$derived` 経由に変更）
+- バッチモード時にスケールフィールドをグレーアウトに変更
+
+### Removed
+- フッターのGitHubリンクを削除
+- `VideoOptions.stillPicture` プロパティを削除（ffmpeg 8.x非対応）
+
 ## [0.3.0] - 2025-02-16
 
 ### Added

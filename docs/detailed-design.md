@@ -85,8 +85,18 @@ interface VideoOptions {
   framerate?: number;      // フレームレート (-r)
   bitrate?: string;        // ビットレート (-b:v)
   crf?: number;            // CRF値
+  quality?: number;        // WebP品質 (0-100)
+  svtav1Preset?: number;   // SVT-AV1 エンコード速度 (0-13)
   preset?: EncoderPreset;  // エンコーダプリセット
   noVideo: boolean;        // 映像無効化 (-vn)
+}
+
+interface FileInfo {
+  name: string;            // ファイル名
+  size: number;            // ファイルサイズ(bytes)
+  type: string;            // MIMEタイプ
+  width?: number;          // メディア幅(px) — D&D時に自動取得
+  height?: number;         // メディア高さ(px) — D&D時に自動取得
 }
 
 interface AudioOptions {
@@ -274,16 +284,21 @@ function isOptionEmpty(value: unknown): boolean
   id: 'video-compress',
   defaults: {
     input: { filename: 'input.mp4' },
-    output: { filename: 'output.mp4', overwrite: true },
-    video: { codec: 'libx264', crf: 23, preset: 'medium' },
-    audio: { codec: 'aac', bitrate: '128k' },
+    output: { filename: 'output.mkv', overwrite: true },
+    video: { codec: 'libsvtav1', crf: 30, svtav1Preset: 6 },
+    audio: { codec: 'libopus', bitrate: '128k' },
   },
   editableFields: [
     'input.filename',
     'output.filename',
+    'video.codec',           // ← 新規: コーデック選択ドロップダウン
+    'audio.codec',           // ← 新規: 音声コーデック選択ドロップダウン
+    'output.format',         // ← 新規: コンテナフォーマット選択ドロップダウン
     'video.crf',
-    'video.preset',
-    'video.bitrate',
+    'video.svtav1Preset',
+    'audio.bitrate',         // ← ドロップダウン化 (64k〜320k)
+    'filter.scale.width',
+    'filter.scale.height',
   ],
 }
 ```
@@ -455,44 +470,42 @@ function isOptionEmpty(value: unknown): boolean
 
 ---
 
-## 6. Store設計 (`src/lib/stores/command.ts`)
+## 6. Store設計 (`src/lib/stores/command.svelte.ts`)
+
+Svelte 5 の runes (`$state`, `$derived`) を使用したクラスベースの状態管理。
 
 ```typescript
-import { writable, derived } from 'svelte/store';
-import type { FFmpegOptions } from '$lib/ffmpeg/types';
-import { buildCommand } from '$lib/ffmpeg/builder';
+class CommandStore {
+  // --- 状態 ---
+  mode = $state<AppMode>('preset');
+  selectedPreset = $state<PresetId | null>(null);
+  options = $state<FFmpegOptions>(createDefaultOptions());
+  batchMode = $state(false);
+  droppedFiles = $state<FileInfo[]>([]);
+  activeScriptType = $state<ScriptType>('bash');
+  aspectRatioLocked = $state(true);           // アスペクト比ロック（デフォルトON）
+  originalAspectRatio = $state<number | null>(null); // 元メディアのアスペクト比
 
-// 現在のモード
-export const mode = writable<'preset' | 'advanced'>('preset');
+  // --- 算出プロパティ ---
+  commandString = $derived(buildCommand(this.options));
+  batchScript = $derived.by((): BatchScript | null => { ... });
+  fileCount = $derived(this.droppedFiles.length);
 
-// 選択中のプリセットID
-export const selectedPreset = writable<string | null>(null);
-
-// FFmpegオプション（全設定値）
-export const options = writable<FFmpegOptions>(getDefaultOptions());
-
-// 生成されたコマンド文字列（自動計算）
-export const commandString = derived(options, ($options) => {
-  return buildCommand($options);
-});
-
-// デフォルトオプション生成
-function getDefaultOptions(): FFmpegOptions {
-  return {
-    input: { filename: 'input.mp4' },
-    output: { filename: 'output.mp4', overwrite: true },
-    video: { noVideo: false },
-    audio: { noAudio: false },
-    filter: {},
-    misc: { stripMetadata: false, copyStreams: false },
-  };
+  // --- アクション ---
+  applyPreset(presetId: PresetId): void { ... }
+  resetOptions(): void { ... }
+  setDroppedFiles(files: FileInfo[]): void { ... }  // D&D時にメディア寸法も反映
+  clearDroppedFiles(): void { ... }
+  updateOption(path: string, value: unknown): void {
+    // $state Proxy は structuredClone 不可のため JSON 経由でディープコピー
+    const newOptions = JSON.parse(JSON.stringify(this.options));
+    // ネストしたパスに値を設定
+    ...
+    this.options = newOptions;
+  }
 }
 
-// プリセット適用
-export function applyPreset(presetId: string): void { ... }
-
-// オプションリセット
-export function resetOptions(): void { ... }
+export const commandStore = new CommandStore();
 ```
 
 ---

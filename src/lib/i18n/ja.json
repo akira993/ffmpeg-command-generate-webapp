@@ -103,7 +103,7 @@
 		"step3": "ファイルがあるフォルダに移動:",
 		"step4": "コピーしたコマンドを貼り付けて実行",
 		"tipTitle": "ヒント：ターミナルの開き方",
-		"tipMac": "Finderでフォルダを右クリック →「フォルダに新規ターミナルタブ」",
+		"tipMac": "Finderでフォルダを右クリック → サービス →「New Terminal at Folder」",
 		"tipWindows": "エクスプローラーのアドレスバーに「cmd」と入力してEnter",
 		"tipLinux": "ファイルマネージャでフォルダを右クリック →「ターミナルで開く」",
 		"warning": "ブラウザのセキュリティ制限により、ファイルのフルパスは取得できません。コマンドはファイル名のみで生成されるため、ファイルがあるディレクトリで実行してください。",
@@ -131,7 +131,6 @@
 		"officialSite": "その他のOS・詳細は公式サイトをご覧ください"
 	},
 	"footer": {
-		"description": "FFmpegコマンドをGUIで簡単に生成するWebアプリ",
-		"github": "GitHub"
+		"description": "FFmpegコマンドをGUIで簡単に生成するWebアプリ"
 	}
 }

@@ -96,7 +96,6 @@ export const RECOMMENDED_AUDIO_CODEC: Partial<Record<VideoCodec, AudioCodec>> = 
  */
 export const AVIF_DEFAULTS = {
 	codec: 'libaom-av1' as VideoCodec,
-	stillPicture: true,
 	crf: 30,
 	pixFmt: 'yuv420p10le' as PixelFormat,
 	aomParams: 'tune=iq',

@@ -32,7 +32,6 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 			output: { filename: 'output.avif', overwrite: true },
 			video: {
 				codec: AVIF_DEFAULTS.codec,
-				stillPicture: AVIF_DEFAULTS.stillPicture,
 				crf: AVIF_DEFAULTS.crf,
 				bitrate: '0',
 				pixFmt: AVIF_DEFAULTS.pixFmt,
@@ -115,6 +114,9 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 		editableFields: [
 			'input.filename',
 			'output.filename',
+			'video.codec',
+			'audio.codec',
+			'output.format',
 			'video.crf',
 			'video.svtav1Preset',
 			'audio.bitrate'
@@ -143,7 +145,10 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 			'input.filename',
 			'output.filename',
 			'video.codec',
-			'audio.codec'
+			'audio.codec',
+			'output.format',
+			'video.crf',
+			'audio.bitrate'
 		]
 	},
 
@@ -169,6 +174,7 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 			'input.filename',
 			'output.filename',
 			'audio.codec',
+			'output.format',
 			'audio.bitrate'
 		]
 	},
@@ -195,6 +201,7 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 			'input.filename',
 			'output.filename',
 			'audio.codec',
+			'output.format',
 			'audio.bitrate',
 			'audio.sampleRate'
 		]
