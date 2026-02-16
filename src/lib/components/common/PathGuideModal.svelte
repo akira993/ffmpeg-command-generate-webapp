@@ -41,7 +41,7 @@
 			</Dialog.Description>
 		</Dialog.Header>
 
-		<div class="space-y-4 py-2">
+		<div class="max-h-[70vh] space-y-4 overflow-y-auto py-2">
 			<!-- 手順 -->
 			<ol class="list-inside list-decimal space-y-2 text-sm">
 				<li>{$t('pathGuide.step1')}</li>

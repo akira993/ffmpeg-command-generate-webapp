@@ -13,6 +13,7 @@
 	import TerminalIcon from '@lucide/svelte/icons/terminal';
 	import CheckCircleIcon from '@lucide/svelte/icons/circle-check';
 	import ExternalLinkIcon from '@lucide/svelte/icons/external-link';
+	import MonitorIcon from '@lucide/svelte/icons/monitor';
 
 	let open = $state(false);
 
@@ -104,6 +105,26 @@
 							gyan.dev/ffmpeg/builds
 							<ExternalLinkIcon size={12} />
 						</a>
+
+						<!-- AV1/AVIF 拡張機能 -->
+						<div class="mt-4 rounded-md border border-primary/20 bg-primary/5 p-3">
+							<h4 class="flex items-center gap-2 text-sm font-semibold">
+								<MonitorIcon size={16} />
+								{$t('installGuide.windows.av1ExtTitle')}
+							</h4>
+							<p class="mt-1 text-xs text-muted-foreground">
+								{$t('installGuide.windows.av1ExtDesc')}
+							</p>
+							<a
+								href="https://apps.microsoft.com/detail/9p13g73d7rmz"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary underline-offset-4 hover:underline"
+							>
+								{$t('installGuide.windows.av1ExtLink')}
+								<ExternalLinkIcon size={12} />
+							</a>
+						</div>
 					</div>
 				</Tabs.Content>
 

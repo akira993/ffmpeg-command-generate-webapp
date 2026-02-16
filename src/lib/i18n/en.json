@@ -124,7 +124,10 @@
 			"wingetDesc": "Run the following in PowerShell or Command Prompt:",
 			"chocoTitle": "Option 2: Chocolatey",
 			"manualTitle": "Option 3: Manual Download",
-			"manualDesc": "Download pre-built binaries from the site below and add to your PATH."
+			"manualDesc": "Download pre-built binaries from the site below and add to your PATH.",
+			"av1ExtTitle": "Viewing AV1/AVIF Files",
+			"av1ExtDesc": "To view AV1 videos and AVIF images on Windows, install the AV1 Video Extensions from the Microsoft Store.",
+			"av1ExtLink": "Get AV1 Video Extensions"
 		},
 		"verifyTitle": "Verify Installation",
 		"verifyDesc": "After installing, run the following in your terminal. If the version is displayed, you're all set.",

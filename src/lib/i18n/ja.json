@@ -124,7 +124,10 @@
 			"wingetDesc": "PowerShellまたはコマンドプロンプトで以下を実行してください。",
 			"chocoTitle": "方法2: Chocolatey",
 			"manualTitle": "方法3: 手動ダウンロード",
-			"manualDesc": "以下のサイトからビルド済みバイナリをダウンロードし、PATHに追加してください。"
+			"manualDesc": "以下のサイトからビルド済みバイナリをダウンロードし、PATHに追加してください。",
+			"av1ExtTitle": "AV1/AVIF ファイルの表示",
+			"av1ExtDesc": "WindowsでAV1動画やAVIF画像を表示・再生するには、Microsoft StoreからAV1拡張機能をインストールしてください。",
+			"av1ExtLink": "AV1 Video Extensions を入手"
 		},
 		"verifyTitle": "インストール確認",
 		"verifyDesc": "インストール後、ターミナルで以下を実行してバージョンが表示されればOKです。",
