@@ -94,7 +94,7 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 		category: 'video',
 		defaults: {
 			input: { filename: 'input.mp4' },
-			output: { filename: 'output.mkv', overwrite: true },
+			output: { filename: 'output.mp4', overwrite: true },
 			video: {
 				codec: SVT_AV1_DEFAULTS.codec,
 				crf: SVT_AV1_DEFAULTS.crf,

@@ -1,11 +1,16 @@
 # Changelog
 
-## [Unreleased]
+## [0.4.1] - 2026-02-17
 
 ### Added
 - FFmpegインストールガイドモーダル（macOS / Windows / Linux 対応）
 - 実行方法モーダルからインストールガイドへの導線
-- オンボーディングUXドキュメント (`docs/onboarding-guide.md`)
+- Windows向け AV1/AVIF 拡張機能（Microsoft Store）の案内を追加
+- 実行方法モーダルにスクロール対応を追加
+- Emoji → Lucide アイコンに統一（📁→FolderIcon, ℹ️→InfoIcon）
+
+### Changed
+- AV1動画圧縮のデフォルト出力を `.mkv` → `.mp4` に変更
 
 ## [0.4.0] - 2026-02-16
 
