@@ -63,8 +63,6 @@ export interface VideoOptions {
 	aomParams?: string;
 	/** ピクセルフォーマット (-pix_fmt) */
 	pixFmt?: PixelFormat;
-	/** 静止画モード (-still-picture 1) — AVIF用 */
-	stillPicture?: boolean;
 	/** 品質 (-quality) — libwebp用 (0-100, 高いほど高品質) */
 	quality?: number;
 	/** ロスレスモード (-lossless 1) — libwebp用 */
@@ -138,6 +136,10 @@ export interface FileInfo {
 	size?: number;
 	/** MIMEタイプ */
 	type?: string;
+	/** 幅（px） — 画像/動画のみ */
+	width?: number;
+	/** 高さ（px） — 画像/動画のみ */
+	height?: number;
 }
 
 // ============================================================

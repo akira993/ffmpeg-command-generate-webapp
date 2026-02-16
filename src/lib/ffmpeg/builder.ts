@@ -10,7 +10,7 @@
  * 2. グローバルオプション (-y)
  * 3. 入力オプション (-ss 開始時刻 ※入力前に置くとシーク高速化)
  * 4. -i input
- * 5. 映像オプション (-c:v, -crf, -b:v, -r, -preset, -vn, -still-picture, -pix_fmt)
+ * 5. 映像オプション (-c:v, -crf, -b:v, -r, -preset, -vn, -pix_fmt)
  * 6. 音声オプション (-c:a, -ar, -ac, -b:a, -an)
  * 7. ストリームコピー (-c copy ※codec指定と排他)
  * 8. フィルタ (-vf "scale=...,fps=...")
@@ -128,11 +128,6 @@ function buildVideoOptions(options: FFmpegOptions): string[] {
 	// コーデック
 	if (v.codec) {
 		parts.push('-c:v', v.codec);
-	}
-
-	// 静止画モード (AVIF)
-	if (v.stillPicture) {
-		parts.push('-still-picture', '1');
 	}
 
 	// CRF

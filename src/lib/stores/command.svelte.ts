@@ -61,6 +61,12 @@ class CommandStore {
 	/** 一括処理スクリプトのタブ選択 */
 	activeScriptType = $state<ScriptType>('bash');
 
+	/** アスペクト比ロック（デフォルトON） */
+	aspectRatioLocked = $state(true);
+
+	/** 元画像/動画のアスペクト比 (width / height) */
+	originalAspectRatio = $state<number | null>(null);
+
 	// ============================================================
 	// 算出プロパティ（derived）
 	// ============================================================
@@ -140,20 +146,35 @@ class CommandStore {
 		// 自動モード切替
 		if (files.length === 0) {
 			this.batchMode = false;
+			this.originalAspectRatio = null;
 		} else if (files.length === 1) {
 			this.batchMode = false;
+			const file = files[0];
 			// 単一ファイルの場合、入力ファイル名を自動反映
-			this.options.input.filename = files[0].name;
+			this.options.input.filename = file.name;
 			// プリセットが選択されている場合、出力ファイル名も更新
 			if (this.selectedPreset) {
 				const preset = PRESETS[this.selectedPreset];
 				const outputExt = getExtension(preset.defaults.output?.filename ?? '');
 				if (outputExt) {
-					this.options.output.filename = replaceExtension(files[0].name, outputExt);
+					this.options.output.filename = replaceExtension(file.name, outputExt);
 				}
+			}
+			// ディメンション情報をスケールに反映
+			if (file.width && file.height) {
+				this.originalAspectRatio = file.width / file.height;
+				if (!this.options.filter.scale) {
+					this.options.filter.scale = {};
+				}
+				this.options.filter.scale.width = file.width;
+				this.options.filter.scale.height = file.height;
+				this.options = { ...this.options };
+			} else {
+				this.originalAspectRatio = null;
 			}
 		} else {
 			this.batchMode = true;
+			this.originalAspectRatio = null;
 		}
 	}
 
@@ -161,13 +182,17 @@ class CommandStore {
 	clearDroppedFiles(): void {
 		this.droppedFiles = [];
 		this.batchMode = false;
+		this.originalAspectRatio = null;
 	}
 
 	/** オプションの一部を更新（ネストしたパスに対応） */
 	updateOption(path: string, value: unknown): void {
+		// ディープコピーでリアクティビティを確実に発火させる
+		// Note: $state Proxy は structuredClone 不可のため JSON 経由でコピー
+		const newOptions = JSON.parse(JSON.stringify(this.options)) as FFmpegOptions;
 		const keys = path.split('.');
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		let obj: any = this.options;
+		let obj: any = newOptions;
 
 		for (let i = 0; i < keys.length - 1; i++) {
 			if (obj[keys[i]] === undefined) {
@@ -177,9 +202,7 @@ class CommandStore {
 		}
 
 		obj[keys[keys.length - 1]] = value;
-
-		// リアクティビティを発火させるため、新しい参照を作成
-		this.options = { ...this.options };
+		this.options = newOptions;
 	}
 }
 

@@ -103,7 +103,7 @@
 		"step3": "Navigate to the folder containing your files:",
 		"step4": "Paste the copied command and press Enter",
 		"tipTitle": "Tips: Opening a Terminal",
-		"tipMac": "Right-click folder in Finder → 'New Terminal Tab at Folder'",
+		"tipMac": "Right-click folder in Finder → Services → 'New Terminal at Folder'",
 		"tipWindows": "Type 'cmd' in Explorer's address bar and press Enter",
 		"tipLinux": "Right-click folder in file manager → 'Open in Terminal'",
 		"warning": "Due to browser security restrictions, the full file path cannot be obtained. Commands are generated with filenames only, so please run them in the directory where your files are located.",
@@ -131,7 +131,6 @@
 		"officialSite": "For other OSes and details, visit the official site"
 	},
 	"footer": {
-		"description": "A web app to easily generate FFmpeg commands with a GUI",
-		"github": "GitHub"
+		"description": "A web app to easily generate FFmpeg commands with a GUI"
 	}
 }
