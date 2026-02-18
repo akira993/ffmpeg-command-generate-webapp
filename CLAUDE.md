@@ -32,11 +32,17 @@ bash scripts/lint-css.sh  # CSS oklch ルールチェック（CI と同一）
 - **GIF 生成**: `buildCommand()` は改行区切りで 2 コマンドを返す（パレット生成 + GIF 生成）
 - **コーデック排他**: `copyStreams=true` のとき個別コーデック指定は無視される → `.claude/rules/ffmpeg-builder.md`
 
-## デプロイ
+## デプロイフロー
 
-`main` push → GitHub Actions CI → Vercel 本番自動デプロイ。
+**`main` push → GitHub Actions CI（型チェック・CSS lint・build）→ Vercel 本番自動デプロイ**
+
+`vercel` CLI は使用しない。デプロイは必ず `git push origin main` 経由で行う。
 
 ```bash
+# CI 完了まで待機
+gh run list --limit 1 --json databaseId --jq '.[0].databaseId' \
+  | xargs gh run watch --exit-status
+
 # 最新デプロイ URL 取得
 gh api repos/akira993/ffmpeg-command-generate-webapp/deployments \
   --jq '.[0].id' | xargs -I{} gh api \
@@ -52,3 +58,5 @@ gh api repos/akira993/ffmpeg-command-generate-webapp/deployments \
 | `/css-lint` | CSS oklch ルール違反チェック |
 | `/ui-test` | Chrome MCP でローカル UI テスト（PC/モバイル） |
 | `/i18n-check` | en.json / ja.json のキー整合性チェック |
+| `/deploy` | push → CI 待機 → デプロイ URL 取得まで一連実行 |
+| `/deploy-test` | 本番 URL に対して Chrome MCP で UI テスト |
