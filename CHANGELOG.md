@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.5.2] - 2026-02-18
+
+### Fixed
+- FfmpegInstallGuide: `whitespace-pre` + `overflow-x-auto` を `break-all` に変更し横スクロールを禁止（Homebrewコマンドを1行に統一）
+- ModeSwitch: スライドピルの位置指定を `transform: translateX` → `left` プロパティに変更し、初期表示時の中央ズレを修正
+
+### Changed
+- ダークテーマ `--color-primary` を `oklch(0.72 0.25 330)` → `oklch(0.55 0.25 330)` に変更（白前景テキストとの WCAG AAA 9.24:1 を確保）
+- ダークテーマ `--color-primary-foreground` を `oklch(0.13 0.02 280)` → `oklch(0.99 0.005 290)` (白) に変更
+
+### Added
+- デザインシステムテスト (`src/lib/a11y/contrast.test.ts`) — CSS構文ルール・カラートークン値・タイポグラフィ・WCAGコントラスト比を検証する28テスト
+- `src/lib/a11y/contrast.ts` — WCAG相対輝度計算ユーティリティ (oklch → OKLab → linear sRGB)
+- `scripts/lint-css.sh` — hex/rgb禁止・in oklab強制 CIスクリプト
+
 ## [0.5.1] - 2026-02-18
 
 ### Fixed

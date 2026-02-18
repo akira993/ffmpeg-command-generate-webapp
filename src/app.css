@@ -132,9 +132,9 @@
 	--color-popover: oklch(0.16 0.025 280);
 	--color-popover-foreground: oklch(0.92 0.01 260);
 
-	/* --- Primary (neon magenta) --- */
-	--color-primary: oklch(0.72 0.25 330);
-	--color-primary-foreground: oklch(0.13 0.02 280);
+	/* --- Primary (deep magenta — white foreground contrast 9.24:1 AAA) --- */
+	--color-primary: oklch(0.55 0.25 330);
+	--color-primary-foreground: oklch(0.99 0.005 290);
 
 	/* --- Secondary (deep indigo) --- */
 	--color-secondary: oklch(0.22 0.04 280);
@@ -167,8 +167,8 @@
 	/* --- Sidebar --- */
 	--color-sidebar: oklch(0.12 0.02 280);
 	--color-sidebar-foreground: oklch(0.92 0.01 260);
-	--color-sidebar-primary: oklch(0.72 0.25 330);
-	--color-sidebar-primary-foreground: oklch(0.13 0.02 280);
+	--color-sidebar-primary: oklch(0.55 0.25 330);
+	--color-sidebar-primary-foreground: oklch(0.99 0.005 290);
 	--color-sidebar-accent: oklch(0.78 0.15 195);
 	--color-sidebar-accent-foreground: oklch(0.13 0.02 280);
 	--color-sidebar-border: oklch(0.28 0.04 280);

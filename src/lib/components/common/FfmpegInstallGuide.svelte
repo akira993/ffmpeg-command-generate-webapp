@@ -60,17 +60,13 @@
 							{$t('installGuide.mac.homebrewTitle')}
 						</h4>
 						<p class="text-xs text-muted-foreground">{$t('installGuide.mac.homebrewDesc')}</p>
-						<code class="block rounded-md bg-muted px-3 py-2 font-mono text-xs">
-							/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-						</code>
+						<code class="block break-all rounded-md bg-muted px-3 py-2 font-mono text-xs">/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</code>
 
 						<h4 class="flex items-center gap-2 pt-2 text-sm font-semibold">
 							<DownloadIcon size={16} />
 							{$t('installGuide.mac.installTitle')}
 						</h4>
-						<code class="block rounded-md bg-muted px-3 py-2 font-mono text-xs">
-							brew install ffmpeg
-						</code>
+						<code class="block break-all rounded-md bg-muted px-3 py-2 font-mono text-xs">brew install ffmpeg</code>
 					</div>
 				</Tabs.Content>
 
@@ -82,17 +78,13 @@
 							{$t('installGuide.windows.wingetTitle')}
 						</h4>
 						<p class="text-xs text-muted-foreground">{$t('installGuide.windows.wingetDesc')}</p>
-						<code class="block rounded-md bg-muted px-3 py-2 font-mono text-xs">
-							winget install Gyan.FFmpeg
-						</code>
+						<code class="block break-all rounded-md bg-muted px-3 py-2 font-mono text-xs">winget install Gyan.FFmpeg</code>
 
 						<h4 class="flex items-center gap-2 pt-2 text-sm font-semibold">
 							<TerminalIcon size={16} />
 							{$t('installGuide.windows.chocoTitle')}
 						</h4>
-						<code class="block rounded-md bg-muted px-3 py-2 font-mono text-xs">
-							choco install ffmpeg
-						</code>
+						<code class="block break-all rounded-md bg-muted px-3 py-2 font-mono text-xs">choco install ffmpeg</code>
 
 						<h4 class="flex items-center gap-2 pt-2 text-sm font-semibold">
 							<DownloadIcon size={16} />
@@ -138,25 +130,19 @@
 							<TerminalIcon size={16} />
 							Ubuntu / Debian
 						</h4>
-						<code class="block rounded-md bg-muted px-3 py-2 font-mono text-xs">
-							sudo apt update && sudo apt install ffmpeg
-						</code>
+						<code class="block break-all rounded-md bg-muted px-3 py-2 font-mono text-xs">sudo apt update && sudo apt install ffmpeg</code>
 
 						<h4 class="flex items-center gap-2 pt-2 text-sm font-semibold">
 							<TerminalIcon size={16} />
 							Fedora
 						</h4>
-						<code class="block rounded-md bg-muted px-3 py-2 font-mono text-xs">
-							sudo dnf install ffmpeg
-						</code>
+						<code class="block break-all rounded-md bg-muted px-3 py-2 font-mono text-xs">sudo dnf install ffmpeg</code>
 
 						<h4 class="flex items-center gap-2 pt-2 text-sm font-semibold">
 							<TerminalIcon size={16} />
 							Arch Linux
 						</h4>
-						<code class="block rounded-md bg-muted px-3 py-2 font-mono text-xs">
-							sudo pacman -S ffmpeg
-						</code>
+						<code class="block break-all rounded-md bg-muted px-3 py-2 font-mono text-xs">sudo pacman -S ffmpeg</code>
 					</div>
 				</Tabs.Content>
 			</Tabs.Root>
@@ -170,9 +156,7 @@
 				<p class="mb-2 text-xs text-muted-foreground">
 					{$t('installGuide.verifyDesc')}
 				</p>
-				<code class="block rounded-md bg-muted px-3 py-2 font-mono text-xs">
-					ffmpeg -version
-				</code>
+				<code class="block break-all rounded-md bg-muted px-3 py-2 font-mono text-xs">ffmpeg -version</code>
 			</div>
 
 			<!-- 公式サイトへのリンク -->

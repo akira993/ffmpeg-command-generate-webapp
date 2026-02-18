@@ -54,7 +54,7 @@
 |---------|-------|------|
 | `--color-background` | `oklch(0.13 0.02 280)` | ディープブルーブラック |
 | `--color-foreground` | `oklch(0.92 0.01 260)` | ライトシルバー |
-| `--color-primary` | `oklch(0.72 0.25 330)` | ネオンマゼンタ |
+| `--color-primary` | `oklch(0.55 0.25 330)` | ディープマゼンタ (WCAG AAA) |
 | `--color-accent` | `oklch(0.78 0.15 195)` | ネオンシアン |
 | `--color-destructive` | `oklch(0.58 0.24 20)` | ネオンレッド |
 
