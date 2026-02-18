@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.5.0] - 2026-02-18
+
+### Added
+- アクションボタンコンポーネント（FFmpegの導入 / 実行方法 / ライブラリの追加）
+- モバイル固定バー（画面下部にアクションボタンを常時表示）
+- 「ライブラリの追加」モーダル — OS別の追加コーデックライブラリインストール手順
+- 非デフォルトコーデックに「*」マークと警告ヒント表示（別途インストール必要）
+- フッターに「FFmpegとは？」リンク
+- `/about-ffmpeg` ページ — FFmpegの歴史・設計思想・ユースケース・圧縮比較表（JA/EN対応、8000文字以上）
+- 動画コーデック / 音声コーデック のラベル分離
+- `NON_DEFAULT_VIDEO_CODECS` / `NON_DEFAULT_AUDIO_CODECS` 定数セット
+
+### Changed
+- モバイルプリセットグリッドを1カラム → 2カラムに変更
+- FfmpegInstallGuide / PathGuideModal を `$bindable` Props化（外部からの開閉制御対応）
+- アクションボタン（FFmpegの導入、実行方法）をCommandOutput内からSeparator下に移動
+- モーダル状態管理を `+page.svelte` に一元化
+
 ## [0.4.1] - 2026-02-17
 
 ### Added

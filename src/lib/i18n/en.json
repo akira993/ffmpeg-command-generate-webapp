@@ -56,6 +56,9 @@
 		"outputFilename": "Output Filename",
 		"format": "Format",
 		"codec": "Codec",
+		"videoCodec": "Video Codec",
+		"audioCodec": "Audio Codec",
+		"codecRequiresLib": "* This codec requires additional library installation",
 		"resolution": "Resolution",
 		"framerate": "Frame Rate",
 		"bitrate": "Bitrate",
@@ -133,7 +136,46 @@
 		"verifyDesc": "After installing, run the following in your terminal. If the version is displayed, you're all set.",
 		"officialSite": "For other OSes and details, visit the official site"
 	},
+	"actionButtons": {
+		"installFfmpeg": "Install FFmpeg",
+		"howToRun": "How to Run",
+		"addLibrary": "Add Libraries"
+	},
+	"libraryGuide": {
+		"buttonLabel": "Add Libraries",
+		"title": "Install Additional Libraries",
+		"description": "How to install additional codecs not included in the default FFmpeg build.",
+		"mac": {
+			"title": "macOS (Homebrew)",
+			"desc": "When installed via Homebrew, major libraries are included by default.",
+			"reinstallTitle": "If libraries are missing",
+			"reinstallDesc": "Reinstalling to the latest version will include additional libraries.",
+			"reinstallCmd": "brew reinstall ffmpeg"
+		},
+		"windows": {
+			"title": "Windows",
+			"desc": "When installed via winget or Chocolatey, major libraries are included. For manual installation, choose the \"full\" build.",
+			"fullBuildTitle": "Download Full Build",
+			"fullBuildDesc": "Download \"ffmpeg-release-full\" from gyan.dev to get all libraries included."
+		},
+		"linux": {
+			"title": "Linux",
+			"desc": "Libraries included depend on your distribution's package. Some codecs may require additional repositories.",
+			"ubuntuTitle": "Ubuntu / Debian",
+			"ubuntuCmd": "sudo apt install ffmpeg",
+			"fedoraTitle": "Fedora (after enabling RPM Fusion)",
+			"fedoraCmd": "sudo dnf install ffmpeg"
+		},
+		"verifyTitle": "Verify Available Libraries",
+		"verifyDesc": "Run the following command to check if a specific encoder is available.",
+		"verifyCmd": "ffmpeg -encoders 2>&1 | grep -i \"codec_name\"",
+		"tableTitle": "Common Additional Libraries",
+		"tableCodec": "Codec",
+		"tableLibrary": "Library Name",
+		"tableUse": "Use Case"
+	},
 	"footer": {
-		"description": "A web app to easily generate FFmpeg commands with a GUI"
+		"description": "A web app to easily generate FFmpeg commands with a GUI",
+		"aboutFfmpeg": "What is FFmpeg?"
 	}
 }

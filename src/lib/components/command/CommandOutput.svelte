@@ -5,7 +5,6 @@
   - 個別コマンド表示（通常モード）
   - 一括処理スクリプト表示（バッチモード）— Bash / PowerShell / cmd タブ切り替え
   - ワンクリックコピー
-  - 実行方法ガイドモーダルへのリンク
 -->
 <script lang="ts">
 	import { t } from '$lib/i18n';
@@ -13,8 +12,6 @@
 	import type { ScriptType } from '$lib/ffmpeg/types';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { Button } from '$lib/components/ui/button';
-	import PathGuideModal from '$lib/components/common/PathGuideModal.svelte';
-	import FfmpegInstallGuide from '$lib/components/common/FfmpegInstallGuide.svelte';
 
 	let copied = $state(false);
 
@@ -58,18 +55,14 @@
 		<h3 class="text-sm font-semibold">
 			{$t('command.generated')}
 		</h3>
-		<div class="flex items-center gap-2">
-			<FfmpegInstallGuide />
-			<PathGuideModal />
-			<Button
-				variant={copied ? 'default' : 'outline'}
-				size="sm"
-				onclick={copyToClipboard}
-				disabled={!displayCommand}
-			>
-				{copied ? `✓ ${$t('common.copied')}` : $t('common.copy')}
-			</Button>
-		</div>
+		<Button
+			variant={copied ? 'default' : 'outline'}
+			size="sm"
+			onclick={copyToClipboard}
+			disabled={!displayCommand}
+		>
+			{copied ? `✓ ${$t('common.copied')}` : $t('common.copy')}
+		</Button>
 	</div>
 
 	<!-- バッチモード: タブ切り替え -->

@@ -15,7 +15,9 @@
 		WEBP_DEFAULTS,
 		VIDEO_CODEC_LABELS,
 		AUDIO_CODEC_LABELS,
-		CODEC_FORMAT_COMPAT
+		CODEC_FORMAT_COMPAT,
+		NON_DEFAULT_VIDEO_CODECS,
+		NON_DEFAULT_AUDIO_CODECS
 	} from '$lib/ffmpeg/codecs';
 	import type { VideoCodec, AudioCodec } from '$lib/ffmpeg/types';
 	import { Input } from '$lib/components/ui/input';
@@ -187,7 +189,7 @@
 
 					<!-- 映像コーデック -->
 					{:else if field === 'video.codec'}
-						<Label for={field}>{$t('form.codec')}</Label>
+						<Label for={field}>{$t('form.videoCodec')}</Label>
 						<Select.Root
 							type="single"
 							value={String(getOptionValue(field) ?? '')}
@@ -198,14 +200,19 @@
 							</Select.Trigger>
 							<Select.Content>
 								{#each Object.entries(VIDEO_CODEC_LABELS) as [value, label] (value)}
-									<Select.Item {value}>{label}</Select.Item>
+									<Select.Item {value}>{label}{NON_DEFAULT_VIDEO_CODECS.has(value) ? ' *' : ''}</Select.Item>
 								{/each}
 							</Select.Content>
 						</Select.Root>
+						{#if NON_DEFAULT_VIDEO_CODECS.has(String(getOptionValue(field) ?? ''))}
+							<p class="text-xs text-amber-600 dark:text-amber-400">
+								{$t('form.codecRequiresLib')}
+							</p>
+						{/if}
 
 					<!-- 音声コーデック -->
 					{:else if field === 'audio.codec'}
-						<Label for={field}>{$t('form.codec')}</Label>
+						<Label for={field}>{$t('form.audioCodec')}</Label>
 						<Select.Root
 							type="single"
 							value={String(getOptionValue(field) ?? '')}
@@ -216,10 +223,15 @@
 							</Select.Trigger>
 							<Select.Content>
 								{#each Object.entries(AUDIO_CODEC_LABELS) as [value, label] (value)}
-									<Select.Item {value}>{label}</Select.Item>
+									<Select.Item {value}>{label}{NON_DEFAULT_AUDIO_CODECS.has(value) ? ' *' : ''}</Select.Item>
 								{/each}
 							</Select.Content>
 						</Select.Root>
+						{#if NON_DEFAULT_AUDIO_CODECS.has(String(getOptionValue(field) ?? ''))}
+							<p class="text-xs text-amber-600 dark:text-amber-400">
+								{$t('form.codecRequiresLib')}
+							</p>
+						{/if}
 
 					<!-- CRFスライダー -->
 					{:else if field === 'video.crf'}
