@@ -15,23 +15,26 @@
 	import ExternalLinkIcon from '@lucide/svelte/icons/external-link';
 	import MonitorIcon from '@lucide/svelte/icons/monitor';
 
-	let open = $state(false);
-
-	/** 外部から開くためのエクスポート */
-	export function show() {
-		open = true;
-	}
+	let {
+		open = $bindable(false),
+		showTrigger = true
+	}: {
+		open?: boolean;
+		showTrigger?: boolean;
+	} = $props();
 </script>
 
 <Dialog.Root bind:open>
-	<Dialog.Trigger>
-		{#snippet child({ props })}
-			<Button variant="outline" size="sm" {...props} data-install-guide-trigger>
-				<DownloadIcon size={14} class="mr-1" />
-				{$t('installGuide.buttonLabel')}
-			</Button>
-		{/snippet}
-	</Dialog.Trigger>
+	{#if showTrigger}
+		<Dialog.Trigger>
+			{#snippet child({ props })}
+				<Button variant="outline" size="sm" {...props} data-install-guide-trigger>
+					<DownloadIcon size={14} class="mr-1" />
+					{$t('installGuide.buttonLabel')}
+				</Button>
+			{/snippet}
+		</Dialog.Trigger>
+	{/if}
 	<Dialog.Content class="max-h-[90vh] max-w-2xl">
 		<Dialog.Header>
 			<Dialog.Title>{$t('installGuide.title')}</Dialog.Title>

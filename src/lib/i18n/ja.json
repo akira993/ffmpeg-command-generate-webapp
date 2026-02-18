@@ -56,6 +56,9 @@
 		"outputFilename": "出力ファイル名",
 		"format": "フォーマット",
 		"codec": "コーデック",
+		"videoCodec": "動画コーデック",
+		"audioCodec": "音声コーデック",
+		"codecRequiresLib": "* このコーデックは別途ライブラリのインストールが必要です",
 		"resolution": "解像度",
 		"framerate": "フレームレート",
 		"bitrate": "ビットレート",
@@ -133,7 +136,46 @@
 		"verifyDesc": "インストール後、ターミナルで以下を実行してバージョンが表示されればOKです。",
 		"officialSite": "その他のOS・詳細は公式サイトをご覧ください"
 	},
+	"actionButtons": {
+		"installFfmpeg": "FFmpegの導入",
+		"howToRun": "実行方法",
+		"addLibrary": "ライブラリの追加"
+	},
+	"libraryGuide": {
+		"buttonLabel": "ライブラリの追加",
+		"title": "追加ライブラリのインストール",
+		"description": "FFmpegのデフォルトビルドに含まれない追加コーデックのインストール方法です。",
+		"mac": {
+			"title": "macOS（Homebrew）",
+			"desc": "Homebrewでインストールした場合、主要なライブラリは標準で含まれています。",
+			"reinstallTitle": "ライブラリが不足している場合",
+			"reinstallDesc": "最新版に再インストールすることで追加ライブラリが含まれます。",
+			"reinstallCmd": "brew reinstall ffmpeg"
+		},
+		"windows": {
+			"title": "Windows",
+			"desc": "wingetやChocolateyでインストールした場合、主要ライブラリは含まれています。手動インストールの場合は「full」ビルドを選んでください。",
+			"fullBuildTitle": "フルビルドのダウンロード",
+			"fullBuildDesc": "gyan.dev から「ffmpeg-release-full」をダウンロードすると全ライブラリが含まれます。"
+		},
+		"linux": {
+			"title": "Linux",
+			"desc": "ディストリビューションのパッケージマネージャでインストールした場合、含まれるライブラリはパッケージに依存します。",
+			"ubuntuTitle": "Ubuntu / Debian",
+			"ubuntuCmd": "sudo apt install ffmpeg",
+			"fedoraTitle": "Fedora（RPM Fusion有効化後）",
+			"fedoraCmd": "sudo dnf install ffmpeg"
+		},
+		"verifyTitle": "ライブラリの確認方法",
+		"verifyDesc": "以下のコマンドで特定のエンコーダーが利用可能か確認できます。",
+		"verifyCmd": "ffmpeg -encoders 2>&1 | grep -i \"コーデック名\"",
+		"tableTitle": "主要な追加ライブラリ一覧",
+		"tableCodec": "コーデック",
+		"tableLibrary": "ライブラリ名",
+		"tableUse": "用途"
+	},
 	"footer": {
-		"description": "FFmpegコマンドをGUIで簡単に生成するWebアプリ"
+		"description": "FFmpegコマンドをGUIで簡単に生成するWebアプリ",
+		"aboutFfmpeg": "FFmpegとは？"
 	}
 }

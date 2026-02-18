@@ -11,28 +11,38 @@
 	import DownloadIcon from '@lucide/svelte/icons/download';
 	import InfoIcon from '@lucide/svelte/icons/info';
 
-	let open = $state(false);
-	let installGuideOpen = $state(false);
+	let {
+		open = $bindable(false),
+		showTrigger = true,
+		onOpenInstallGuide
+	}: {
+		open?: boolean;
+		showTrigger?: boolean;
+		onOpenInstallGuide?: () => void;
+	} = $props();
 
 	function openInstallGuide() {
 		open = false;
-		// 少し遅延させてモーダルの閉じアニメーション後に開く
-		setTimeout(() => {
-			const btn = document.querySelector<HTMLButtonElement>('[data-install-guide-trigger]');
-			btn?.click();
-		}, 200);
+		if (onOpenInstallGuide) {
+			// 少し遅延させてモーダルの閉じアニメーション後に開く
+			setTimeout(() => {
+				onOpenInstallGuide();
+			}, 200);
+		}
 	}
 </script>
 
 <Dialog.Root bind:open>
-	<Dialog.Trigger>
-		{#snippet child({ props })}
-			<Button variant="outline" size="sm" {...props}>
-				<InfoIcon size={14} class="mr-1" />
-				{$t('pathGuide.buttonLabel')}
-			</Button>
-		{/snippet}
-	</Dialog.Trigger>
+	{#if showTrigger}
+		<Dialog.Trigger>
+			{#snippet child({ props })}
+				<Button variant="outline" size="sm" {...props}>
+					<InfoIcon size={14} class="mr-1" />
+					{$t('pathGuide.buttonLabel')}
+				</Button>
+			{/snippet}
+		</Dialog.Trigger>
+	{/if}
 	<Dialog.Content class="max-w-lg">
 		<Dialog.Header>
 			<Dialog.Title>{$t('pathGuide.title')}</Dialog.Title>
