@@ -244,7 +244,7 @@
 							min={crfRange.min}
 							max={crfRange.max}
 							step={1}
-							onValueChange={(v) => handleSliderChange(field, v)}
+							onValueChange={(v: number) => handleSliderChange(field, v)}
 						/>
 						<p class="text-xs text-muted-foreground">
 							{crfRange.min} ({$t('form.crfBest')}) — {crfRange.max} ({$t('form.crfWorst')})
@@ -261,7 +261,7 @@
 							min={WEBP_DEFAULTS.qualityRange.min}
 							max={WEBP_DEFAULTS.qualityRange.max}
 							step={1}
-							onValueChange={(v) => handleSliderChange(field, v)}
+							onValueChange={(v: number) => handleSliderChange(field, v)}
 						/>
 						<p class="text-xs text-muted-foreground">
 							0 ({$t('form.crfWorst')}) — 100 ({$t('form.crfBest')})
@@ -278,7 +278,7 @@
 							min={SVT_AV1_DEFAULTS.presetRange.min}
 							max={SVT_AV1_DEFAULTS.presetRange.max}
 							step={1}
-							onValueChange={(v) => handleSliderChange(field, v)}
+							onValueChange={(v: number) => handleSliderChange(field, v)}
 						/>
 						<p class="text-xs text-muted-foreground">
 							0 ({$t('form.slowest')}) — 13 ({$t('form.fastest')})
