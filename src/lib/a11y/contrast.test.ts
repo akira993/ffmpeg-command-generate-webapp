@@ -95,23 +95,23 @@ describe('CSSデザインルール (docs/css-design.md §1)', () => {
 	it('app.css に hex カラー (#xxx) が含まれない', () => {
 		const hexMatches = cssSource
 			.split('\n')
-			.filter(line => !line.trimStart().startsWith('*') && !line.trimStart().startsWith('/*'))
-			.filter(line => /#[0-9a-fA-F]{3,8}\b/.test(line));
+			.filter((line: string) => !line.trimStart().startsWith('*') && !line.trimStart().startsWith('/*'))
+			.filter((line: string) => /#[0-9a-fA-F]{3,8}\b/.test(line));
 		expect(hexMatches, `hex カラーが検出されました:\n${hexMatches.join('\n')}`).toHaveLength(0);
 	});
 
 	it('app.css に rgb()/rgba()/hsl()/hsla() が含まれない', () => {
 		const rgbMatches = cssSource
 			.split('\n')
-			.filter(line => !line.trimStart().startsWith('*') && !line.trimStart().startsWith('/*'))
-			.filter(line => /\b(rgb|rgba|hsl|hsla)\s*\(/i.test(line));
+			.filter((line: string) => !line.trimStart().startsWith('*') && !line.trimStart().startsWith('/*'))
+			.filter((line: string) => /\b(rgb|rgba|hsl|hsla)\s*\(/i.test(line));
 		expect(rgbMatches, `rgb/hsl カラーが検出されました:\n${rgbMatches.join('\n')}`).toHaveLength(0);
 	});
 
 	it('app.css のグラデーションはすべて "in oklab" を使用している', () => {
 		const lines = cssSource.split('\n');
 		const violations: string[] = [];
-		lines.forEach((line, i) => {
+		lines.forEach((line: string, i: number) => {
 			if (/gradient\(/.test(line) && !/^\s*[/*]/.test(line)) {
 				const block = lines.slice(i, i + 4).join('\n');
 				if (!/in oklab/.test(block)) {
