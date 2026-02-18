@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1] - 2026-02-18
+
+### Fixed
+- モバイル時にSeparator下のActionButtonsと固定バーが重複表示される問題を修正（`hidden sm:block`）
+- モバイル時にフッターが固定バーに隠れる問題を修正（`pb-16 sm:pb-0`）
+- `min-h-screen` → `min-h-dvh` に変更（iOS Safariブラウザツールバー対応）
+
 ## [0.5.0] - 2026-02-18
 
 ### Added
