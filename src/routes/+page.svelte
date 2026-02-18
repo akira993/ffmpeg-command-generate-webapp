@@ -66,8 +66,8 @@
 
 	<Separator />
 
-	<!-- 5. アクションボタン（デスクトップ） -->
-	<section>
+	<!-- 5. アクションボタン（デスクトップのみ表示） -->
+	<section class="hidden sm:block">
 		<ActionButtons
 			onInstallGuide={() => { installGuideOpen = true; }}
 			onPathGuide={() => { pathGuideOpen = true; }}

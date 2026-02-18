@@ -17,7 +17,7 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-<div class="flex min-h-screen flex-col">
+<div class="flex min-h-dvh flex-col">
 	<Header />
 	<main class="container mx-auto flex-1 px-4 py-6">
 		{@render children()}

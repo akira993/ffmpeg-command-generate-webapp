@@ -2,7 +2,7 @@
 	import { t } from '$lib/i18n';
 </script>
 
-<footer class="border-t border-border mt-auto">
+<footer class="border-t border-border mt-auto pb-16 sm:pb-0">
 	<div class="container mx-auto flex items-center justify-center gap-3 px-4 py-4 text-sm text-muted-foreground">
 		<p>{$t('footer.description')}</p>
 		<span class="text-border">|</span>
