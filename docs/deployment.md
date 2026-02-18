@@ -124,7 +124,7 @@ GitHub Actions: 型チェック + ビルド（CI）
 Vercel: 本番デプロイ（自動）                    ← akiratakahashis-projects チーム
 ```
 
-### 確認済みフロー（2025-02-15）
+### 確認済みフロー（2026-02-18）
 
 1. ✅ `git push origin main` → GitHub Actions CI green（27秒）
 2. ✅ Vercel 自動デプロイ → `state: success`

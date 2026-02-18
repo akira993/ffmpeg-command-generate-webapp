@@ -9,8 +9,9 @@ GUIで簡単にFFmpegコマンドを生成するWebアプリ。
 - **アスペクト比ロック**: D&D時にアスペクト比を自動計算・ロック
 - **コーデック/コンテナ選択**: ドロップダウンで簡単切替（互換性フィルタ付き）
 - **一括処理**: Bash / PowerShell / cmd スクリプトを自動生成
-- **初心者ガイド**: FFmpegインストール方法 + コマンド実行方法をOS別に案内
+- **初心者ガイド**: FFmpegインストール方法 + コマンド実行方法 + コーデックライブラリ追加をOS別に案内
 - **日英対応**: 日本語・英語の切り替え（HTML lang属性も連動）
+- **FFmpeg紹介ページ**: `/about-ffmpeg` — FFmpegの歴史・設計思想・ユースケース・圧縮比較表（JA/EN対応）
 - **ダーク/ライトテーマ**: ペールトーン(Light) / サイバーパンク(Dark)
 
 ## Tech Stack
@@ -51,12 +52,12 @@ src/
 │   │   ├── layout/       # Header, Footer
 │   │   ├── command/      # CommandOutput
 │   │   ├── preset/       # PresetCard, PresetGrid, PresetCustomizer
-│   │   ├── common/       # DropZone, ThemeToggle, PathGuideModal, FfmpegInstallGuide
+│   │   ├── common/       # DropZone, ThemeToggle, ActionButtons, FfmpegInstallGuide, PathGuideModal, LibraryInstallGuide
 │   │   └── form/         # Advanced mode form sections
 │   ├── ffmpeg/           # コマンド生成ロジック・プリセット定義・バリデーション
 │   ├── stores/           # Svelte Stores (command state)
 │   └── i18n/             # 日英翻訳ファイル
-├── routes/               # SvelteKit ルーティング
+├── routes/               # SvelteKit ルーティング（/, /about-ffmpeg）
 ├── app.css               # デザイントークン・テーマ定義
 └── app.html              # FOUC防止スクリプト
 ```
