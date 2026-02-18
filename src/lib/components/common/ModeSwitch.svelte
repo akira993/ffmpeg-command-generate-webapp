@@ -20,9 +20,9 @@
 	const activeIndex = $derived(options.findIndex((o) => o.value === commandStore.mode));
 </script>
 
-<!-- 外枠: TabsList と同じ bg-muted / rounded-lg / p-[3px] -->
+<!-- 外枠: TabsList と同じ bg-muted / rounded-lg / p-[3px]、w-[220px] で固定幅センタリング -->
 <div
-	class="bg-muted text-muted-foreground relative inline-flex h-9 items-center justify-center rounded-lg p-[3px]"
+	class="bg-muted text-muted-foreground relative inline-flex h-9 w-[220px] items-center justify-center rounded-lg p-[3px]"
 	role="tablist"
 	aria-label="mode switch"
 >
@@ -42,7 +42,7 @@
 				disabled:pointer-events-none disabled:opacity-50
 				{commandStore.mode === option.value
 					? 'dark:text-foreground text-foreground'
-					: 'text-muted-foreground hover:text-foreground'}"
+					: 'text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10'}"
 			onclick={() => select(option.value)}
 		>
 			{$t(option.labelKey)}
