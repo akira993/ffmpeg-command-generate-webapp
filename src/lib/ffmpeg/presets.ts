@@ -35,7 +35,6 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 				crf: AVIF_DEFAULTS.crf,
 				bitrate: '0',
 				pixFmt: AVIF_DEFAULTS.pixFmt,
-				aomParams: AVIF_DEFAULTS.aomParams,
 				noVideo: false
 			},
 			audio: { noAudio: true },
@@ -301,7 +300,7 @@ export function inferBatchOptions(preset: PresetDefinition): {
 	// 画像の場合は主要な画像拡張子すべて
 	if (preset.category === 'image') {
 		return {
-			inputExtensions: ['jpg', 'jpeg', 'png', 'webp', 'bmp', 'tiff'],
+			inputExtensions: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'tiff', 'heic', 'heif'],
 			outputExtension: outputExt || 'avif'
 		};
 	}
@@ -309,14 +308,14 @@ export function inferBatchOptions(preset: PresetDefinition): {
 	// 動画の場合
 	if (preset.category === 'video') {
 		return {
-			inputExtensions: ['mp4', 'mov', 'avi', 'mkv', 'webm'],
+			inputExtensions: ['mp4', 'mov', 'avi', 'mkv', 'webm', 'flv', 'wmv', 'm4v'],
 			outputExtension: outputExt || 'mkv'
 		};
 	}
 
 	// 音声の場合
 	return {
-		inputExtensions: [inputExt || 'wav'],
+		inputExtensions: ['mp3', 'aac', 'flac', 'wav', 'ogg', 'm4a', 'opus', 'wma'],
 		outputExtension: outputExt || 'mp3'
 	};
 }

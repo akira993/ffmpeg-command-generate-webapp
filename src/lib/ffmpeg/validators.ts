@@ -70,7 +70,7 @@ export function validateTimeFormat(time: string): ValidationResult {
  * @param min - 最小値（デフォルト: 0）
  * @param max - 最大値（デフォルト: 63、コーデックにより異なる）
  *   - H.264/H.265: 0-51
- *   - AV1 (libaom/SVT-AV1): 0-63
+ *   - AV1 (SVT-AV1): 0-63
  */
 export function validateCRF(crf: number, min = 0, max = 63): ValidationResult {
 	if (!Number.isInteger(crf)) {
@@ -197,7 +197,7 @@ export function validateCodecFormatCompat(codec: string, format: string): Valida
 }
 
 // ============================================================
-// SVT-AV1 / libaom 固有
+// SVT-AV1 固有
 // ============================================================
 
 /** SVT-AV1 preset バリデーション (0-13) */
@@ -208,10 +208,3 @@ export function validateSvtav1Preset(preset: number): ValidationResult {
 	return { valid: true };
 }
 
-/** libaom cpu-used バリデーション (0-8) */
-export function validateCpuUsed(cpuUsed: number): ValidationResult {
-	if (!Number.isInteger(cpuUsed) || cpuUsed < 0 || cpuUsed > 8) {
-		return { valid: false, message: 'validation.cpuUsedOutOfRange' };
-	}
-	return { valid: true };
-}

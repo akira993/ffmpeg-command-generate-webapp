@@ -9,7 +9,6 @@
 	import { commandStore } from '$lib/stores/command.svelte';
 	import { PRESETS } from '$lib/ffmpeg/presets';
 	import {
-		AVIF_DEFAULTS,
 		SVT_AV1_DEFAULTS,
 		H264_DEFAULTS,
 		WEBP_DEFAULTS,
@@ -38,7 +37,6 @@
 	// CRFの範囲はコーデックによって異なる
 	const crfRange = $derived.by(() => {
 		const codec = commandStore.options.video.codec;
-		if (codec === 'libaom-av1') return AVIF_DEFAULTS.crfRange;
 		if (codec === 'libsvtav1') return SVT_AV1_DEFAULTS.crfRange;
 		return H264_DEFAULTS.crfRange;
 	});

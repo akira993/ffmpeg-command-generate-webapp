@@ -173,7 +173,7 @@
 					<div class="space-y-1.5">
 						<h3 class="text-sm font-medium">画像をAVIFに変換</h3>
 						<code class="block rounded-md bg-muted px-3 py-2 font-mono text-xs">
-							ffmpeg -i photo.jpg -c:v libaom-av1 -crf 30 -pix_fmt yuv420p10le photo.avif
+							ffmpeg -i photo.jpg -c:v libsvtav1 -crf 30 -pix_fmt yuv420p10le photo.avif
 						</code>
 					</div>
 					<div class="space-y-1.5">
@@ -255,7 +255,6 @@
 								<th class="px-3 py-2 text-left font-medium">項目</th>
 								<th class="px-3 py-2 text-right font-medium">H.264（元）</th>
 								<th class="px-3 py-2 text-right font-medium">AV1（SVT-AV1, preset 6）</th>
-								<th class="px-3 py-2 text-right font-medium">AV1（libaom, cpu-used 4）</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -263,37 +262,32 @@
 								<td class="px-3 py-1.5">1本あたりサイズ</td>
 								<td class="px-3 py-1.5 text-right font-mono">300 MB</td>
 								<td class="px-3 py-1.5 text-right font-mono">120 MB</td>
-								<td class="px-3 py-1.5 text-right font-mono">100 MB</td>
 							</tr>
 							<tr class="border-b border-border">
 								<td class="px-3 py-1.5">100本合計</td>
 								<td class="px-3 py-1.5 text-right font-mono">30 GB</td>
 								<td class="px-3 py-1.5 text-right font-mono">12 GB</td>
-								<td class="px-3 py-1.5 text-right font-mono">10 GB</td>
 							</tr>
 							<tr class="border-b border-border">
 								<td class="px-3 py-1.5">削減率</td>
 								<td class="px-3 py-1.5 text-right">—</td>
 								<td class="px-3 py-1.5 text-right font-mono text-green-600 dark:text-green-400">-60%</td>
-								<td class="px-3 py-1.5 text-right font-mono text-green-600 dark:text-green-400">-67%</td>
 							</tr>
 							<tr class="border-b border-border">
 								<td class="px-3 py-1.5">エンコード速度（1本5分の動画）</td>
 								<td class="px-3 py-1.5 text-right">—</td>
 								<td class="px-3 py-1.5 text-right font-mono">~3分</td>
-								<td class="px-3 py-1.5 text-right font-mono">~40分</td>
 							</tr>
 							<tr>
 								<td class="px-3 py-1.5">視覚品質（VMAF）</td>
 								<td class="px-3 py-1.5 text-right font-mono">基準</td>
 								<td class="px-3 py-1.5 text-right font-mono">93+</td>
-								<td class="px-3 py-1.5 text-right font-mono">95+</td>
 							</tr>
 						</tbody>
 					</table>
 				</div>
 				<p class="text-xs text-muted-foreground">
-					※ SVT-AV1は速度と品質のバランスに優れ、実用的な選択肢です。libaomは品質は最高ですが非常に低速です。
+					※ SVT-AV1は速度と品質のバランスに優れ、Homebrew ffmpegで標準利用可能な実用的な選択肢です。
 					実際のパフォーマンスはハードウェア、ソース映像の特性、設定により異なります。
 				</p>
 			</section>
@@ -528,7 +522,7 @@
 					<div class="space-y-1.5">
 						<h3 class="text-sm font-medium">Convert image to AVIF</h3>
 						<code class="block rounded-md bg-muted px-3 py-2 font-mono text-xs">
-							ffmpeg -i photo.jpg -c:v libaom-av1 -crf 30 -pix_fmt yuv420p10le photo.avif
+							ffmpeg -i photo.jpg -c:v libsvtav1 -crf 30 -pix_fmt yuv420p10le photo.avif
 						</code>
 					</div>
 					<div class="space-y-1.5">
@@ -610,7 +604,6 @@
 								<th class="px-3 py-2 text-left font-medium">Metric</th>
 								<th class="px-3 py-2 text-right font-medium">H.264 (Original)</th>
 								<th class="px-3 py-2 text-right font-medium">AV1 (SVT-AV1, preset 6)</th>
-								<th class="px-3 py-2 text-right font-medium">AV1 (libaom, cpu-used 4)</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -618,37 +611,32 @@
 								<td class="px-3 py-1.5">Size per video</td>
 								<td class="px-3 py-1.5 text-right font-mono">300 MB</td>
 								<td class="px-3 py-1.5 text-right font-mono">120 MB</td>
-								<td class="px-3 py-1.5 text-right font-mono">100 MB</td>
 							</tr>
 							<tr class="border-b border-border">
 								<td class="px-3 py-1.5">Total (100 videos)</td>
 								<td class="px-3 py-1.5 text-right font-mono">30 GB</td>
 								<td class="px-3 py-1.5 text-right font-mono">12 GB</td>
-								<td class="px-3 py-1.5 text-right font-mono">10 GB</td>
 							</tr>
 							<tr class="border-b border-border">
 								<td class="px-3 py-1.5">Reduction</td>
 								<td class="px-3 py-1.5 text-right">—</td>
 								<td class="px-3 py-1.5 text-right font-mono text-green-600 dark:text-green-400">-60%</td>
-								<td class="px-3 py-1.5 text-right font-mono text-green-600 dark:text-green-400">-67%</td>
 							</tr>
 							<tr class="border-b border-border">
 								<td class="px-3 py-1.5">Encode time (5-min video)</td>
 								<td class="px-3 py-1.5 text-right">—</td>
 								<td class="px-3 py-1.5 text-right font-mono">~3 min</td>
-								<td class="px-3 py-1.5 text-right font-mono">~40 min</td>
 							</tr>
 							<tr>
 								<td class="px-3 py-1.5">Visual Quality (VMAF)</td>
 								<td class="px-3 py-1.5 text-right font-mono">Baseline</td>
 								<td class="px-3 py-1.5 text-right font-mono">93+</td>
-								<td class="px-3 py-1.5 text-right font-mono">95+</td>
 							</tr>
 						</tbody>
 					</table>
 				</div>
 				<p class="text-xs text-muted-foreground">
-					* SVT-AV1 offers excellent speed-quality balance for practical use. libaom achieves the highest quality but is much slower.
+					* SVT-AV1 offers excellent speed-quality balance and is available in Homebrew ffmpeg by default.
 					Actual performance varies with hardware, source content, and settings.
 				</p>
 			</section>
