@@ -53,14 +53,10 @@ export interface VideoOptions {
 	preset?: EncoderPreset;
 	/** 映像無効化 (-vn) */
 	noVideo: boolean;
-	/** libaom cpu-used (0-8) — AVIF/libaom-av1 用速度設定 */
-	cpuUsed?: number;
 	/** SVT-AV1 プリセット (0-13) */
 	svtav1Preset?: number;
 	/** SVT-AV1 追加パラメータ (-svtav1-params) */
 	svtav1Params?: string;
-	/** libaom 追加パラメータ (-aom-params) */
-	aomParams?: string;
 	/** ピクセルフォーマット (-pix_fmt) */
 	pixFmt?: PixelFormat;
 	/** 品質 (-quality) — libwebp用 (0-100, 高いほど高品質) */
@@ -152,8 +148,7 @@ export type VideoCodec =
 	| 'libx265' // H.265/HEVC
 	| 'libvpx' // VP8
 	| 'libvpx-vp9' // VP9
-	| 'libaom-av1' // AV1 (libaom — 高品質/低速、AVIF静止画に最適)
-	| 'libsvtav1' // AV1 (SVT-AV1 — 高速/実用的、動画圧縮に最適)
+	| 'libsvtav1' // AV1 (SVT-AV1 — 高速/実用的、動画・AVIF両対応)
 	| 'libwebp' // WebP
 	| 'copy'; // ストリームコピー
 

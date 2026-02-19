@@ -17,8 +17,7 @@ export const VIDEO_CODEC_LABELS: Record<VideoCodec, string> = {
 	libx265: 'H.265/HEVC (libx265)',
 	libvpx: 'VP8 (libvpx)',
 	'libvpx-vp9': 'VP9 (libvpx-vp9)',
-	'libaom-av1': 'AV1 (libaom — 高品質)',
-	libsvtav1: 'AV1 (SVT-AV1 — 高速)',
+	libsvtav1: 'AV1 (SVT-AV1)',
 	libwebp: 'WebP (libwebp)',
 	copy: 'コピー（再エンコードなし）'
 };
@@ -60,8 +59,7 @@ export const CODEC_FORMAT_COMPAT: Record<string, string[]> = {
 	libx265: ['mp4', 'mov', 'mkv'],
 	libvpx: ['webm', 'mkv'],
 	'libvpx-vp9': ['webm', 'mkv'],
-	'libaom-av1': ['mp4', 'mkv', 'webm', 'avif'],
-	libsvtav1: ['mp4', 'mkv', 'webm'],
+	libsvtav1: ['mp4', 'mkv', 'webm', 'avif'],
 	libwebp: ['webp'],
 	aac: ['mp4', 'mov', 'mkv', 'aac'],
 	libmp3lame: ['mp3', 'mkv'],
@@ -77,7 +75,6 @@ export const RECOMMENDED_AUDIO_CODEC: Partial<Record<VideoCodec, AudioCodec>> = 
 	libx265: 'aac',
 	libvpx: 'libvorbis',
 	'libvpx-vp9': 'libopus',
-	'libaom-av1': 'libopus',
 	libsvtav1: 'libopus'
 };
 
@@ -88,22 +85,17 @@ export const RECOMMENDED_AUDIO_CODEC: Partial<Record<VideoCodec, AudioCodec>> = 
 /**
  * AVIF画像圧縮の推奨設定
  *
- * libaom-av1 + still-picture で静止画に最適化。
+ * libsvtav1 は Homebrew ffmpeg で標準利用可能。
  * 10bit (yuv420p10le) は8bitソースでも圧縮効率が向上する。
- * tune=iq は2025年最新の静止画向けチューニング。
  *
  * @see https://darekkay.com/blog/avif-images/
  */
 export const AVIF_DEFAULTS = {
-	codec: 'libaom-av1' as VideoCodec,
+	codec: 'libsvtav1' as VideoCodec,
 	crf: 30,
 	pixFmt: 'yuv420p10le' as PixelFormat,
-	aomParams: 'tune=iq',
-	/** CRF範囲: 0(最高品質) ~ 63(最低品質) */
-	crfRange: { min: 0, max: 63 },
-	/** cpu-used範囲: 0(最遅/高品質) ~ 8(最速) — 推奨は2-4 */
-	cpuUsedRange: { min: 0, max: 8 },
-	cpuUsedDefault: 4
+	/** CRF範囲: 1(最高品質) ~ 63(最低品質) */
+	crfRange: { min: 1, max: 63 }
 } as const;
 
 // ============================================================
@@ -113,7 +105,7 @@ export const AVIF_DEFAULTS = {
 /**
  * SVT-AV1 動画圧縮の推奨設定
  *
- * libsvtav1 は libaom より大幅に高速で実用的。
+ * libsvtav1 は高速で実用的。Homebrew ffmpeg で標準利用可能。
  * preset 6 が速度/品質のバランスポイント。
  * tune=0 は知覚品質優先。
  *
@@ -133,19 +125,6 @@ export const SVT_AV1_DEFAULTS = {
 	crfRange: { min: 1, max: 63 },
 	/** preset範囲: 0(最遅/高品質) ~ 13(最速) — 推奨は4-8 */
 	presetRange: { min: 0, max: 13 }
-} as const;
-
-/**
- * libaom-av1 動画圧縮の設定（低速だが高品質）
- */
-export const LIBAOM_AV1_DEFAULTS = {
-	codec: 'libaom-av1' as VideoCodec,
-	crf: 30,
-	cpuUsed: 4,
-	pixFmt: 'yuv420p10le' as PixelFormat,
-	aomParams: 'tune=0',
-	crfRange: { min: 0, max: 63 },
-	cpuUsedRange: { min: 0, max: 8 }
 } as const;
 
 // ============================================================
@@ -197,7 +176,6 @@ export const NON_DEFAULT_VIDEO_CODECS: Set<string> = new Set([
 	'libx265',
 	'libvpx',
 	'libvpx-vp9',
-	'libaom-av1',
 	'libsvtav1',
 	'libwebp'
 ]);

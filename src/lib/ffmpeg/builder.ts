@@ -84,17 +84,20 @@ export function buildBatchCommand(options: FFmpegOptions, batch: BatchOptions): 
 	// コマンドのオプション部分を生成（入力/出力ファイル名は変数に置換）
 	const optionParts = buildOptionParts(options);
 
-	const inputGlob = batch.inputExtensions.map((ext) => `*.${ext}`).join(' ');
 	const outExt = batch.outputExtension;
+	const extensions = batch.inputExtensions;
+
+	// case パターン文字列（Bash / cmd 用）
+	const casePattern = extensions.join('|');
 
 	// Bash (macOS/Linux)
-	const bash = buildBashScript(optionParts, inputGlob, outExt, options);
+	const bash = buildBashScript(optionParts, casePattern, outExt, options);
 
 	// PowerShell (Windows)
-	const powershell = buildPowerShellScript(optionParts, batch.inputExtensions, outExt, options);
+	const powershell = buildPowerShellScript(optionParts, extensions, outExt, options);
 
 	// cmd (Windows Batch)
-	const cmd = buildCmdScript(optionParts, inputGlob, outExt, options);
+	const cmd = buildCmdScript(optionParts, extensions, outExt, options);
 
 	return { bash, powershell, cmd };
 }
@@ -160,11 +163,6 @@ function buildVideoOptions(options: FFmpegOptions): string[] {
 		parts.push('-svtav1-params', v.svtav1Params);
 	}
 
-	// libaom 追加パラメータ
-	if (v.aomParams) {
-		parts.push('-aom-params', v.aomParams);
-	}
-
 	// libwebp quality
 	if (v.quality !== undefined) {
 		parts.push('-quality', String(v.quality));
@@ -173,11 +171,6 @@ function buildVideoOptions(options: FFmpegOptions): string[] {
 	// libwebp lossless
 	if (v.lossless) {
 		parts.push('-lossless', '1');
-	}
-
-	// libaom cpu-used
-	if (v.cpuUsed !== undefined) {
-		parts.push('-cpu-used', String(v.cpuUsed));
 	}
 
 	// フレームレート
@@ -336,53 +329,108 @@ function buildOptionParts(options: FFmpegOptions): string {
 	return parts.join(' ');
 }
 
+/**
+ * Bash スクリプト生成（macOS / Linux）
+ *
+ * - 全ファイルを走査し、拡張子を小文字化して case で判定
+ * - 大文字拡張子（.JPG 等）にも対応
+ * - 出力拡張子と同一のファイルはスキップ
+ * - 出力先フォルダを自動作成
+ */
 function buildBashScript(
 	optionParts: string,
-	inputGlob: string,
+	casePattern: string,
 	outExt: string,
 	options: FFmpegOptions
 ): string {
-	const lines: string[] = ['#!/bin/bash', ''];
-
-	// AVIF 静止画の場合、-b:v 0 はオプション部分に含まれている
 	const inputOpts = options.input.startTime ? `-ss ${options.input.startTime} ` : '';
-
-	lines.push(`for f in ${inputGlob}; do`);
-	lines.push(`  ffmpeg ${inputOpts}-i "$f" ${optionParts} "\${f%.*}.${outExt}"`);
-	lines.push('done');
+	const lines: string[] = [
+		'#!/bin/bash',
+		'',
+		`OUTPUT_EXT="${outExt}"`,
+		`OUTPUT_DIR="$(basename "$(pwd)")_\${OUTPUT_EXT}"`,
+		'mkdir -p "$OUTPUT_DIR"',
+		'',
+		'for f in *; do',
+		'  [ -f "$f" ] || continue',
+		'  ext="${f##*.}"',
+		'  ext_lower=$(echo "$ext" | tr \'[:upper:]\' \'[:lower:]\')',
+		`  case "$ext_lower" in`,
+		`    ${casePattern})`,
+		'      [ "$ext_lower" = "$OUTPUT_EXT" ] && continue',
+		`      ffmpeg ${inputOpts}-i "$f" ${optionParts} "$OUTPUT_DIR/\${f%.*}.$OUTPUT_EXT"`,
+		'      ;;',
+		'  esac',
+		'done'
+	];
 
 	return lines.join('\n');
 }
 
+/**
+ * PowerShell スクリプト生成（Windows）
+ *
+ * - -Include で大文字小文字両方にマッチ（PowerShell は case-insensitive）
+ * - Where-Object で出力拡張子と同一のファイルを除外
+ * - 出力先フォルダを自動作成
+ */
 function buildPowerShellScript(
 	optionParts: string,
 	extensions: string[],
 	outExt: string,
 	options: FFmpegOptions
 ): string {
-	const lines: string[] = [];
-	const includeFilter = extensions.map((ext) => `*.${ext}`).join(',');
-
+	const includeFilter = extensions.map((ext) => `"*.${ext}"`).join(', ');
 	const inputOpts = options.input.startTime ? `-ss ${options.input.startTime} ` : '';
 
-	lines.push(`Get-ChildItem -Include ${includeFilter} -Recurse | ForEach-Object {`);
-	lines.push(
-		`  ffmpeg ${inputOpts}-i $_.FullName ${optionParts} "$($_.DirectoryName)\\$($_.BaseName).${outExt}"`
-	);
-	lines.push('}');
+	const lines: string[] = [
+		`$outputExt = "${outExt}"`,
+		`$outputDir = "$(Split-Path -Leaf (Get-Location))_$outputExt"`,
+		'New-Item -ItemType Directory -Force -Path $outputDir | Out-Null',
+		'',
+		`Get-ChildItem -File -Include ${includeFilter} -Recurse |`,
+		'  Where-Object { $_.Extension.TrimStart(\'.\').ToLower() -ne $outputExt } |',
+		'  ForEach-Object {',
+		`    ffmpeg ${inputOpts}-i $_.FullName ${optionParts} "$outputDir\\$($_.BaseName).$outputExt"`,
+		'  }'
+	];
 
 	return lines.join('\n');
 }
 
+/**
+ * cmd スクリプト生成（Windows バッチ）
+ *
+ * - 拡張子ごとに for ループ（cmd は case-insensitive で大文字も自動マッチ）
+ * - 出力拡張子と同一のファイルはスキップ
+ * - 出力先フォルダを自動作成
+ */
 function buildCmdScript(
 	optionParts: string,
-	inputGlob: string,
+	extensions: string[],
 	outExt: string,
 	options: FFmpegOptions
 ): string {
 	const inputOpts = options.input.startTime ? `-ss ${options.input.startTime} ` : '';
 
-	return `for %%f in (${inputGlob}) do ffmpeg ${inputOpts}-i "%%f" ${optionParts} "%%~nf.${outExt}"`;
+	const lines: string[] = [
+		'@echo off',
+		`set "OUTPUT_EXT=${outExt}"`,
+		'for %%I in (.) do set "FOLDER_NAME=%%~nxI"',
+		'set "OUTPUT_DIR=%FOLDER_NAME%_%OUTPUT_EXT%"',
+		'if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"',
+		''
+	];
+
+	// cmd では拡張子ごとに for ループを回す（case-insensitive なので大文字も自動マッチ）
+	for (const ext of extensions) {
+		if (ext.toLowerCase() === outExt.toLowerCase()) continue;
+		lines.push(
+			`for %%f in (*.${ext}) do ffmpeg ${inputOpts}-i "%%f" ${optionParts} "%OUTPUT_DIR%\\%%~nf.%OUTPUT_EXT%"`
+		);
+	}
+
+	return lines.join('\n');
 }
 
 // ============================================================
