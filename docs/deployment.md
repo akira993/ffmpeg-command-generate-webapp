@@ -11,7 +11,7 @@ GitHub の main ブランチへの push で自動的に本番デプロイが行�
 |------|-----|
 | Vercel チーム | `akiratakahashis-projects` |
 | Vercel ダッシュボード | https://vercel.com/akiratakahashis-projects/ffmpeg-command-generate-webapp |
-| プロダクションURL | 固定ドメイン取得予定（※下記「URL構造」参照） |
+| プロダクションURL | https://www.cmd-gen.com |
 | GitHub リポジトリ | `akira993/ffmpeg-command-generate-webapp` |
 | CI | GitHub Actions（`.github/workflows/ci.yml`） |
 | 自動デプロイ | main push → 本番、PR → プレビュー |
@@ -26,7 +26,7 @@ Vercel は各デプロイにユニークな URL を付与する：
 |------|---------|------|
 | デプロイ固有URL | `https://ffmpeg-command-generate-webapp-{hash}.vercel.app` | デプロイごとに変わる |
 | プロジェクトURL | `https://ffmpeg-command-generate-webapp.vercel.app` | 最新の本番デプロイを指す（要確認） |
-| カスタムドメイン | 未設定（取得予定） | Vercel ダッシュボード → Settings → Domains で設定 |
+| カスタムドメイン | `https://www.cmd-gen.com`（本番） | Xserver ドメイン DNS → Vercel |
 
 **最新デプロイ URL の取得方法**:
 

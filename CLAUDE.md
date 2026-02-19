@@ -2,6 +2,8 @@
 
 SvelteKit 2 + Svelte 5 (Runes) + TypeScript + Tailwind CSS v4。フロントエンドのみ（Vercel SSG）。
 
+**本番URL**: https://www.cmd-gen.com（`cmd-gen.com` → `www.cmd-gen.com` へ 307 リダイレクト）
+
 ## コマンド
 
 ```bash
@@ -58,5 +60,6 @@ gh api repos/akira993/ffmpeg-command-generate-webapp/deployments \
 | `/css-lint` | CSS oklch ルール違反チェック |
 | `/ui-test` | Chrome MCP でローカル UI テスト（PC/モバイル） |
 | `/i18n-check` | en.json / ja.json のキー整合性チェック |
+| `/perf-test` | Chrome MCP でパフォーマンス計測（Navigation Timing / CLS） |
 | `/deploy` | push → CI 待機 → デプロイ URL 取得まで一連実行 |
-| `/deploy-test` | 本番 URL に対して Chrome MCP で UI テスト |
+| `/deploy-test` | 本番 URL に対して Chrome MCP で UI + パフォーマンステスト |

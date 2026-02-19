@@ -25,9 +25,9 @@
   (key: emerald / teal / violet / blue / pink / amber / rose / orange)
 
 ### タイポグラフィトークン
-- `--text-xs` (11-12px) / `--text-sm` (13-14px) / `--text-base` (15-16px)
-- `--text-lg` (17-18px) / `--text-xl` (19-20px)
-- `--text-2xl` (22-24px) / `--text-3xl` (28-30px)
+- `--text-xs` (12-13px) / `--text-sm` (14-15px) / `--text-base` (16-17px)
+- `--text-lg` (18-19px) / `--text-xl` (20-22px)
+- `--text-2xl` (24-26px) / `--text-3xl` (30-33px)
 
 ## 修正例
 

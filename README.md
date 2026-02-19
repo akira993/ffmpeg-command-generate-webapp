@@ -83,6 +83,8 @@ src/
 
 ## Deployment
 
+**本番URL**: https://www.cmd-gen.com
+
 Vercel で自動デプロイ。`main` ブランチへの push で本番デプロイが走る。
 
 ## License

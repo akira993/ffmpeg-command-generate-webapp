@@ -16,7 +16,7 @@
 アイコンカラー: `--color-icon-{key}` / `--color-icon-{key}-bg`
 key: `emerald` / `teal` / `violet` / `blue` / `pink` / `amber` / `rose` / `orange`
 
-テキスト: `--text-xs`(11-12px) / `--text-sm` / `--text-base` / `--text-lg` / `--text-xl` / `--text-2xl` / `--text-3xl`(28-30px)
+テキスト: `--text-xs`(12-13px) / `--text-sm`(14-15px) / `--text-base`(16-17px) / `--text-lg`(18-19px) / `--text-xl`(20-22px) / `--text-2xl`(24-26px) / `--text-3xl`(30-33px)
 
 ## 修正例
 

@@ -59,7 +59,11 @@
       "Bash(npx tsc:*)",
       "Bash(npx vitest:*)",
       "Bash(npm test:*)",
-      "Bash(npm run test:*)"
+      "Bash(npm run test:*)",
+      "Bash(VERCEL_ORG_ID=team_eZhuMPiRFRfR6G0C3dMIv8nt vercel:*)",
+      "Bash(git -C /Users/akiratakahashi/Projects/ffmpeg-command-generate-webapp config --list)",
+      "Bash(grep:*)",
+      "Bash(git status:*)"
     ]
   }
 }

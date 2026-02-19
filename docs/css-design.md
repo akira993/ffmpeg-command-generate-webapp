@@ -68,13 +68,13 @@
 
 | トークン | 定義 | 最小 → 最大 |
 |---------|------|-------------|
-| `--text-xs` | `clamp(0.6875rem, 0.65rem + 0.1vw, 0.75rem)` | 11px → 12px |
-| `--text-sm` | `clamp(0.8125rem, 0.775rem + 0.15vw, 0.875rem)` | 13px → 14px |
-| `--text-base` | `clamp(0.9375rem, 0.9rem + 0.2vw, 1rem)` | 15px → 16px |
-| `--text-lg` | `clamp(1.0625rem, 1rem + 0.3vw, 1.125rem)` | 17px → 18px |
-| `--text-xl` | `clamp(1.1875rem, 1.1rem + 0.4vw, 1.25rem)` | 19px → 20px |
-| `--text-2xl` | `clamp(1.375rem, 1.25rem + 0.5vw, 1.5rem)` | 22px → 24px |
-| `--text-3xl` | `clamp(1.75rem, 1.6rem + 0.65vw, 1.875rem)` | 28px → 30px |
+| `--text-xs` | `clamp(0.75rem, 0.7rem + 0.15vw, 0.8125rem)` | 12px → 13px |
+| `--text-sm` | `clamp(0.875rem, 0.82rem + 0.2vw, 0.9375rem)` | 14px → 15px |
+| `--text-base` | `clamp(1rem, 0.94rem + 0.25vw, 1.0625rem)` | 16px → 17px |
+| `--text-lg` | `clamp(1.125rem, 1.05rem + 0.3vw, 1.1875rem)` | 18px → 19px |
+| `--text-xl` | `clamp(1.25rem, 1.15rem + 0.4vw, 1.375rem)` | 20px → 22px |
+| `--text-2xl` | `clamp(1.5rem, 1.35rem + 0.55vw, 1.625rem)` | 24px → 26px |
+| `--text-3xl` | `clamp(1.875rem, 1.7rem + 0.7vw, 2.0625rem)` | 30px → 33px |
 
 ### 3.1 適用ルール
 

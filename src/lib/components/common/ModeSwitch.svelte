@@ -28,8 +28,8 @@
 >
 	<!-- スライドする背景ピル: TabsTrigger の active 状態と同じ bg-background / rounded-md / shadow-sm -->
 	<span
-		class="dark:bg-input/30 dark:border-input absolute top-[3px] bottom-[3px] w-[calc(50%-2px)] rounded-md border border-transparent bg-background shadow-sm transition-[left] duration-200 ease-in-out"
-		style="left: {activeIndex === 0 ? '3px' : 'calc(50% + 1px)'}"
+		class="dark:bg-input/30 dark:border-input absolute top-[3px] bottom-[3px] w-[calc(50%-3px)] rounded-md border border-transparent bg-background shadow-sm transition-[left] duration-200 ease-in-out"
+		style="left: {activeIndex === 0 ? '3px' : 'calc(50%)'}"
 		aria-hidden="true"
 	></span>
 

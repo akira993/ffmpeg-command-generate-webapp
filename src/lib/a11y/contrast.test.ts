@@ -168,13 +168,13 @@ describe('ダークテーマ トークン値 (docs §2.3)', () => {
 
 describe('タイポグラフィ clamp() トークン (docs §3)', () => {
 	const TYPO_TOKENS: Record<string, string> = {
-		'--text-xs':   'clamp(0.6875rem, 0.65rem + 0.1vw, 0.75rem)',
-		'--text-sm':   'clamp(0.8125rem, 0.775rem + 0.15vw, 0.875rem)',
-		'--text-base': 'clamp(0.9375rem, 0.9rem + 0.2vw, 1rem)',
-		'--text-lg':   'clamp(1.0625rem, 1rem + 0.3vw, 1.125rem)',
-		'--text-xl':   'clamp(1.1875rem, 1.1rem + 0.4vw, 1.25rem)',
-		'--text-2xl':  'clamp(1.375rem, 1.25rem + 0.5vw, 1.5rem)',
-		'--text-3xl':  'clamp(1.75rem, 1.6rem + 0.65vw, 1.875rem)'
+		'--text-xs':   'clamp(0.75rem, 0.7rem + 0.15vw, 0.8125rem)',
+		'--text-sm':   'clamp(0.875rem, 0.82rem + 0.2vw, 0.9375rem)',
+		'--text-base': 'clamp(1rem, 0.94rem + 0.25vw, 1.0625rem)',
+		'--text-lg':   'clamp(1.125rem, 1.05rem + 0.3vw, 1.1875rem)',
+		'--text-xl':   'clamp(1.25rem, 1.15rem + 0.4vw, 1.375rem)',
+		'--text-2xl':  'clamp(1.5rem, 1.35rem + 0.55vw, 1.625rem)',
+		'--text-3xl':  'clamp(1.875rem, 1.7rem + 0.7vw, 2.0625rem)'
 	};
 
 	for (const [token, expected] of Object.entries(TYPO_TOKENS)) {
