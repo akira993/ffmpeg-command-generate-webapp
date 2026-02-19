@@ -76,7 +76,7 @@ npm run dev
 
 | # | プリセット | 期待コマンド（概要） | OK/NG |
 |---|-----------|---------------------|-------|
-| 3-1 | 画像圧縮（AVIF） | `ffmpeg -y -i input.png -c:v libaom-av1 -crf 30 -b:v 0 -pix_fmt yuv420p10le -aom-params tune=iq -an output.avif` | |
+| 3-1 | 画像圧縮（AVIF） | `ffmpeg -y -i input.png -c:v libsvtav1 -crf 30 -b:v 0 -pix_fmt yuv420p10le -an output.avif` | |
 | 3-2 | 画像圧縮（WebP） | `ffmpeg -y -i input.png -c:v libwebp -quality 75 -an output.webp` | |
 | 3-3 | 動画圧縮（AV1） | `ffmpeg -y -i input.mp4 -c:v libsvtav1 -crf 30 -pix_fmt yuv420p10le -preset 6 -svtav1-params tune=0:enable-overlays=1:scd=1 -c:a libopus -b:a 128k output.mp4` | |
 | 3-4 | 動画フォーマット変換 | `ffmpeg -y -i input.mp4 -c:v libvpx-vp9 -crf 30 -c:a libopus -b:a 128k output.webm` | |
@@ -285,11 +285,20 @@ bash scripts/lint-css.sh  # CSSリント — PASSED
 
 ## 12. パフォーマンステスト
 
-| # | 手順 | 期待結果 | OK/NG |
-|---|------|---------|-------|
-| 12-1 | Lighthouse（Performance） | スコア 90+ | |
-| 12-2 | 初回表示 | 3秒以内にインタラクティブ | |
-| 12-3 | プリセット切替 | 即座にコマンドが更新される（体感遅延なし） | |
+Chrome DevTools または `/perf-test` スキルで計測する。
+
+| # | 指標 | 目標値 | 計測方法 | OK/NG |
+|---|------|--------|---------|-------|
+| 12-1 | TTFB | < 200ms | Navigation Timing API | |
+| 12-2 | FCP（First Contentful Paint） | < 1000ms | Paint Timing API | |
+| 12-3 | DOMContentLoaded | < 500ms | Navigation Timing API | |
+| 12-4 | Load Complete | < 1500ms | Navigation Timing API | |
+| 12-5 | 転送サイズ合計 | < 300KB | Resource Timing API | |
+| 12-6 | JS 転送サイズ | < 200KB | Resource Timing API | |
+| 12-7 | CLS（Cumulative Layout Shift） | < 0.1 | Layout Shift API | |
+| 12-8 | プリセット切替応答 | < 100ms（体感遅延なし） | 目視確認 | |
+
+**ベースライン（2026-02-19 本番計測）**: TTFB 96ms, FCP 368ms, DOMContentLoaded 240ms, Load 284ms, 転送 105KB, JS 93KB
 
 ---
 
@@ -311,8 +320,8 @@ bash scripts/lint-css.sh  # CSSリント — PASSED
 | レスポンシブ | 8 | | | |
 | CI/CD | 4 | | | |
 | アクセシビリティ | 4 | | | |
-| パフォーマンス | 3 | | | |
-| **合計** | **119** | | | |
+| パフォーマンス | 8 | | | |
+| **合計** | **124** | | | |
 
 ---
 

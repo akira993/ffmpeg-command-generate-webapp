@@ -130,7 +130,8 @@ type VideoCodec =
   | 'libx265'    // H.265/HEVC
   | 'libvpx'     // VP8
   | 'libvpx-vp9' // VP9
-  | 'libaom-av1' // AV1
+  | 'libsvtav1'  // AV1 (SVT-AV1)
+  | 'libwebp'    // WebP
   | 'copy';      // コピー
 
 type AudioCodec =

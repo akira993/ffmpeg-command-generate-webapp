@@ -107,18 +107,16 @@ FFmpegは動画・音声・画像処理における最も強力なCLIツール�
 ## 4. 対応FFmpeg操作一覧
 
 ### 4.1 画像圧縮（AVIF）— MVP優先
-- エンコーダ: libaom-av1（静止画に最適）
-- 推奨コマンド: `ffmpeg -i input.jpg -c:v libaom-av1 -still-picture 1 -crf 30 -b:v 0 -pix_fmt yuv420p10le -aom-params tune=iq output.avif`
+- エンコーダ: libsvtav1（Homebrew ffmpeg で標準利用可能）
+- 推奨コマンド: `ffmpeg -i input.jpg -c:v libsvtav1 -crf 30 -b:v 0 -pix_fmt yuv420p10le output.avif`
 - 主要パラメータ:
-  - `-still-picture 1`: 静止画最適化（AVIF必須）
-  - `-crf 0-63`: 品質（30がバランス）
+  - `-crf 1-63`: 品質（30がバランス）
   - `-pix_fmt yuv420p10le`: 10bit（8bitソースでも圧縮効率向上）
-  - `-aom-params tune=iq`: 静止画向けチューニング（2025年最新）
-- 対応入力: JPG, JPEG, PNG, WebP, BMP, TIFF
+- 対応入力: JPG, JPEG, PNG, GIF, WebP, BMP, TIFF, HEIC, HEIF
 - 対応出力: AVIF, WebP, PNG
 
 ### 4.2 動画圧縮（AV1）— MVP優先
-- エンコーダ: SVT-AV1（libsvtav1 — libaomより大幅に高速で実用的）
+- エンコーダ: SVT-AV1（libsvtav1 — Homebrew ffmpeg で標準利用可能）
 - 推奨コマンド: `ffmpeg -i input.mp4 -c:v libsvtav1 -crf 30 -preset 6 -pix_fmt yuv420p10le -svtav1-params tune=0:enable-overlays=1:scd=1 -c:a libopus -b:a 128k output.mkv`
 - 主要パラメータ:
   - `-crf 1-63`: 品質（30がバランス）≒ x264 CRF 16相当
@@ -129,7 +127,7 @@ FFmpegは動画・音声・画像処理における最も強力なCLIツール�
 
 ### 4.3 フォーマット変換
 - 対応フォーマット: MP4, WebM, MOV, AVI, MKV, FLV
-- コーデック指定: H.264, H.265/HEVC, VP8, VP9, AV1 (libaom-av1, libsvtav1)
+- コーデック指定: H.264, H.265/HEVC, VP8, VP9, AV1 (libsvtav1)
 
 ### 4.4 音声操作
 - 音声抽出: 動画 → MP3/AAC/WAV/FLAC/OGG
