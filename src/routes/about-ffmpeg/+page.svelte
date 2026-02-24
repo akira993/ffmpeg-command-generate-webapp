@@ -17,13 +17,90 @@
 		<meta name="description" content="FFmpegとは何か？ 25年以上の歴史を持つオープンソース動画・音声処理ツールの設計思想、主な機能、コマンド例、最新情報、JPEG→AVIF/H.264→AV1の圧縮比較データを詳しく解説します。" />
 		<meta property="og:title" content="FFmpegとは？ — 歴史・設計思想・使い方を徹底解説" />
 		<meta property="og:description" content="25年以上の歴史を持つオープンソース動画・音声処理ツールFFmpegの完全ガイド" />
+		<meta property="og:image" content="https://www.cmd-gen.com/og-about-ja.png" />
+		<meta property="og:locale" content="ja_JP" />
+		<meta property="og:locale:alternate" content="en_US" />
+		<meta name="twitter:title" content="FFmpegとは？ — 歴史・設計思想・使い方を徹底解説" />
+		<meta name="twitter:description" content="25年以上の歴史を持つオープンソース動画・音声処理ツールFFmpegの完全ガイド" />
+		<meta name="twitter:image" content="https://www.cmd-gen.com/og-about-ja.png" />
 	{:else}
 		<title>What is FFmpeg? — History, Design, and Use Cases | FFmpeg Command Generator</title>
 		<meta name="description" content="What is FFmpeg? A comprehensive guide to the open-source multimedia framework with 25+ years of history. Learn about its design philosophy, features, command examples, and JPEG→AVIF/H.264→AV1 compression benchmarks." />
 		<meta property="og:title" content="What is FFmpeg? — History, Design, and Use Cases" />
 		<meta property="og:description" content="A comprehensive guide to FFmpeg, the open-source multimedia framework" />
+		<meta property="og:image" content="https://www.cmd-gen.com/og-about-en.png" />
+		<meta property="og:locale" content="en_US" />
+		<meta property="og:locale:alternate" content="ja_JP" />
+		<meta name="twitter:title" content="What is FFmpeg? — History, Design, and Use Cases" />
+		<meta name="twitter:description" content="A comprehensive guide to FFmpeg, the open-source multimedia framework" />
+		<meta name="twitter:image" content="https://www.cmd-gen.com/og-about-en.png" />
 	{/if}
 	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://www.cmd-gen.com/about-ffmpeg" />
+	<meta property="og:site_name" content="FFmpeg Command Generator" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<link rel="canonical" href="https://www.cmd-gen.com/about-ffmpeg" />
+	<link rel="alternate" hreflang="ja" href="https://www.cmd-gen.com/about-ffmpeg" />
+	<link rel="alternate" hreflang="en" href="https://www.cmd-gen.com/about-ffmpeg" />
+	<link rel="alternate" hreflang="x-default" href="https://www.cmd-gen.com/about-ffmpeg" />
+
+	<!-- JSON-LD 構造化データ -->
+	{@html `<script type="application/ld+json">${JSON.stringify({
+		"@context": "https://schema.org",
+		"@graph": [
+			{
+				"@type": "Article",
+				"headline": "FFmpegとは？ — 歴史・設計思想・使い方を徹底解説",
+				"alternativeHeadline": "What is FFmpeg? — History, Design, and Use Cases",
+				"description": "FFmpegの概要・歴史・設計思想・ユースケース・圧縮比較データを徹底解説する完全ガイド",
+				"url": "https://www.cmd-gen.com/about-ffmpeg",
+				"inLanguage": ["ja", "en"],
+				"publisher": {
+					"@type": "Organization",
+					"name": "cmd-gen.com",
+					"url": "https://www.cmd-gen.com/"
+				},
+				"mainEntityOfPage": {
+					"@type": "WebPage",
+					"@id": "https://www.cmd-gen.com/about-ffmpeg"
+				},
+				"about": {
+					"@type": "SoftwareApplication",
+					"name": "FFmpeg",
+					"url": "https://ffmpeg.org/"
+				}
+			},
+			{
+				"@type": "HowTo",
+				"name": "FFmpegコマンドの使い方",
+				"description": "FFmpegの代表的なコマンド例を紹介",
+				"step": [
+					{
+						"@type": "HowToStep",
+						"name": "動画をH.264で圧縮",
+						"text": "ffmpeg -i input.mov -c:v libx264 -crf 23 -c:a aac output.mp4"
+					},
+					{
+						"@type": "HowToStep",
+						"name": "AV1で高効率圧縮",
+						"text": "ffmpeg -i input.mp4 -c:v libsvtav1 -crf 30 -preset 6 -c:a libopus output.mp4"
+					},
+					{
+						"@type": "HowToStep",
+						"name": "画像をAVIFに変換",
+						"text": "ffmpeg -i photo.jpg -c:v libsvtav1 -crf 30 -pix_fmt yuv420p10le photo.avif"
+					},
+					{
+						"@type": "HowToStep",
+						"name": "動画から音声を抽出",
+						"text": "ffmpeg -i video.mp4 -vn -c:a libmp3lame -q:a 2 audio.mp3"
+					}
+				]
+			}
+		]
+	})}</script>`}
 </svelte:head>
 
 <div class="mx-auto max-w-3xl space-y-8 pb-12">
