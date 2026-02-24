@@ -17,23 +17,23 @@
 		<meta name="description" content="FFmpegとは何か？ 25年以上の歴史を持つオープンソース動画・音声処理ツールの設計思想、主な機能、コマンド例、最新情報、JPEG→AVIF/H.264→AV1の圧縮比較データを詳しく解説します。" />
 		<meta property="og:title" content="FFmpegとは？ — 歴史・設計思想・使い方を徹底解説" />
 		<meta property="og:description" content="25年以上の歴史を持つオープンソース動画・音声処理ツールFFmpegの完全ガイド" />
-		<meta property="og:image" content="https://www.cmd-gen.com/og-about-ja.png" />
+		<meta property="og:image" content="https://www.cmd-gen.com/og-about-ja.png?v=1" />
 		<meta property="og:locale" content="ja_JP" />
 		<meta property="og:locale:alternate" content="en_US" />
 		<meta name="twitter:title" content="FFmpegとは？ — 歴史・設計思想・使い方を徹底解説" />
 		<meta name="twitter:description" content="25年以上の歴史を持つオープンソース動画・音声処理ツールFFmpegの完全ガイド" />
-		<meta name="twitter:image" content="https://www.cmd-gen.com/og-about-ja.png" />
+		<meta name="twitter:image" content="https://www.cmd-gen.com/og-about-ja.png?v=1" />
 	{:else}
 		<title>What is FFmpeg? — History, Design, and Use Cases | FFmpeg Command Generator</title>
 		<meta name="description" content="What is FFmpeg? A comprehensive guide to the open-source multimedia framework with 25+ years of history. Learn about its design philosophy, features, command examples, and JPEG→AVIF/H.264→AV1 compression benchmarks." />
 		<meta property="og:title" content="What is FFmpeg? — History, Design, and Use Cases" />
 		<meta property="og:description" content="A comprehensive guide to FFmpeg, the open-source multimedia framework" />
-		<meta property="og:image" content="https://www.cmd-gen.com/og-about-en.png" />
+		<meta property="og:image" content="https://www.cmd-gen.com/og-about-en.png?v=1" />
 		<meta property="og:locale" content="en_US" />
 		<meta property="og:locale:alternate" content="ja_JP" />
 		<meta name="twitter:title" content="What is FFmpeg? — History, Design, and Use Cases" />
 		<meta name="twitter:description" content="A comprehensive guide to FFmpeg, the open-source multimedia framework" />
-		<meta name="twitter:image" content="https://www.cmd-gen.com/og-about-en.png" />
+		<meta name="twitter:image" content="https://www.cmd-gen.com/og-about-en.png?v=1" />
 	{/if}
 	<meta property="og:type" content="article" />
 	<meta property="og:url" content="https://www.cmd-gen.com/about-ffmpeg" />
