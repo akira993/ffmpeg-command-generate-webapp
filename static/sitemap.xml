@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <!-- ホームページ -->
+  <url>
+    <loc>https://www.cmd-gen.com/</loc>
+    <lastmod>2025-06-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.cmd-gen.com/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.cmd-gen.com/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.cmd-gen.com/" />
+  </url>
+
+  <!-- FFmpegとは？ 記事ページ -->
+  <url>
+    <loc>https://www.cmd-gen.com/about-ffmpeg</loc>
+    <lastmod>2025-06-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.cmd-gen.com/about-ffmpeg" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.cmd-gen.com/about-ffmpeg" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.cmd-gen.com/about-ffmpeg" />
+  </url>
+
+</urlset>

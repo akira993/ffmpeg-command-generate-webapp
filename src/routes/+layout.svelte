@@ -4,12 +4,15 @@
 	import Header from '$lib/components/layout/Header.svelte';
 	import Footer from '$lib/components/layout/Footer.svelte';
 	import { locale } from '$lib/i18n';
+	import { browser } from '$app/environment';
 
 	let { children } = $props();
 
-	// HTML lang属性をロケールに連動
+	// HTML lang属性をロケールに連動（SSR時はdocumentが存在しないためガード）
 	$effect(() => {
-		document.documentElement.lang = $locale ?? 'ja';
+		if (browser) {
+			document.documentElement.lang = $locale ?? 'ja';
+		}
 	});
 </script>
 

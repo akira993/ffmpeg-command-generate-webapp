@@ -2,7 +2,8 @@ import { loadTranslations, locale, defaultLocale } from '$lib/i18n';
 import { browser } from '$app/environment';
 import type { LayoutLoad } from './$types';
 
-export const ssr = false;
+export const ssr = true;
+export const prerender = true;
 
 export const load: LayoutLoad = async () => {
 	let initLocale = defaultLocale;
