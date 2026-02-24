@@ -36,23 +36,23 @@
 		<meta name="description" content="FFmpegのコマンドをGUIで簡単生成。動画圧縮（H.264/AV1）、音声抽出、画像変換（AVIF/WebP）、GIF生成など7つのプリセットでワンクリック設定。ドラッグ＆ドロップ対応。" />
 		<meta property="og:title" content="FFmpegコマンドジェネレーター" />
 		<meta property="og:description" content="GUIで直感的にFFmpegコマンドを生成。動画圧縮・音声抽出・画像変換・GIF生成をワンクリックで。" />
-		<meta property="og:image" content="https://www.cmd-gen.com/og-home-ja.png" />
+		<meta property="og:image" content="https://www.cmd-gen.com/og-home-ja.png?v=1" />
 		<meta property="og:locale" content="ja_JP" />
 		<meta property="og:locale:alternate" content="en_US" />
 		<meta name="twitter:title" content="FFmpegコマンドジェネレーター" />
 		<meta name="twitter:description" content="GUIで直感的にFFmpegコマンドを生成。動画圧縮・音声抽出・画像変換・GIF生成をワンクリックで。" />
-		<meta name="twitter:image" content="https://www.cmd-gen.com/og-home-ja.png" />
+		<meta name="twitter:image" content="https://www.cmd-gen.com/og-home-ja.png?v=1" />
 	{:else}
 		<title>FFmpeg Command Generator — Easily Generate Video, Audio & Image Commands</title>
 		<meta name="description" content="Generate FFmpeg commands with an intuitive GUI. One-click presets for video compression (H.264/AV1), audio extraction, image conversion (AVIF/WebP), GIF generation, and more. Drag & drop supported." />
 		<meta property="og:title" content="FFmpeg Command Generator" />
 		<meta property="og:description" content="Generate FFmpeg commands with an intuitive GUI. Video compression, audio extraction, image conversion & GIF generation in one click." />
-		<meta property="og:image" content="https://www.cmd-gen.com/og-home-en.png" />
+		<meta property="og:image" content="https://www.cmd-gen.com/og-home-en.png?v=1" />
 		<meta property="og:locale" content="en_US" />
 		<meta property="og:locale:alternate" content="ja_JP" />
 		<meta name="twitter:title" content="FFmpeg Command Generator" />
 		<meta name="twitter:description" content="Generate FFmpeg commands with an intuitive GUI. Video compression, audio extraction, image conversion & GIF generation in one click." />
-		<meta name="twitter:image" content="https://www.cmd-gen.com/og-home-en.png" />
+		<meta name="twitter:image" content="https://www.cmd-gen.com/og-home-en.png?v=1" />
 	{/if}
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content="https://www.cmd-gen.com/" />
