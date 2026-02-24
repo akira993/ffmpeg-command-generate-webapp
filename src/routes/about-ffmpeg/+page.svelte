@@ -41,6 +41,7 @@
 		<meta name="twitter:image" content="https://www.cmd-gen.com/og-about-en.png?v=2" />
 		<meta name="twitter:image:alt" content="What is FFmpeg?" />
 	{/if}
+	<meta property="fb:app_id" content="2306408559869119" />
 	<meta property="og:type" content="article" />
 	<meta property="og:url" content="https://www.cmd-gen.com/about-ffmpeg" />
 	<meta property="og:site_name" content="FFmpeg Command Generator" />

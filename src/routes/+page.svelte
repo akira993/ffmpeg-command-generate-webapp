@@ -60,6 +60,7 @@
 		<meta name="twitter:image" content="https://www.cmd-gen.com/og-home-en.png?v=2" />
 		<meta name="twitter:image:alt" content="FFmpeg Command Generator" />
 	{/if}
+	<meta property="fb:app_id" content="2306408559869119" />
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content="https://www.cmd-gen.com/" />
 	<meta property="og:site_name" content="FFmpeg Command Generator" />
