@@ -87,7 +87,11 @@
 	"command": {
 		"generated": "Generated Command",
 		"empty": "Select a preset or configure options to generate a command",
-		"copied": "Command copied to clipboard"
+		"copied": "Command copied to clipboard",
+		"cwebpNote": "Uses cwebp (official WebP tool by Google)",
+		"cwebpInstallMac": "brew install webp",
+		"cwebpInstallLinux": "sudo apt install webp",
+		"cwebpInstallWindows": "choco install webp"
 	},
 	"dropzone": {
 		"title": "Drag & drop files or folders here",
@@ -143,14 +147,14 @@
 	},
 	"libraryGuide": {
 		"buttonLabel": "Add Libraries",
-		"title": "Install Additional Libraries",
-		"description": "How to install additional codecs not included in the default FFmpeg build.",
+		"title": "FFmpeg Library List",
+		"description": "Overview of encoder libraries used by FFmpeg, including Homebrew availability and official links.",
 		"mac": {
 			"title": "macOS (Homebrew)",
-			"desc": "When installed via Homebrew, major libraries are included by default.",
+			"desc": "When installed via brew install ffmpeg, major libraries (H.264/H.265/AV1/VP9/MP3/Opus) are included by default.",
 			"reinstallTitle": "If libraries are missing",
-			"reinstallDesc": "Reinstalling to the latest version will include additional libraries.",
-			"reinstallCmd": "brew reinstall ffmpeg"
+			"reinstallDesc": "For WebP conversion, install cwebp separately. For other libraries, try reinstalling ffmpeg.",
+			"reinstallCmd": "brew install webp     # cwebp (for WebP conversion)\nbrew reinstall ffmpeg  # Update ffmpeg"
 		},
 		"windows": {
 			"title": "Windows",
@@ -169,10 +173,17 @@
 		"verifyTitle": "Verify Available Libraries",
 		"verifyDesc": "Run the following command to check if a specific encoder is available.",
 		"verifyCmd": "ffmpeg -encoders 2>&1 | grep -i \"codec_name\"",
-		"tableTitle": "Common Additional Libraries",
+		"tableTitle": "Library List",
 		"tableCodec": "Codec",
 		"tableLibrary": "Library Name",
-		"tableUse": "Use Case"
+		"tableUse": "Use Case",
+		"tableDescription": "Description",
+		"tableHomebrew": "Homebrew",
+		"tableLink": "Official Site",
+		"included": "Included",
+		"notIncluded": "Separate",
+		"builtin": "Built-in",
+		"separateInstall": "Separate install"
 	},
 	"consent": {
 		"message": "This site uses cookies and Google Analytics to improve our service.",

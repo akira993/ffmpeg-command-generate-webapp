@@ -168,23 +168,33 @@ export const H265_DEFAULTS = {
 } as const;
 
 // ============================================================
-// 非デフォルトコーデック（別途ライブラリインストールが必要）
+// 非デフォルトコーデック（外部ライブラリが必要）
 // ============================================================
 
-/** 別途ライブラリが必要な映像コーデック */
+/**
+ * 外部ライブラリが必要な映像コーデック
+ *
+ * Homebrew (macOS) / winget (Windows) / apt (Ubuntu) の標準パッケージに含まれるもの:
+ *   libx265, libvpx, libvpx-vp9, libsvtav1 — ✅ 追加インストール不要
+ *
+ * 標準パッケージに含まれないもの:
+ *   libwebp — ❌ Homebrew ffmpeg に未同梱（cwebp を代替使用）
+ */
 export const NON_DEFAULT_VIDEO_CODECS: Set<string> = new Set([
-	'libx265',
-	'libvpx',
-	'libvpx-vp9',
-	'libsvtav1',
-	'libwebp'
+	'libwebp' // Homebrew ffmpeg に未同梱。WebP変換は cwebp を推奨
 ]);
 
-/** 別途ライブラリが必要な音声コーデック */
+/**
+ * 外部ライブラリが必要な音声コーデック
+ *
+ * 標準パッケージに含まれるもの:
+ *   libmp3lame, libopus — ✅ 追加インストール不要
+ *
+ * 標準パッケージに含まれないもの:
+ *   libvorbis — ❌ Homebrew ffmpeg に未同梱
+ */
 export const NON_DEFAULT_AUDIO_CODECS: Set<string> = new Set([
-	'libmp3lame',
-	'libopus',
-	'libvorbis'
+	'libvorbis' // Homebrew ffmpeg に未同梱
 ]);
 
 // ============================================================

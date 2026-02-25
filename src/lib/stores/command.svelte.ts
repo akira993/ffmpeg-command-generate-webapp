@@ -14,7 +14,7 @@ import type {
 	BatchScript,
 	ScriptType
 } from '$lib/ffmpeg/types';
-import { buildCommand, buildBatchCommand } from '$lib/ffmpeg/builder';
+import { buildCommand, buildBatchCommand, buildCwebpCommand, buildCwebpBatchCommand } from '$lib/ffmpeg/builder';
 import { PRESETS, inferBatchOptions } from '$lib/ffmpeg/presets';
 
 // ============================================================
@@ -71,10 +71,14 @@ class CommandStore {
 	// 算出プロパティ（derived）
 	// ============================================================
 
-	/** 生成されたコマンド文字列 */
-	commandString = $derived(buildCommand(this.options));
+	/** 生成されたコマンド文字列（WebP プリセット時は cwebp を使用） */
+	commandString = $derived(
+		this.selectedPreset === 'image-webp'
+			? buildCwebpCommand(this.options)
+			: buildCommand(this.options)
+	);
 
-	/** 一括処理スクリプト（batchMode時） */
+	/** 一括処理スクリプト（batchMode時、WebP プリセット時は cwebp を使用） */
 	batchScript = $derived.by((): BatchScript | null => {
 		if (!this.batchMode || !this.selectedPreset) return null;
 		const preset = PRESETS[this.selectedPreset];
@@ -94,7 +98,9 @@ class CommandStore {
 			}
 		}
 
-		return buildBatchCommand(this.options, batchOptions);
+		return this.selectedPreset === 'image-webp'
+			? buildCwebpBatchCommand(this.options, batchOptions)
+			: buildBatchCommand(this.options, batchOptions);
 	});
 
 	/** 現在表示すべきスクリプト */
