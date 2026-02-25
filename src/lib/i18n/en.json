@@ -174,8 +174,15 @@
 		"tableLibrary": "Library Name",
 		"tableUse": "Use Case"
 	},
+	"consent": {
+		"message": "This site uses cookies and Google Analytics to improve our service.",
+		"learnMore": "Learn more",
+		"accept": "Accept",
+		"reject": "Decline"
+	},
 	"footer": {
 		"description": "A web app to easily generate FFmpeg commands with a GUI",
-		"aboutFfmpeg": "What is FFmpeg?"
+		"aboutFfmpeg": "What is FFmpeg?",
+		"privacy": "Privacy Policy"
 	}
 }

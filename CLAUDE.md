@@ -22,6 +22,7 @@ bash scripts/lint-css.sh  # CSS oklch ルールチェック（CI と同一）
 | `src/lib/ffmpeg/types.ts` | `FFmpegOptions` など全型定義 |
 | `src/lib/ffmpeg/presets.ts` | 7種のプリセット定義 |
 | `src/lib/stores/command.svelte.ts` | `CommandStore` (Svelte 5 Runes) |
+| `src/lib/stores/consent.svelte.ts` | `ConsentStore` — Cookie 同意 + GA4 Consent Mode v2 |
 | `src/lib/i18n/ja.json` / `en.json` | 翻訳ファイル |
 | `src/app.css` | デザイントークン（oklch カラー） |
 | `tests/ffmpeg/` | Vitest ユニットテスト |
@@ -33,6 +34,7 @@ bash scripts/lint-css.sh  # CSS oklch ルールチェック（CI と同一）
 - **i18n**: キー追加時は `ja.json` と `en.json` の両方に必ず追加 → `.claude/rules/i18n.md`
 - **GIF 生成**: `buildCommand()` は改行区切りで 2 コマンドを返す（パレット生成 + GIF 生成）
 - **コーデック排他**: `copyStreams=true` のとき個別コーデック指定は無視される → `.claude/rules/ffmpeg-builder.md`
+- **GA4 Consent Mode**: `app.html` で `analytics_storage: 'denied'` がデフォルト。`consentStore` が同意時に `granted` へ更新する。GA スクリプトは常にロードされるが Cookie は同意後のみ
 
 ## デプロイフロー
 
