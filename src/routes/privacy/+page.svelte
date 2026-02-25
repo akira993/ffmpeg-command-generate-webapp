@@ -8,6 +8,7 @@
 	import { locale } from '$lib/i18n';
 	import { Button } from '$lib/components/ui/button';
 	import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left';
+	import ExternalLinkIcon from '@lucide/svelte/icons/external-link';
 </script>
 
 <svelte:head>
@@ -241,13 +242,22 @@
 			<section class="space-y-3">
 				<h2 class="text-xl font-semibold">11. お問い合わせ</h2>
 				<p class="text-sm leading-relaxed text-muted-foreground">
-					本プライバシーポリシーに関するご質問やご要望がございましたら、
-					以下の連絡先までお問い合わせください。
+					本プライバシーポリシーに関するご質問やご要望、
+					データの削除・訂正のご依頼などがございましたら、
+					以下のお問い合わせフォームよりご連絡ください。
 				</p>
-				<p class="text-sm text-muted-foreground">
-					<!-- TODO: 連絡先を設定 -->
-					メール: <span class="text-foreground">[お問い合わせ先を準備中]</span>
-				</p>
+				<div class="mt-2">
+					<Button
+						variant="outline"
+						size="sm"
+						href="https://docs.google.com/forms/d/e/1FAIpQLSdBDarenhXZ7TeQEDZiS-SbMCcAIA8NlSnT9qrnjdzDly9AjA/viewform?usp=dialog"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						<ExternalLinkIcon />
+						お問い合わせフォームを開く
+					</Button>
+				</div>
 			</section>
 		</article>
 
@@ -456,12 +466,21 @@
 				<h2 class="text-xl font-semibold">11. Contact Us</h2>
 				<p class="text-sm leading-relaxed text-muted-foreground">
 					If you have any questions or requests regarding this Privacy Policy,
-					please contact us at:
+					including data deletion or correction requests,
+					please reach out through the contact form below.
 				</p>
-				<p class="text-sm text-muted-foreground">
-					<!-- TODO: Set contact information -->
-					Email: <span class="text-foreground">[Contact information coming soon]</span>
-				</p>
+				<div class="mt-2">
+					<Button
+						variant="outline"
+						size="sm"
+						href="https://docs.google.com/forms/d/e/1FAIpQLSdBDarenhXZ7TeQEDZiS-SbMCcAIA8NlSnT9qrnjdzDly9AjA/viewform?usp=dialog"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						<ExternalLinkIcon />
+						Open Contact Form
+					</Button>
+				</div>
 			</section>
 		</article>
 	{/if}
