@@ -434,6 +434,143 @@ function buildCmdScript(
 }
 
 // ============================================================
+// cwebp コマンド生成（WebP 画像圧縮）
+// ============================================================
+
+/**
+ * cwebp コマンドを生成する（単一ファイル）
+ *
+ * Homebrew の ffmpeg には libwebp が含まれないため、
+ * WebP 変換には Google 公式の cwebp コマンドを使用する。
+ * インストール: brew install webp (macOS) / sudo apt install webp (Ubuntu)
+ */
+export function buildCwebpCommand(options: FFmpegOptions): string {
+	const parts: string[] = ['cwebp'];
+
+	// 品質 (-q)
+	const quality = options.video.quality ?? 75;
+	parts.push('-q', String(quality));
+
+	// リサイズ (-resize width height) — -1 は 0（自動算出）にマッピング
+	if (options.filter.scale && (options.filter.scale.width || options.filter.scale.height)) {
+		const w = options.filter.scale.width ?? 0;
+		const h = options.filter.scale.height ?? 0;
+		parts.push('-resize', String(w <= 0 ? 0 : w), String(h <= 0 ? 0 : h));
+	}
+
+	// 入力ファイル
+	parts.push(quoteFilename(options.input.filename));
+
+	// 出力ファイル (-o)
+	parts.push('-o', quoteFilename(options.output.filename));
+
+	return parts.join(' ');
+}
+
+/**
+ * cwebp 一括処理スクリプトを生成する
+ *
+ * Bash / PowerShell / cmd の3形式で出力。
+ */
+export function buildCwebpBatchCommand(options: FFmpegOptions, batch: BatchOptions): BatchScript {
+	const quality = options.video.quality ?? 75;
+	const outExt = batch.outputExtension;
+	const extensions = batch.inputExtensions;
+	const casePattern = extensions.join('|');
+
+	// リサイズオプション
+	let resizeOpts = '';
+	if (options.filter.scale && (options.filter.scale.width || options.filter.scale.height)) {
+		const w = options.filter.scale.width ?? 0;
+		const h = options.filter.scale.height ?? 0;
+		resizeOpts = ` -resize ${w <= 0 ? 0 : w} ${h <= 0 ? 0 : h}`;
+	}
+
+	const bash = buildCwebpBashScript(quality, resizeOpts, casePattern, outExt);
+	const powershell = buildCwebpPowerShellScript(quality, resizeOpts, extensions, outExt);
+	const cmd = buildCwebpCmdScript(quality, resizeOpts, extensions, outExt);
+
+	return { bash, powershell, cmd };
+}
+
+function buildCwebpBashScript(
+	quality: number,
+	resizeOpts: string,
+	casePattern: string,
+	outExt: string
+): string {
+	const lines: string[] = [
+		'#!/bin/bash',
+		'',
+		`OUTPUT_EXT="${outExt}"`,
+		`OUTPUT_DIR="$(basename "$(pwd)")_\${OUTPUT_EXT}"`,
+		'mkdir -p "$OUTPUT_DIR"',
+		'',
+		'for f in *; do',
+		'  [ -f "$f" ] || continue',
+		'  ext="${f##*.}"',
+		'  ext_lower=$(echo "$ext" | tr \'[:upper:]\' \'[:lower:]\')',
+		`  case "$ext_lower" in`,
+		`    ${casePattern})`,
+		'      [ "$ext_lower" = "$OUTPUT_EXT" ] && continue',
+		`      cwebp -q ${quality}${resizeOpts} "$f" -o "$OUTPUT_DIR/\${f%.*}.$OUTPUT_EXT"`,
+		'      ;;',
+		'  esac',
+		'done'
+	];
+
+	return lines.join('\n');
+}
+
+function buildCwebpPowerShellScript(
+	quality: number,
+	resizeOpts: string,
+	extensions: string[],
+	outExt: string
+): string {
+	const includeFilter = extensions.map((ext) => `"*.${ext}"`).join(', ');
+
+	const lines: string[] = [
+		`$outputExt = "${outExt}"`,
+		`$outputDir = "$(Split-Path -Leaf (Get-Location))_$outputExt"`,
+		'New-Item -ItemType Directory -Force -Path $outputDir | Out-Null',
+		'',
+		`Get-ChildItem -File -Include ${includeFilter} -Recurse |`,
+		'  Where-Object { $_.Extension.TrimStart(\'.\').ToLower() -ne $outputExt } |',
+		'  ForEach-Object {',
+		`    cwebp -q ${quality}${resizeOpts} $_.FullName -o "$outputDir\\$($_.BaseName).$outputExt"`,
+		'  }'
+	];
+
+	return lines.join('\n');
+}
+
+function buildCwebpCmdScript(
+	quality: number,
+	resizeOpts: string,
+	extensions: string[],
+	outExt: string
+): string {
+	const lines: string[] = [
+		'@echo off',
+		`set "OUTPUT_EXT=${outExt}"`,
+		'for %%I in (.) do set "FOLDER_NAME=%%~nxI"',
+		'set "OUTPUT_DIR=%FOLDER_NAME%_%OUTPUT_EXT%"',
+		'if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"',
+		''
+	];
+
+	for (const ext of extensions) {
+		if (ext.toLowerCase() === outExt.toLowerCase()) continue;
+		lines.push(
+			`for %%f in (*.${ext}) do cwebp -q ${quality}${resizeOpts} "%%f" -o "%OUTPUT_DIR%\\%%~nf.%OUTPUT_EXT%"`
+		);
+	}
+
+	return lines.join('\n');
+}
+
+// ============================================================
 // ユーティリティ
 // ============================================================
 

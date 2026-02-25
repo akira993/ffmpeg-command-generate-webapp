@@ -1,8 +1,8 @@
 <!--
-  LibraryInstallGuide.svelte — 追加ライブラリインストールガイドモーダル
+  LibraryInstallGuide.svelte — FFmpeg ライブラリ一覧 & インストールガイドモーダル
 
-  FFmpegのデフォルトビルドに含まれない追加コーデックライブラリの
-  インストール方法をOS別に案内する。
+  FFmpegで使用されるエンコーダーライブラリの一覧（Homebrew同梱状況・公式リンク付き）と
+  追加インストール方法をOS別に案内する。
 -->
 <script lang="ts">
 	import { t } from '$lib/i18n';
@@ -14,6 +14,9 @@
 	import CheckCircleIcon from '@lucide/svelte/icons/circle-check';
 	import DownloadIcon from '@lucide/svelte/icons/download';
 	import ExternalLinkIcon from '@lucide/svelte/icons/external-link';
+	import CircleCheckIcon from '@lucide/svelte/icons/circle-check';
+	import CircleXIcon from '@lucide/svelte/icons/circle-x';
+	import CircleDotIcon from '@lucide/svelte/icons/circle-dot';
 
 	let {
 		open = $bindable(false),
@@ -23,17 +26,123 @@
 		showTrigger?: boolean;
 	} = $props();
 
-	/** ライブラリ一覧テーブルデータ */
+	/**
+	 * ライブラリ一覧（使用頻度が高い順）
+	 * homebrew: 'included' | 'not-included' | 'builtin' | 'separate'
+	 */
 	const libraries = [
-		{ codec: 'H.265/HEVC', library: 'libx265', use: 'video' },
-		{ codec: 'VP8', library: 'libvpx', use: 'video' },
-		{ codec: 'VP9', library: 'libvpx-vp9', use: 'video' },
-		{ codec: 'AV1', library: 'libsvtav1', use: 'video' },
-		{ codec: 'WebP', library: 'libwebp', use: 'image' },
-		{ codec: 'MP3', library: 'libmp3lame', use: 'audio' },
-		{ codec: 'Opus', library: 'libopus', use: 'audio' },
-		{ codec: 'Vorbis', library: 'libvorbis', use: 'audio' }
-	] as const;
+		{
+			codec: 'H.264',
+			library: 'libx264',
+			use: 'video',
+			desc: { ja: '最も広く使われる動画エンコーダー', en: 'Most widely used video encoder' },
+			homebrew: 'included' as const,
+			url: 'https://www.videolan.org/developers/x264.html'
+		},
+		{
+			codec: 'H.265/HEVC',
+			library: 'libx265',
+			use: 'video',
+			desc: { ja: 'H.264の後継。高圧縮率', en: 'Successor to H.264. Better compression' },
+			homebrew: 'included' as const,
+			url: 'https://www.x265.org/'
+		},
+		{
+			codec: 'AV1',
+			library: 'libsvtav1',
+			use: 'video/image',
+			desc: { ja: '次世代コーデック。動画・AVIF両対応', en: 'Next-gen codec. Video & AVIF support' },
+			homebrew: 'included' as const,
+			url: 'https://gitlab.com/AOMediaCodec/SVT-AV1'
+		},
+		{
+			codec: 'MP3',
+			library: 'libmp3lame',
+			use: 'audio',
+			desc: { ja: '音声エンコード（MP3）', en: 'Audio encoding (MP3)' },
+			homebrew: 'included' as const,
+			url: 'https://lame.sourceforge.io/'
+		},
+		{
+			codec: 'AAC',
+			library: 'aac',
+			use: 'audio',
+			desc: { ja: '音声エンコード（ffmpeg内蔵）', en: 'Audio encoding (ffmpeg built-in)' },
+			homebrew: 'builtin' as const,
+			url: null
+		},
+		{
+			codec: 'Opus',
+			library: 'libopus',
+			use: 'audio',
+			desc: { ja: '高品質・低遅延の音声コーデック', en: 'High-quality, low-latency audio codec' },
+			homebrew: 'included' as const,
+			url: 'https://opus-codec.org/'
+		},
+		{
+			codec: 'VP9',
+			library: 'libvpx-vp9',
+			use: 'video',
+			desc: { ja: 'WebM動画エンコード', en: 'WebM video encoding' },
+			homebrew: 'included' as const,
+			url: 'https://www.webmproject.org/'
+		},
+		{
+			codec: 'VP8',
+			library: 'libvpx',
+			use: 'video',
+			desc: { ja: 'WebM動画エンコード（旧世代）', en: 'WebM video encoding (legacy)' },
+			homebrew: 'included' as const,
+			url: 'https://www.webmproject.org/'
+		},
+		{
+			codec: 'WebP',
+			library: 'cwebp',
+			use: 'image',
+			desc: { ja: '画像圧縮（Google公式ツール）', en: 'Image compression (Google official tool)' },
+			homebrew: 'separate' as const,
+			url: 'https://developers.google.com/speed/webp'
+		},
+		{
+			codec: 'Vorbis',
+			library: 'libvorbis',
+			use: 'audio',
+			desc: { ja: 'OGG音声エンコード', en: 'OGG audio encoding' },
+			homebrew: 'not-included' as const,
+			url: 'https://xiph.org/vorbis/'
+		},
+		{
+			codec: 'FLAC',
+			library: 'flac',
+			use: 'audio',
+			desc: { ja: 'ロスレス音声（ffmpeg内蔵）', en: 'Lossless audio (ffmpeg built-in)' },
+			homebrew: 'builtin' as const,
+			url: null
+		},
+		{
+			codec: 'AAC (FDK)',
+			library: 'libfdk_aac',
+			use: 'audio',
+			desc: { ja: '高品質AAC（ライセンス制約あり）', en: 'High-quality AAC (license restrictions)' },
+			homebrew: 'not-included' as const,
+			url: 'https://github.com/mstorsjo/fdk-aac'
+		},
+		{
+			codec: 'AV1 (decode)',
+			library: 'libdav1d',
+			use: 'video',
+			desc: { ja: 'AV1デコード専用（高速）', en: 'AV1 decoding only (fast)' },
+			homebrew: 'included' as const,
+			url: 'https://code.videolan.org/videolan/dav1d'
+		}
+	];
+
+	/** 現在の言語に応じた説明を取得 */
+	function getDesc(lib: typeof libraries[number]): string {
+		// i18n の現在言語を判定（簡易的にドキュメントのlangを参照）
+		const isEn = typeof document !== 'undefined' && document.documentElement.lang === 'en';
+		return isEn ? lib.desc.en : lib.desc.ja;
+	}
 </script>
 
 <Dialog.Root bind:open>
@@ -47,7 +156,7 @@
 			{/snippet}
 		</Dialog.Trigger>
 	{/if}
-	<Dialog.Content class="max-h-[90vh] max-w-2xl">
+	<Dialog.Content class="max-h-[90vh] max-w-3xl">
 		<Dialog.Header>
 			<Dialog.Title>{$t('libraryGuide.title')}</Dialog.Title>
 			<Dialog.Description>
@@ -56,6 +165,86 @@
 		</Dialog.Header>
 
 		<div class="max-h-[70vh] space-y-5 overflow-y-auto py-2">
+			<!-- ライブラリ一覧テーブル（最初に表示） -->
+			<div class="space-y-2">
+				<h4 class="text-sm font-medium">{$t('libraryGuide.tableTitle')}</h4>
+				<div class="overflow-x-auto rounded-md border border-border">
+					<table class="w-full text-xs">
+						<thead>
+							<tr class="border-b border-border bg-muted/50">
+								<th class="px-2.5 py-2 text-left font-medium">{$t('libraryGuide.tableCodec')}</th>
+								<th class="px-2.5 py-2 text-left font-medium">{$t('libraryGuide.tableLibrary')}</th>
+								<th class="hidden px-2.5 py-2 text-left font-medium sm:table-cell">{$t('libraryGuide.tableDescription')}</th>
+								<th class="px-2.5 py-2 text-center font-medium">{$t('libraryGuide.tableHomebrew')}</th>
+								<th class="px-2.5 py-2 text-center font-medium">{$t('libraryGuide.tableLink')}</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each libraries as lib (lib.library)}
+								<tr class="border-b border-border last:border-0">
+									<td class="px-2.5 py-1.5 font-medium">{lib.codec}</td>
+									<td class="px-2.5 py-1.5 font-mono">{lib.library}</td>
+									<td class="hidden px-2.5 py-1.5 text-muted-foreground sm:table-cell">{getDesc(lib)}</td>
+									<td class="px-2.5 py-1.5 text-center">
+										{#if lib.homebrew === 'included'}
+											<span class="inline-flex items-center gap-1 text-emerald-500" title={$t('libraryGuide.included')}>
+												<CircleCheckIcon size={14} />
+											</span>
+										{:else if lib.homebrew === 'builtin'}
+											<span class="inline-flex items-center gap-1 text-blue-500" title={$t('libraryGuide.builtin')}>
+												<CircleDotIcon size={14} />
+											</span>
+										{:else if lib.homebrew === 'separate'}
+											<span class="inline-flex items-center gap-1 text-amber-500" title={$t('libraryGuide.separateInstall')}>
+												<DownloadIcon size={14} />
+											</span>
+										{:else}
+											<span class="inline-flex items-center gap-1 text-destructive" title={$t('libraryGuide.notIncluded')}>
+												<CircleXIcon size={14} />
+											</span>
+										{/if}
+									</td>
+									<td class="px-2.5 py-1.5 text-center">
+										{#if lib.url}
+											<a
+												href={lib.url}
+												target="_blank"
+												rel="noopener noreferrer"
+												class="inline-flex items-center text-primary hover:text-primary/80"
+												title={lib.url}
+											>
+												<ExternalLinkIcon size={14} />
+											</a>
+										{:else}
+											<span class="text-muted-foreground">—</span>
+										{/if}
+									</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
+				<!-- 凡例 -->
+				<div class="flex flex-wrap gap-3 text-xs text-muted-foreground">
+					<span class="inline-flex items-center gap-1">
+						<CircleCheckIcon size={12} class="text-emerald-500" />
+						{$t('libraryGuide.included')}
+					</span>
+					<span class="inline-flex items-center gap-1">
+						<CircleDotIcon size={12} class="text-blue-500" />
+						{$t('libraryGuide.builtin')}
+					</span>
+					<span class="inline-flex items-center gap-1">
+						<DownloadIcon size={12} class="text-amber-500" />
+						{$t('libraryGuide.separateInstall')}
+					</span>
+					<span class="inline-flex items-center gap-1">
+						<CircleXIcon size={12} class="text-destructive" />
+						{$t('libraryGuide.notIncluded')}
+					</span>
+				</div>
+			</div>
+
 			<!-- OS別タブ -->
 			<Tabs.Root value="mac">
 				<Tabs.List class="grid w-full grid-cols-3">
@@ -78,9 +267,7 @@
 							{$t('libraryGuide.mac.reinstallTitle')}
 						</h4>
 						<p class="text-xs text-muted-foreground">{$t('libraryGuide.mac.reinstallDesc')}</p>
-						<code class="block rounded-md bg-muted px-3 py-2 font-mono text-xs">
-							{$t('libraryGuide.mac.reinstallCmd')}
-						</code>
+						<pre class="rounded-md bg-muted px-3 py-2 font-mono text-xs">{$t('libraryGuide.mac.reinstallCmd')}</pre>
 					</div>
 				</Tabs.Content>
 
@@ -150,31 +337,6 @@
 				<code class="block rounded-md bg-muted px-3 py-2 font-mono text-xs">
 					{$t('libraryGuide.verifyCmd')}
 				</code>
-			</div>
-
-			<!-- ライブラリ一覧テーブル -->
-			<div class="space-y-2">
-				<h4 class="text-sm font-medium">{$t('libraryGuide.tableTitle')}</h4>
-				<div class="overflow-x-auto rounded-md border border-border">
-					<table class="w-full text-xs">
-						<thead>
-							<tr class="border-b border-border bg-muted/50">
-								<th class="px-3 py-2 text-left font-medium">{$t('libraryGuide.tableCodec')}</th>
-								<th class="px-3 py-2 text-left font-medium">{$t('libraryGuide.tableLibrary')}</th>
-								<th class="px-3 py-2 text-left font-medium">{$t('libraryGuide.tableUse')}</th>
-							</tr>
-						</thead>
-						<tbody>
-							{#each libraries as lib (lib.library)}
-								<tr class="border-b border-border last:border-0">
-									<td class="px-3 py-1.5">{lib.codec}</td>
-									<td class="px-3 py-1.5 font-mono">{lib.library}</td>
-									<td class="px-3 py-1.5 text-muted-foreground">{lib.use}</td>
-								</tr>
-							{/each}
-						</tbody>
-					</table>
-				</div>
 			</div>
 		</div>
 	</Dialog.Content>
