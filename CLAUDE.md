@@ -24,6 +24,7 @@ bash scripts/lint-css.sh  # CSS oklch ルールチェック（CI と同一）
 | `src/lib/stores/command.svelte.ts` | `CommandStore` (Svelte 5 Runes) |
 | `src/lib/stores/consent.svelte.ts` | `ConsentStore` — Cookie 同意 + GA4 Consent Mode v2 |
 | `src/lib/i18n/ja.json` / `en.json` | 翻訳ファイル |
+| `src/routes/privacy/+page.svelte` | プライバシーポリシーページ（GDPR/CCPA対応、日英切替） |
 | `src/app.css` | デザイントークン（oklch カラー） |
 | `tests/ffmpeg/` | Vitest ユニットテスト |
 
@@ -35,6 +36,7 @@ bash scripts/lint-css.sh  # CSS oklch ルールチェック（CI と同一）
 - **GIF 生成**: `buildCommand()` は改行区切りで 2 コマンドを返す（パレット生成 + GIF 生成）
 - **コーデック排他**: `copyStreams=true` のとき個別コーデック指定は無視される → `.claude/rules/ffmpeg-builder.md`
 - **GA4 Consent Mode**: `app.html` で `analytics_storage: 'denied'` がデフォルト。`consentStore` が同意時に `granted` へ更新する。GA スクリプトは常にロードされるが Cookie は同意後のみ
+- **お問い合わせフォーム**: プライバシーポリシーページ（`/privacy`）のセクション11に Google Form へのリンクボタンを設置。GDPR/CCPA の権利行使もこのフォーム経由で受付
 
 ## デプロイフロー
 
@@ -65,3 +67,16 @@ gh api repos/akira993/ffmpeg-command-generate-webapp/deployments \
 | `/perf-test` | Chrome MCP でパフォーマンス計測（Navigation Timing / CLS） |
 | `/deploy` | push → CI 待機 → デプロイ URL 取得まで一連実行 |
 | `/deploy-test` | 本番 URL に対して Chrome MCP で UI + パフォーマンステスト |
+| `/implement` | CocoIndex + Cipher を使った新機能実装ワークフロー |
+
+## AI行動規範
+
+### 基本原則
+1. 推測でコードを書かない：必ず CocoIndex で現状を確認してから着手
+2. 記憶を活用する：新しいタスクの前に Cipher で過去の決定事項を検索
+3. 知識を蓄積する：タスク完了後は Cipher に結果を保存
+4. 計画を提示する：実装前に計画をリストで出力し、承認を得る
+
+### ワークフロー自動適用
+- **新機能実装・大規模改修時** → `.claude/skills/implement_workflow.md` を読み込んで従う
+- 機密情報は `[MASKED]` に置き換えて記録する
