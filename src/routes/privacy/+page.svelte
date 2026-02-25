@@ -190,6 +190,9 @@
 				<p class="text-sm leading-relaxed text-muted-foreground">
 					データ処理の法的根拠は、ユーザーの同意（GDPR第6条1項(a)）です。
 				</p>
+				<p class="text-sm leading-relaxed text-muted-foreground">
+					これらの権利を行使される場合は、本ページ下部のお問い合わせフォームよりご連絡ください。
+				</p>
 			</section>
 
 			<!-- 7. CCPA -->
@@ -207,6 +210,9 @@
 				</ul>
 				<p class="text-sm leading-relaxed text-muted-foreground">
 					本サービスは、ユーザーの個人情報を第三者に販売または共有することはありません。
+				</p>
+				<p class="text-sm leading-relaxed text-muted-foreground">
+					これらの権利を行使される場合は、本ページ下部のお問い合わせフォームよりご連絡ください。
 				</p>
 			</section>
 
@@ -242,10 +248,17 @@
 			<section class="space-y-3">
 				<h2 class="text-xl font-semibold">11. お問い合わせ</h2>
 				<p class="text-sm leading-relaxed text-muted-foreground">
-					本プライバシーポリシーに関するご質問やご要望、
-					データの削除・訂正のご依頼などがございましたら、
+					本プライバシーポリシーに関するご質問やご要望がございましたら、
 					以下のお問い合わせフォームよりご連絡ください。
+					フォームでは以下の種類のお問い合わせを受け付けています：
 				</p>
+				<ul class="list-inside list-disc space-y-1 text-sm text-muted-foreground">
+					<li>個人情報の開示請求</li>
+					<li>個人情報の訂正・追加・削除の依頼</li>
+					<li>個人情報の利用停止・消去の依頼</li>
+					<li>プライバシーポリシーに関する一般的なご質問</li>
+					<li>その他</li>
+				</ul>
 				<div class="mt-2">
 					<Button
 						variant="outline"
@@ -413,6 +426,9 @@
 				<p class="text-sm leading-relaxed text-muted-foreground">
 					The legal basis for data processing is your consent (GDPR Article 6(1)(a)).
 				</p>
+				<p class="text-sm leading-relaxed text-muted-foreground">
+					To exercise any of these rights, please use the contact form at the bottom of this page.
+				</p>
 			</section>
 
 			<!-- 7. CCPA -->
@@ -430,6 +446,9 @@
 				</ul>
 				<p class="text-sm leading-relaxed text-muted-foreground">
 					We do not sell or share your personal information with third parties.
+				</p>
+				<p class="text-sm leading-relaxed text-muted-foreground">
+					To exercise any of these rights, please use the contact form at the bottom of this page.
 				</p>
 			</section>
 
@@ -466,9 +485,16 @@
 				<h2 class="text-xl font-semibold">11. Contact Us</h2>
 				<p class="text-sm leading-relaxed text-muted-foreground">
 					If you have any questions or requests regarding this Privacy Policy,
-					including data deletion or correction requests,
 					please reach out through the contact form below.
+					The form accepts the following types of inquiries:
 				</p>
+				<ul class="list-inside list-disc space-y-1 text-sm text-muted-foreground">
+					<li>Request for disclosure of personal information</li>
+					<li>Request for correction, addition, or deletion of personal information</li>
+					<li>Request for suspension of use or erasure of personal information</li>
+					<li>General questions regarding the Privacy Policy</li>
+					<li>Other</li>
+				</ul>
 				<div class="mt-2">
 					<Button
 						variant="outline"
