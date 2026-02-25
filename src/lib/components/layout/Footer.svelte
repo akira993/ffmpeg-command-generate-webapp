@@ -12,5 +12,12 @@
 		>
 			{$t('footer.aboutFfmpeg')}
 		</a>
+		<span class="text-border">|</span>
+		<a
+			href="/privacy"
+			class="underline-offset-4 hover:text-foreground hover:underline"
+		>
+			{$t('footer.privacy')}
+		</a>
 	</div>
 </footer>

@@ -8,11 +8,14 @@
 		<meta name="theme-color" content="#6d28d9" media="(prefers-color-scheme: dark)" />
 		<meta name="author" content="cmd-gen.com" />
 		<meta property="fb:app_id" content="2306408559869119" />
-		<!-- Google Analytics (GA4) -->
+		<!-- Google Analytics (GA4) — Consent Mode v2 -->
 		<script async src="https://www.googletagmanager.com/gtag/js?id=G-TX9J3RENDP"></script>
 		<script>
 			window.dataLayer = window.dataLayer || [];
 			function gtag(){dataLayer.push(arguments);}
+			gtag('consent', 'default', {
+				analytics_storage: 'denied'
+			});
 			gtag('js', new Date());
 			gtag('config', 'G-TX9J3RENDP');
 		</script>

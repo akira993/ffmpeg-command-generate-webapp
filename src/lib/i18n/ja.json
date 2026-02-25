@@ -174,8 +174,15 @@
 		"tableLibrary": "ライブラリ名",
 		"tableUse": "用途"
 	},
+	"consent": {
+		"message": "このサイトでは、サービス改善のためにCookieとGoogle Analyticsを使用しています。",
+		"learnMore": "詳しく見る",
+		"accept": "同意する",
+		"reject": "拒否する"
+	},
 	"footer": {
 		"description": "FFmpegコマンドをGUIで簡単に生成するWebアプリ",
-		"aboutFfmpeg": "FFmpegとは？"
+		"aboutFfmpeg": "FFmpegとは？",
+		"privacy": "プライバシーポリシー"
 	}
 }
