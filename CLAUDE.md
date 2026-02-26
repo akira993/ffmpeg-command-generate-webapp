@@ -56,18 +56,38 @@ gh api repos/akira993/ffmpeg-command-generate-webapp/deployments \
   --jq '.[0].target_url'
 ```
 
-## スキル（必要時に呼び出す）
+## MCP サーバー
 
-| コマンド | 用途 |
-|----------|------|
-| `/run-tests` | Vitest + 型チェック実行 |
-| `/css-lint` | CSS oklch ルール違反チェック |
-| `/ui-test` | Chrome MCP でローカル UI テスト（PC/モバイル） |
-| `/i18n-check` | en.json / ja.json のキー整合性チェック |
-| `/perf-test` | Chrome MCP でパフォーマンス計測（Navigation Timing / CLS） |
-| `/deploy` | push → CI 待機 → デプロイ URL 取得まで一連実行 |
-| `/deploy-test` | 本番 URL に対して Chrome MCP で UI + パフォーマンステスト |
-| `/implement` | CocoIndex + Cipher を使った新機能実装ワークフロー |
+本プロジェクトでは 4 つの MCP サーバーを使用する。詳細は `.claude/docs/mcp-setup-guide.md` を参照。
+
+| MCP | 用途 | 備考 |
+|-----|------|------|
+| **CocoIndex** | AST ベースのセマンティックコード検索 | `uvx` で起動 |
+| **Cipher** | 長期記憶（メモリ保存・検索） | Gemini API（ローカル運用）。`cipher.yml` の設定が環境変数より優先 |
+| **Serena** | LSP ベースのシンボル解析 | 初回 `onboarding` 必要。`.serena/` は git 管理外 |
+| **Chrome DevTools** | ブラウザ自動テスト・UI 検証 | `npx` で起動 |
+
+## スキル（`.claude/skills/` に定義）
+
+| スキル | 用途 |
+|--------|------|
+| `run-tests` | Vitest + 型チェック実行 |
+| `css-lint` | CSS oklch ルール違反チェック |
+| `ui-test` | Chrome MCP でローカル UI テスト（PC/モバイル） |
+| `i18n-check` | en.json / ja.json のキー整合性チェック |
+| `perf-test` | Chrome MCP でパフォーマンス計測（Navigation Timing / CLS） |
+| `deploy` | push → CI 待機 → デプロイ URL 取得まで一連実行 |
+| `deploy-test` | 本番 URL に対して Chrome MCP で UI + パフォーマンステスト |
+| `implement_workflow` | CocoIndex + Cipher + Serena を使った新機能実装ワークフロー |
+
+## ドキュメント構成
+
+| パス | 内容 |
+|------|------|
+| `CLAUDE.md` | プロジェクト概要・ルール・AI 行動規範（本ファイル） |
+| `.claude/rules/` | CSS・Svelte5・i18n・FFmpeg ビルダーのコーディングルール |
+| `.claude/skills/` | スキル定義（テスト・デプロイ・実装ワークフローなど） |
+| `.claude/docs/mcp-setup-guide.md` | MCP セットアップ詳細・トラブルシューティング |
 
 ## AI行動規範
 
@@ -75,8 +95,9 @@ gh api repos/akira993/ffmpeg-command-generate-webapp/deployments \
 1. 推測でコードを書かない：必ず CocoIndex で現状を確認してから着手
 2. 記憶を活用する：新しいタスクの前に Cipher で過去の決定事項を検索
 3. 知識を蓄積する：タスク完了後は Cipher に結果を保存
-4. 計画を提示する：実装前に計画をリストで出力し、承認を得る
+4. 計画を提示する：実装前に計画をリスト形式で出力し、承認を得る
 
 ### ワークフロー自動適用
 - **新機能実装・大規模改修時** → `.claude/skills/implement_workflow.md` を読み込んで従う
 - 機密情報は `[MASKED]` に置き換えて記録する
+- MCP の問題発生時 → `.claude/docs/mcp-setup-guide.md` を参照

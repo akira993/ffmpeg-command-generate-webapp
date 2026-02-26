@@ -31,3 +31,7 @@ vite.config.ts.timestamp-*
 
 # Test
 coverage/
+
+# MCP local data
+.cipher/
+.serena/
