@@ -5,7 +5,7 @@
   追加インストール方法をOS別に案内する。
 -->
 <script lang="ts">
-	import { t } from '$lib/i18n';
+	import { t, locale } from '$lib/i18n';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { Button } from '$lib/components/ui/button';
@@ -137,12 +137,6 @@
 		}
 	];
 
-	/** 現在の言語に応じた説明を取得 */
-	function getDesc(lib: typeof libraries[number]): string {
-		// i18n の現在言語を判定（簡易的にドキュメントのlangを参照）
-		const isEn = typeof document !== 'undefined' && document.documentElement.lang === 'en';
-		return isEn ? lib.desc.en : lib.desc.ja;
-	}
 </script>
 
 <Dialog.Root bind:open>
@@ -184,7 +178,7 @@
 								<tr class="border-b border-border last:border-0">
 									<td class="px-2.5 py-1.5 font-medium">{lib.codec}</td>
 									<td class="px-2.5 py-1.5 font-mono">{lib.library}</td>
-									<td class="hidden px-2.5 py-1.5 text-muted-foreground sm:table-cell">{getDesc(lib)}</td>
+									<td class="hidden px-2.5 py-1.5 text-muted-foreground sm:table-cell">{$locale === 'en' ? lib.desc.en : lib.desc.ja}</td>
 									<td class="px-2.5 py-1.5 text-center">
 										{#if lib.homebrew === 'included'}
 											<span class="inline-flex items-center gap-1 text-emerald-500" title={$t('libraryGuide.included')}>
