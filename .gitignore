@@ -35,3 +35,7 @@ coverage/
 # MCP local data
 .cipher/
 .serena/
+.cocoindex_code/
+
+# Local runtime data
+data/
