@@ -1,20 +1,27 @@
 <script lang="ts">
-	import { Dialog as DialogPrimitive } from "bits-ui";
-	import { cn } from "$lib/utils.js";
+	import { cn, type WithElementRef } from "$lib/utils.js";
+	import type { HTMLAttributes } from "svelte/elements";
+	import { getContext } from "svelte";
+	import { DIALOG_CTX, type DialogContext } from "./dialog.svelte";
 
 	let {
 		ref = $bindable(null),
 		class: className,
 		...restProps
-	}: DialogPrimitive.OverlayProps = $props();
+	}: WithElementRef<HTMLAttributes<HTMLDivElement>> = $props();
+
+	const ctx = getContext<DialogContext>(DIALOG_CTX);
 </script>
 
-<DialogPrimitive.Overlay
-	bind:ref
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div
+	bind:this={ref}
 	data-slot="dialog-overlay"
+	data-state={ctx.open ? "open" : "closed"}
 	class={cn(
-		"data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50",
+		"animate-in fade-in-0 fixed inset-0 z-50 bg-black/50",
 		className
 	)}
+	onclick={() => ctx.setOpen(false)}
 	{...restProps}
-/>
+></div>
