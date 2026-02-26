@@ -114,7 +114,10 @@
       "mcp__serena__onboarding",
       "mcp__serena__list_dir",
       "mcp__serena__write_memory",
-      "mcp__serena__read_memory"
+      "mcp__serena__read_memory",
+      "WebFetch(domain:developers.openai.com)",
+      "WebFetch(domain:cursor.com)",
+      "WebFetch(domain:docs.cursor.com)"
     ]
   }
 }

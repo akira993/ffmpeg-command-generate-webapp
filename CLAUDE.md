@@ -33,6 +33,8 @@ bash scripts/lint-css.sh  # CSS oklch ルールチェック（CI と同一）
 - **CSS**: `oklch()` のみ使用。`#hex`/`rgb()`/`hsl()` は CI で弾かれる → `.claude/rules/css.md`
 - **Svelte 5**: `$state` Proxy は `structuredClone` 不可。`JSON.parse(JSON.stringify(...))` を使う → `.claude/rules/svelte5.md`
 - **i18n**: キー追加時は `ja.json` と `en.json` の両方に必ず追加 → `.claude/rules/i18n.md`
+- **コーデックラベルの翻訳**: `codecs.ts` の `VIDEO_CODEC_LABELS` / `AUDIO_CODEC_LABELS` は技術名以外（`copy`, `pcm_s16le`）が日本語。コンポーネント側で `$derived` を使い翻訳済みラベルマップを生成して上書きする（`PresetCustomizer.svelte` 参照）
+- **言語判定は `$locale` ストアを使う**: `document.documentElement.lang` は非リアクティブで言語切替に追従しない。`import { locale } from '$lib/i18n'` して `$locale` を使うこと
 - **GIF 生成**: `buildCommand()` は改行区切りで 2 コマンドを返す（パレット生成 + GIF 生成）
 - **コーデック排他**: `copyStreams=true` のとき個別コーデック指定は無視される → `.claude/rules/ffmpeg-builder.md`
 - **GA4 Consent Mode**: `app.html` で `analytics_storage: 'denied'` がデフォルト。`consentStore` が同意時に `granted` へ更新する。GA スクリプトは常にロードされるが Cookie は同意後のみ
