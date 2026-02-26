@@ -1,53 +1,142 @@
 <script lang="ts">
-	import { Slider as SliderPrimitive, type SliderRootSnippetProps } from "bits-ui";
-	import { cn } from "$lib/utils.js";
+	import { cn, type WithElementRef } from "$lib/utils.js";
+	import type { HTMLAttributes } from "svelte/elements";
+	import { onMount } from "svelte";
 
-	// bits-ui の Slider.RootProps は discriminated union のため、
-	// $props() の destructuring と互換性がない。
-	// 型安全性を維持しつつ、Record<string, any> で受けて内部で展開する。
+	type SliderProps = WithElementRef<HTMLAttributes<HTMLDivElement>> & {
+		value?: number;
+		min?: number;
+		max?: number;
+		step?: number;
+		orientation?: "horizontal" | "vertical";
+		disabled?: boolean;
+		type?: string; // backward compat, ignored
+		onValueChange?: (value: number) => void;
+	};
+
 	let {
 		ref = $bindable(null),
-		value = $bindable(),
-		type = "single" as const,
-		orientation = "horizontal" as const,
+		value = $bindable(0),
+		min = 0,
+		max = 100,
+		step = 1,
+		orientation = "horizontal",
+		disabled = false,
+		type: _type,
 		class: className,
+		onValueChange,
 		...restProps
-	}: Record<string, any> = $props();
+	}: SliderProps = $props();
+
+	let trackRef: HTMLSpanElement | undefined = $state();
+	let isDragging = $state(false);
+
+	const percentage = $derived(
+		max !== min ? ((value - min) / (max - min)) * 100 : 0
+	);
+
+	function clampAndStep(raw: number): number {
+		const stepped = Math.round((raw - min) / step) * step + min;
+		return Math.min(max, Math.max(min, stepped));
+	}
+
+	function updateFromPointer(clientX: number) {
+		if (!trackRef || disabled) return;
+		const rect = trackRef.getBoundingClientRect();
+		const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+		const newValue = clampAndStep(min + ratio * (max - min));
+		if (newValue !== value) {
+			value = newValue;
+			onValueChange?.(newValue);
+		}
+	}
+
+	function handlePointerDown(e: PointerEvent) {
+		if (disabled) return;
+		e.preventDefault();
+		isDragging = true;
+		(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+		updateFromPointer(e.clientX);
+	}
+
+	function handlePointerMove(e: PointerEvent) {
+		if (!isDragging) return;
+		updateFromPointer(e.clientX);
+	}
+
+	function handlePointerUp() {
+		isDragging = false;
+	}
+
+	function handleKeyDown(e: KeyboardEvent) {
+		if (disabled) return;
+		let newValue = value;
+		switch (e.key) {
+			case "ArrowRight":
+			case "ArrowUp":
+				newValue = clampAndStep(value + step);
+				break;
+			case "ArrowLeft":
+			case "ArrowDown":
+				newValue = clampAndStep(value - step);
+				break;
+			case "Home":
+				newValue = min;
+				break;
+			case "End":
+				newValue = max;
+				break;
+			default:
+				return;
+		}
+		e.preventDefault();
+		if (newValue !== value) {
+			value = newValue;
+			onValueChange?.(newValue);
+		}
+	}
 </script>
 
-<SliderPrimitive.Root
-	bind:ref
-	bind:value={value as never}
-	{type}
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div
+	bind:this={ref}
 	data-slot="slider"
-	{orientation}
+	data-orientation={orientation}
+	data-disabled={disabled || undefined}
 	class={cn(
-		"relative flex w-full touch-none items-center select-none data-[disabled]:opacity-50 data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col",
+		"relative flex w-full touch-none items-center select-none data-[disabled]:opacity-50",
 		className
 	)}
+	onpointerdown={handlePointerDown}
+	onpointermove={handlePointerMove}
+	onpointerup={handlePointerUp}
+	onpointercancel={handlePointerUp}
 	{...restProps}
 >
-	{#snippet children({ thumbs }: SliderRootSnippetProps)}
+	<span
+		bind:this={trackRef}
+		data-orientation={orientation}
+		data-slot="slider-track"
+		class="bg-muted relative grow overflow-hidden rounded-full data-[orientation=horizontal]:h-1.5 data-[orientation=horizontal]:w-full"
+	>
 		<span
-			data-orientation={orientation}
-			data-slot="slider-track"
-			class={cn(
-				"bg-muted relative grow overflow-hidden rounded-full data-[orientation=horizontal]:h-1.5 data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5"
-			)}
-		>
-			<SliderPrimitive.Range
-				data-slot="slider-range"
-				class={cn(
-					"bg-primary absolute data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full"
-				)}
-			/>
-		</span>
-		{#each thumbs as thumb (thumb)}
-			<SliderPrimitive.Thumb
-				data-slot="slider-thumb"
-				index={thumb}
-				class="border-primary ring-ring/50 block size-4 shrink-0 rounded-full border bg-white shadow-sm transition-[color,box-shadow] hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
-			/>
-		{/each}
-	{/snippet}
-</SliderPrimitive.Root>
+			data-slot="slider-range"
+			class="bg-primary absolute h-full"
+			style="width: {percentage}%"
+		></span>
+	</span>
+	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+	<span
+		data-slot="slider-thumb"
+		role="slider"
+		tabindex={disabled ? -1 : 0}
+		aria-valuenow={value}
+		aria-valuemin={min}
+		aria-valuemax={max}
+		aria-orientation={orientation}
+		aria-disabled={disabled || undefined}
+		class="border-primary ring-ring/50 absolute block size-4 shrink-0 rounded-full border bg-white shadow-sm transition-[color,box-shadow] hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
+		style="left: calc({percentage}% - 0.5rem)"
+		onkeydown={handleKeyDown}
+	></span>
+</div>
