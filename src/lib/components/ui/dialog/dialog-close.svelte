@@ -1,7 +1,27 @@
 <script lang="ts">
-	import { Dialog as DialogPrimitive } from "bits-ui";
+	import type { Snippet } from "svelte";
+	import type { HTMLButtonAttributes } from "svelte/elements";
+	import { getContext } from "svelte";
+	import { DIALOG_CTX, type DialogContext } from "./dialog.svelte";
+	import { cn, type WithElementRef } from "$lib/utils.js";
 
-	let { ref = $bindable(null), ...restProps }: DialogPrimitive.CloseProps = $props();
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLButtonAttributes, HTMLButtonElement> & { children?: Snippet } = $props();
+
+	const ctx = getContext<DialogContext>(DIALOG_CTX);
 </script>
 
-<DialogPrimitive.Close bind:ref data-slot="dialog-close" {...restProps} />
+<button
+	bind:this={ref}
+	type="button"
+	data-slot="dialog-close"
+	class={cn(className)}
+	onclick={() => ctx.setOpen(false)}
+	{...restProps}
+>
+	{@render children?.()}
+</button>

@@ -1,20 +1,29 @@
 <script lang="ts">
-	import { Tabs as TabsPrimitive } from "bits-ui";
-	import { cn } from "$lib/utils.js";
+	import { cn, type WithElementRef } from "$lib/utils.js";
+	import type { Snippet } from "svelte";
+	import type { HTMLAttributes } from "svelte/elements";
+
+	type TabsListProps = WithElementRef<HTMLAttributes<HTMLDivElement>> & {
+		children?: Snippet;
+	};
 
 	let {
 		ref = $bindable(null),
 		class: className,
+		children,
 		...restProps
-	}: TabsPrimitive.ListProps = $props();
+	}: TabsListProps = $props();
 </script>
 
-<TabsPrimitive.List
-	bind:ref
+<div
+	bind:this={ref}
+	role="tablist"
 	data-slot="tabs-list"
 	class={cn(
 		"bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-lg p-[3px]",
 		className
 	)}
 	{...restProps}
-/>
+>
+	{@render children?.()}
+</div>
