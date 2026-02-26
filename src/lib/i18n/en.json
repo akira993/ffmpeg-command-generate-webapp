@@ -82,7 +82,9 @@
 		"audioBitrate": "Audio Bitrate",
 		"scaleWidth": "Width (px)",
 		"scaleHeight": "Height (px)",
-		"quality": "Quality"
+		"quality": "Quality",
+		"codecCopy": "Copy (no re-encoding)",
+		"codecPcmUncompressed": "PCM (Uncompressed)"
 	},
 	"command": {
 		"generated": "Generated Command",

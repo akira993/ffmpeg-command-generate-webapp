@@ -44,6 +44,17 @@
 	// バッチモード時はスケールを無効化
 	const scaleDisabled = $derived(commandStore.batchMode);
 
+	// 翻訳済みコーデックラベル（言語切替に対応）
+	const videoCodecLabels = $derived({
+		...VIDEO_CODEC_LABELS,
+		copy: $t('form.codecCopy')
+	});
+	const audioCodecLabels = $derived({
+		...AUDIO_CODEC_LABELS,
+		copy: $t('form.codecCopy'),
+		pcm_s16le: $t('form.codecPcmUncompressed')
+	});
+
 	// 音声ビットレートの選択肢
 	const AUDIO_BITRATE_OPTIONS = ['64k', '96k', '128k', '160k', '192k', '256k', '320k'];
 
@@ -194,10 +205,10 @@
 							onValueChange={(v) => { if (v) handleCodecChange(field, v); }}
 						>
 							<Select.Trigger class="w-full">
-								{VIDEO_CODEC_LABELS[getOptionValue(field) as VideoCodec] ?? String(getOptionValue(field) ?? '—')}
+								{videoCodecLabels[getOptionValue(field) as VideoCodec] ?? String(getOptionValue(field) ?? '—')}
 							</Select.Trigger>
 							<Select.Content>
-								{#each Object.entries(VIDEO_CODEC_LABELS) as [value, label] (value)}
+								{#each Object.entries(videoCodecLabels) as [value, label] (value)}
 									<Select.Item {value}>{label}{NON_DEFAULT_VIDEO_CODECS.has(value) ? ' *' : ''}</Select.Item>
 								{/each}
 							</Select.Content>
@@ -217,10 +228,10 @@
 							onValueChange={(v) => { if (v) handleCodecChange(field, v); }}
 						>
 							<Select.Trigger class="w-full">
-								{AUDIO_CODEC_LABELS[getOptionValue(field) as AudioCodec] ?? String(getOptionValue(field) ?? '—')}
+								{audioCodecLabels[getOptionValue(field) as AudioCodec] ?? String(getOptionValue(field) ?? '—')}
 							</Select.Trigger>
 							<Select.Content>
-								{#each Object.entries(AUDIO_CODEC_LABELS) as [value, label] (value)}
+								{#each Object.entries(audioCodecLabels) as [value, label] (value)}
 									<Select.Item {value}>{label}{NON_DEFAULT_AUDIO_CODECS.has(value) ? ' *' : ''}</Select.Item>
 								{/each}
 							</Select.Content>

@@ -82,7 +82,9 @@
 		"audioBitrate": "音声ビットレート",
 		"scaleWidth": "幅（px）",
 		"scaleHeight": "高さ（px）",
-		"quality": "品質"
+		"quality": "品質",
+		"codecCopy": "コピー（再エンコードなし）",
+		"codecPcmUncompressed": "PCM（非圧縮）"
 	},
 	"command": {
 		"generated": "生成されたコマンド",
