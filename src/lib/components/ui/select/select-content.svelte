@@ -1,45 +1,110 @@
 <script lang="ts">
-	import { Select as SelectPrimitive } from "bits-ui";
-	import SelectPortal from "./select-portal.svelte";
-	import SelectScrollUpButton from "./select-scroll-up-button.svelte";
-	import SelectScrollDownButton from "./select-scroll-down-button.svelte";
-	import { cn, type WithoutChild } from "$lib/utils.js";
-	import type { ComponentProps } from "svelte";
-	import type { WithoutChildrenOrChild } from "$lib/utils.js";
+	import { cn, type WithElementRef } from "$lib/utils.js";
+	import type { Snippet } from "svelte";
+	import type { HTMLAttributes } from "svelte/elements";
+	import { getContext, tick } from "svelte";
+	import { SELECT_CTX, type SelectContext } from "./select.svelte";
+
+	type SelectContentProps = WithElementRef<HTMLAttributes<HTMLDivElement>> & {
+		sideOffset?: number;
+		children?: Snippet;
+	};
 
 	let {
 		ref = $bindable(null),
 		class: className,
 		sideOffset = 4,
-		portalProps,
 		children,
-		preventScroll = true,
 		...restProps
-	}: WithoutChild<SelectPrimitive.ContentProps> & {
-		portalProps?: WithoutChildrenOrChild<ComponentProps<typeof SelectPortal>>;
-	} = $props();
+	}: SelectContentProps = $props();
+
+	const ctx = getContext<SelectContext>(SELECT_CTX);
+
+	let portalEl: HTMLDivElement | undefined = $state();
+	let top = $state(0);
+	let left = $state(0);
+	let width = $state(0);
+	let dropUp = $state(false);
+
+	function updatePosition() {
+		const trigger = ctx.triggerEl;
+		if (!trigger) return;
+		const rect = trigger.getBoundingClientRect();
+		const spaceBelow = window.innerHeight - rect.bottom;
+		const spaceAbove = rect.top;
+		dropUp = spaceBelow < 200 && spaceAbove > spaceBelow;
+		width = rect.width;
+		left = rect.left;
+		if (dropUp) {
+			top = rect.top - sideOffset;
+		} else {
+			top = rect.bottom + sideOffset;
+		}
+	}
+
+	$effect(() => {
+		if (ctx.open) {
+			tick().then(updatePosition);
+		}
+	});
+
+	$effect(() => {
+		if (!ctx.open) return;
+
+		function handleClickOutside(e: MouseEvent) {
+			const target = e.target as Node;
+			if (portalEl && !portalEl.contains(target) && !ctx.triggerEl?.contains(target)) {
+				ctx.setOpen(false);
+			}
+		}
+
+		function handleKeyDown(e: KeyboardEvent) {
+			if (e.key === "Escape") {
+				e.preventDefault();
+				ctx.setOpen(false);
+				ctx.triggerEl?.focus();
+			}
+		}
+
+		function handleScroll() {
+			updatePosition();
+		}
+
+		window.addEventListener("mousedown", handleClickOutside, true);
+		window.addEventListener("keydown", handleKeyDown);
+		window.addEventListener("scroll", handleScroll, true);
+		window.addEventListener("resize", updatePosition);
+
+		return () => {
+			window.removeEventListener("mousedown", handleClickOutside, true);
+			window.removeEventListener("keydown", handleKeyDown);
+			window.removeEventListener("scroll", handleScroll, true);
+			window.removeEventListener("resize", updatePosition);
+		};
+	});
 </script>
 
-<SelectPortal {...portalProps}>
-	<SelectPrimitive.Content
-		bind:ref
-		{sideOffset}
-		{preventScroll}
-		data-slot="select-content"
-		class={cn(
-			"bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-end-2 data-[side=right]:slide-in-from-start-2 data-[side=top]:slide-in-from-bottom-2 relative z-50 max-h-(--bits-select-content-available-height) min-w-[8rem] origin-(--bits-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-md border shadow-md data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
-			className
-		)}
-		{...restProps}
+{#if ctx.open}
+	<div
+		bind:this={portalEl}
+		style="position: fixed; z-index: 50; top: {dropUp ? 'auto' : top + 'px'}; bottom: {dropUp
+			? window.innerHeight - top + 'px'
+			: 'auto'}; left: {left}px; min-width: {width}px;"
 	>
-		<SelectScrollUpButton />
-		<SelectPrimitive.Viewport
+		<div
+			bind:this={ref}
+			role="listbox"
+			data-slot="select-content"
+			data-state="open"
+			data-side={dropUp ? "top" : "bottom"}
 			class={cn(
-				"h-(--bits-select-anchor-height) w-full min-w-(--bits-select-anchor-width) scroll-my-1 p-1"
+				"bg-popover text-popover-foreground animate-in fade-in-0 zoom-in-95 relative max-h-[300px] min-w-[8rem] overflow-x-hidden overflow-y-auto rounded-md border p-1 shadow-md",
+				dropUp ? "slide-in-from-bottom-2" : "slide-in-from-top-2",
+				className
 			)}
+			{...restProps}
 		>
 			{@render children?.()}
-		</SelectPrimitive.Viewport>
-		<SelectScrollDownButton />
-	</SelectPrimitive.Content>
-</SelectPortal>
+		</div>
+	</div>
+{/if}
