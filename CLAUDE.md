@@ -12,6 +12,8 @@ npm run build && npm run preview  # ビルド確認 http://localhost:4173
 npm run check        # 型チェック
 npm run test         # Vitest ユニットテスト
 bash scripts/lint-css.sh  # CSS oklch ルールチェック（CI と同一）
+npm run storybook    # Storybook http://localhost:6006
+npm run build-storybook  # Storybook 静的ビルド
 ```
 
 ## 重要ファイル
@@ -27,6 +29,7 @@ bash scripts/lint-css.sh  # CSS oklch ルールチェック（CI と同一）
 | `src/routes/privacy/+page.svelte` | プライバシーポリシーページ（GDPR/CCPA対応、日英切替） |
 | `src/app.css` | デザイントークン（oklch カラー） |
 | `tests/ffmpeg/` | Vitest ユニットテスト |
+| `.storybook/` | Storybook 設定（main.ts, preview.ts） |
 
 ## 落とし穴・非自明なルール
 
@@ -39,12 +42,20 @@ bash scripts/lint-css.sh  # CSS oklch ルールチェック（CI と同一）
 - **コーデック排他**: `copyStreams=true` のとき個別コーデック指定は無視される → `.claude/rules/ffmpeg-builder.md`
 - **GA4 Consent Mode**: `app.html` で `analytics_storage: 'denied'` がデフォルト。`consentStore` が同意時に `granted` へ更新する。GA スクリプトは常にロードされるが Cookie は同意後のみ
 - **お問い合わせフォーム**: プライバシーポリシーページ（`/privacy`）のセクション11に Google Form へのリンクボタンを設置。GDPR/CCPA の権利行使もこのフォーム経由で受付
+- **Storybook**: グローバルストア依存のストーリーは `{@const _ = (() => { ... })()}` パターンで状態を設定 → `.claude/rules/storybook.md`
 
 ## デプロイフロー
 
-**`main` push → GitHub Actions CI（型チェック・CSS lint・build）→ Vercel 本番自動デプロイ**
+**`main` push → GitHub Actions CI（型チェック・CSS lint・build・Storybook build）→ Vercel 本番自動デプロイ**
 
 `vercel` CLI は使用しない。デプロイは必ず `git push origin main` 経由で行う。
+
+| プロジェクト | URL | ビルドコマンド |
+|-------------|-----|---------------|
+| メインアプリ | `www.cmd-gen.com` | `npm run build` |
+| Storybook | Vercel 別プロジェクト | `npm run build-storybook` |
+
+両方とも同じ GitHub リポジトリから自動デプロイされる。
 
 ```bash
 # CI 完了まで待機
@@ -81,13 +92,14 @@ gh api repos/akira993/ffmpeg-command-generate-webapp/deployments \
 | `deploy` | push → CI 待機 → デプロイ URL 取得まで一連実行 |
 | `deploy-test` | 本番 URL に対して Chrome MCP で UI + パフォーマンステスト |
 | `implement_workflow` | CocoIndex + Cipher + Serena を使った新機能実装ワークフロー |
+| `storybook-check` | Storybook ビルド検証（全ストーリーのコンパイル確認） |
 
 ## ドキュメント構成
 
 | パス | 内容 |
 |------|------|
 | `CLAUDE.md` | プロジェクト概要・ルール・AI 行動規範（本ファイル） |
-| `.claude/rules/` | CSS・Svelte5・i18n・FFmpeg ビルダーのコーディングルール |
+| `.claude/rules/` | CSS・Svelte5・i18n・FFmpeg ビルダー・Storybook のコーディングルール |
 | `.claude/skills/` | スキル定義（テスト・デプロイ・実装ワークフローなど） |
 | `.claude/docs/mcp-setup-guide.md` | MCP セットアップ詳細・トラブルシューティング |
 
