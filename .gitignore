@@ -42,3 +42,6 @@ storybook-static/
 
 # Local runtime data
 data/
+
+# Font source files (raw .ttf)
+scripts/font-sources/
