@@ -51,6 +51,7 @@ const preview: Preview = {
 			// Locale switching
 			const loc = context.globals.locale || 'ja';
 			locale.set(loc);
+			document.documentElement.lang = loc;
 
 			return storyFn();
 		}
