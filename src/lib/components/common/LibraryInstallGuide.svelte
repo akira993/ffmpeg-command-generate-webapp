@@ -261,7 +261,7 @@
 							{$t('libraryGuide.mac.reinstallTitle')}
 						</h4>
 						<p class="text-xs text-muted-foreground">{$t('libraryGuide.mac.reinstallDesc')}</p>
-						<pre class="rounded-md bg-muted px-3 py-2 font-mono text-xs">{$t('libraryGuide.mac.reinstallCmd')}</pre>
+						<pre class="whitespace-pre-wrap break-all rounded-md bg-muted px-3 py-2 font-mono text-xs">{$t('libraryGuide.mac.reinstallCmd')}</pre>
 					</div>
 				</Tabs.Content>
 
