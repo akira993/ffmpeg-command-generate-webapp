@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 """
-Noto Sans JP / Noto Sans サブセット化スクリプト
+Noto Sans JP / Inter サブセット化スクリプト
 
 使い方:
   1. pip install fonttools brotli
   2. scripts/font-sources/ にソースフォント (.ttf) を配置:
      - NotoSansJP-Regular.ttf, NotoSansJP-Bold.ttf
-     - NotoSans-Regular.ttf, NotoSans-Bold.ttf
+     - Inter-Regular.ttf, Inter-Bold.ttf
   3. python scripts/subset-fonts.py
 
 Google Fonts GitHub からダウンロード:
   JP: https://github.com/google/fonts/tree/main/ofl/notosansjp
-  EN: https://github.com/google/fonts/tree/main/ofl/notosans
+  EN: https://github.com/google/fonts/tree/main/ofl/inter
+     (Variable TTF をダウンロード後、fonttools varLib.instancer で
+      wght=400 / wght=700 の静的インスタンスを生成)
 """
 
 import json
@@ -149,7 +151,7 @@ def main():
 
     # 2. 出力ディレクトリ作成
     jp_out = os.path.join(OUT_DIR, "noto-sans-jp")
-    en_out = os.path.join(OUT_DIR, "noto-sans")
+    en_out = os.path.join(OUT_DIR, "inter")
     os.makedirs(jp_out, exist_ok=True)
     os.makedirs(en_out, exist_ok=True)
 
@@ -163,14 +165,14 @@ def main():
         out = os.path.join(jp_out, f"NotoSansJP-{weight}.woff2")
         subset_font(src, out, JP_UNICODE_RANGES, text_file=kanji_text_path)
 
-    # 4. Noto Sans サブセット
-    print("\n=== Noto Sans ===")
+    # 4. Inter サブセット
+    print("\n=== Inter ===")
     for weight in WEIGHTS:
-        src = os.path.join(SRC_DIR, f"NotoSans-{weight}.ttf")
+        src = os.path.join(SRC_DIR, f"Inter-{weight}.ttf")
         if not os.path.exists(src):
             print(f"  SKIP: {src} が見つかりません", file=sys.stderr)
             continue
-        out = os.path.join(en_out, f"NotoSans-{weight}.woff2")
+        out = os.path.join(en_out, f"Inter-{weight}.woff2")
         subset_font(src, out, EN_UNICODE_RANGES)
 
     # 5. クリーンアップ
