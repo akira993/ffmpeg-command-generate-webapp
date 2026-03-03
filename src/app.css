@@ -30,18 +30,18 @@
 	src: url('/fonts/noto-sans-jp/NotoSansJP-Bold.woff2') format('woff2');
 }
 @font-face {
-	font-family: 'Noto Sans';
+	font-family: 'Inter';
 	font-style: normal;
 	font-weight: 400;
 	font-display: swap;
-	src: url('/fonts/noto-sans/NotoSans-Regular.woff2') format('woff2');
+	src: url('/fonts/inter/Inter-Regular.woff2') format('woff2');
 }
 @font-face {
-	font-family: 'Noto Sans';
+	font-family: 'Inter';
 	font-style: normal;
 	font-weight: 700;
 	font-display: swap;
-	src: url('/fonts/noto-sans/NotoSans-Bold.woff2') format('woff2');
+	src: url('/fonts/inter/Inter-Bold.woff2') format('woff2');
 }
 
 @custom-variant dark (&:is(.dark *));
@@ -231,7 +231,7 @@
 		font-family: 'Noto Sans JP', sans-serif;
 	}
 	html[lang="en"] {
-		font-family: 'Noto Sans', sans-serif;
+		font-family: 'Inter', sans-serif;
 	}
 	* {
 		@apply border-border;

@@ -42,7 +42,7 @@ npm run build-storybook  # Storybook 静的ビルド
 - **コーデック排他**: `copyStreams=true` のとき個別コーデック指定は無視される → `.claude/rules/ffmpeg-builder.md`
 - **GA4 Consent Mode**: `app.html` で `analytics_storage: 'denied'` がデフォルト。`consentStore` が同意時に `granted` へ更新する。GA スクリプトは常にロードされるが Cookie は同意後のみ
 - **お問い合わせフォーム**: プライバシーポリシーページ（`/privacy`）のセクション11に Google Form へのリンクボタンを設置。GDPR/CCPA の権利行使もこのフォーム経由で受付
-- **Web フォント**: Noto Sans JP / Noto Sans を woff2 でセルフホスト。`html[lang]` 属性で言語別に切替（`app.css` の `@layer base`）。サブセット化スクリプトは `scripts/subset-fonts.py`、ソース ttf は `scripts/font-sources/`（gitignore 対象）
+- **Web フォント**: Noto Sans JP（日本語）/ Inter（英語）を woff2 でセルフホスト。`html[lang]` 属性で言語別に切替（`app.css` の `@layer base`）。サブセット化スクリプトは `scripts/subset-fonts.py`、ソース ttf は `scripts/font-sources/`（gitignore 対象）
 - **Storybook**: グローバルストア依存のストーリーは `{@const _ = (() => { ... })()}` パターンで状態を設定 → `.claude/rules/storybook.md`
 
 ## デプロイフロー
