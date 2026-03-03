@@ -97,7 +97,7 @@
 
 	<!-- コマンド表示エリア -->
 	<div
-		class="relative min-h-[80px] rounded-md border border-border bg-muted/30 p-4"
+		class="relative min-h-[5rem] rounded-md border border-border bg-muted/30 p-4"
 	>
 		{#if displayCommand}
 			<pre class="whitespace-pre-wrap break-all font-mono text-sm leading-relaxed">{displayCommand}</pre>

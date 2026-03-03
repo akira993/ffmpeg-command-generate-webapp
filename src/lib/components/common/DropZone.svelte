@@ -193,7 +193,7 @@
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div
-			class="flex min-h-[160px] cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 text-center transition-colors
+			class="flex min-h-[10rem] cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 text-center transition-colors
 				{isDragging
 					? 'border-primary bg-primary/5 text-primary'
 					: 'border-muted-foreground/25 text-muted-foreground hover:border-primary/50 hover:bg-muted/50'}"

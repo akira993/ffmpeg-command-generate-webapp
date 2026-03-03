@@ -98,7 +98,7 @@
 			data-state="open"
 			data-side={dropUp ? "top" : "bottom"}
 			class={cn(
-				"bg-popover text-popover-foreground animate-in fade-in-0 zoom-in-95 relative max-h-[300px] min-w-[8rem] overflow-x-hidden overflow-y-auto rounded-md border p-1 shadow-md",
+				"bg-popover text-popover-foreground animate-in fade-in-0 zoom-in-95 relative max-h-[18.75rem] min-w-[8rem] overflow-x-hidden overflow-y-auto rounded-md border p-1 shadow-md",
 				dropUp ? "slide-in-from-bottom-2" : "slide-in-from-top-2",
 				className
 			)}

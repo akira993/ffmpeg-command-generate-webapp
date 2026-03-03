@@ -9,6 +9,8 @@
 
 違反すると `bash scripts/lint-css.sh` と GitHub Actions が失敗する。
 
+5. **Tailwind arbitrary values は `rem`** — `w-[220px]` ではなく `w-[13.75rem]` を使う（`getBoundingClientRect()` 等の動的 px 値は除く）
+
 ## トークン早見表
 
 カラー: `--color-background`, `--color-foreground`, `--color-primary`, `--color-secondary`, `--color-accent`, `--color-destructive`
@@ -26,4 +28,7 @@ key: `emerald` / `teal` / `violet` / `blue` / `pink` / `amber` / `rose` / `orang
 
 /* NG */ background: linear-gradient(135deg, oklch(0.5 0.2 0), oklch(0.7 0.1 180));
 /* OK */ background: linear-gradient(135deg in oklab, oklch(0.5 0.2 0), oklch(0.7 0.1 180));
+
+/* NG */ class="w-[220px] p-[3px]"
+/* OK */ class="w-[13.75rem] p-[0.1875rem]"
 ```
