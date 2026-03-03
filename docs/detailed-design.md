@@ -6,7 +6,7 @@
 src/
 ├── lib/
 │   ├── components/
-│   │   ├── ui/              # shadcn-svelte コンポーネント
+│   │   ├── ui/              # 独自 UI コンポーネント（CVA + Context API）
 │   │   ├── layout/
 │   │   │   ├── Header.svelte
 │   │   │   └── Footer.svelte

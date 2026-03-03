@@ -210,7 +210,7 @@ declare module '*.css' {
 | `svelte-check` (v4.3.6) | TS 6.0 対応バージョンか確認。必要なら更新 |
 | `@sveltejs/kit` (v2.50) | `.svelte-kit/tsconfig.json` 生成内容が TS 6.0 対応か |
 | `sveltekit-i18n` (v2.4.2) | 型定義に問題がないか |
-| `bits-ui` (v2.15.5) | TS 6.0 strict 下で型エラーが出ないか |
+| ~~`bits-ui`~~ | 移行済み（RabeeUI パターンで独自実装に置換。確認不要） |
 | `vitest` (v4.0.18) | TS 6.0 での動作確認 |
 | `@types/node` (v25.2.3) | TS 6.0 対応版か（通常問題なし） |
 

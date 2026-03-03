@@ -117,7 +117,25 @@
       "mcp__serena__read_memory",
       "WebFetch(domain:developers.openai.com)",
       "WebFetch(domain:cursor.com)",
-      "WebFetch(domain:docs.cursor.com)"
+      "WebFetch(domain:docs.cursor.com)",
+      "Bash(git checkout -b feat/rabeeui-migration)",
+      "Bash(npm uninstall bits-ui tailwind-variants @internationalized/date)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(gh pr:*)",
+      "WebFetch(domain:storybook.js.org)",
+      "Bash(npx storybook@latest init --skip-install)",
+      "mcp__chrome-devtools__new_page",
+      "Bash(npm run build-storybook)",
+      "Bash(file /Users/akiratakahashi/Projects/ffmpeg-command-generate-webapp/scripts/font-sources/*.ttf)",
+      "WebFetch(domain:fonts.google.com)",
+      "WebFetch(domain:fonts.googleapis.com)",
+      "Bash(pip3 install fonttools brotli)",
+      "Bash(PATH=\"$PATH:/Users/akiratakahashi/Library/Python/3.9/bin\" python3 scripts/subset-fonts.py)",
+      "Bash(awk 'NF')",
+      "Bash(xxd:*)",
+      "Bash(pip3 install:*)",
+      "Bash(pip3 list:*)",
+      "Bash(pyftsubset:*)"
     ]
   }
 }
