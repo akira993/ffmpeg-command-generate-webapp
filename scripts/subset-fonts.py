@@ -6,14 +6,21 @@ Noto Sans JP / Inter サブセット化スクリプト
   1. pip install fonttools brotli
   2. scripts/font-sources/ にソースフォント (.ttf) を配置:
      - NotoSansJP-Regular.ttf, NotoSansJP-Bold.ttf
+       (Google Fonts GitHub から静的ウェイト版をダウンロード)
      - Inter-Regular.ttf, Inter-Bold.ttf
+       (Variable TTF をダウンロード後、fonttools varLib.instancer で
+        wght=400 / wght=700 の静的インスタンスを生成)
   3. python scripts/subset-fonts.py
 
 Google Fonts GitHub からダウンロード:
   JP: https://github.com/google/fonts/tree/main/ofl/notosansjp
   EN: https://github.com/google/fonts/tree/main/ofl/inter
-     (Variable TTF をダウンロード後、fonttools varLib.instancer で
-      wght=400 / wght=700 の静的インスタンスを生成)
+
+最適化方針:
+  - Noto Sans JP: アプリ内で実際に使用する漢字のみ含める（常用漢字全体ではなく）
+    SSG サイトなのでコンテンツは事前確定。翻訳やページ追加時はスクリプト再実行で対応。
+  - Inter: 静的ウェイト + Latin 文字セットのみ
+  - 両方: 不要テーブル (gasp, STAT, vhea, vmtx) を削除して軽量化
 """
 
 import json
@@ -62,6 +69,9 @@ EN_UNICODE_RANGES = ",".join([
     "U+00A5",           # Yen sign
 ])
 
+# 出力後に削除する不要テーブル
+TABLES_TO_DROP = ["gasp", "STAT", "vhea", "vmtx"]
+
 
 def extract_jp_chars_from_app():
     """アプリ内の日本語テキストから漢字を抽出"""
@@ -93,17 +103,6 @@ def extract_jp_chars_from_app():
     return chars
 
 
-def load_joyo_kanji():
-    """jp-chars.txt から常用漢字リストを読み込み"""
-    path = os.path.join(SCRIPT_DIR, "jp-chars.txt")
-    if not os.path.exists(path):
-        print(f"ERROR: {path} が見つかりません", file=sys.stderr)
-        sys.exit(1)
-    with open(path, "r", encoding="utf-8") as f:
-        text = f.read()
-    return set(c for c in text if "\u4e00" <= c <= "\u9fff")
-
-
 def write_text_file(chars, path):
     """サブセット用テキストファイルを書き出し"""
     with open(path, "w", encoding="utf-8") as f:
@@ -125,6 +124,10 @@ def subset_font(input_path, output_path, unicodes, text_file=None):
     if text_file:
         cmd.append(f"--text-file={text_file}")
 
+    # 不要テーブルを削除
+    for table in TABLES_TO_DROP:
+        cmd.append(f"--drop-tables+={table}")
+
     print(f"  Subsetting: {os.path.basename(input_path)} -> {os.path.basename(output_path)}")
     subprocess.run(cmd, check=True)
 
@@ -133,21 +136,14 @@ def subset_font(input_path, output_path, unicodes, text_file=None):
 
 
 def main():
-    # 1. 漢字セットの準備
+    # 1. 漢字セットの準備（アプリ内で使用する漢字のみ）
     print("=== 漢字セットの準備 ===")
-    joyo = load_joyo_kanji()
     app_chars = extract_jp_chars_from_app()
-    extra = app_chars - joyo
-    if extra:
-        print(f"  常用漢字外の文字 ({len(extra)} 字): {''.join(sorted(extra))}")
-    all_kanji = joyo | app_chars
-    print(f"  常用漢字: {len(joyo)} 字")
-    print(f"  アプリ固有: {len(app_chars)} 字")
-    print(f"  合計漢字: {len(all_kanji)} 字")
+    print(f"  アプリ使用漢字: {len(app_chars)} 字")
 
     # 漢字をテキストファイルに書き出し（pyftsubset --text-file 用）
     kanji_text_path = os.path.join(SCRIPT_DIR, "_kanji_subset.txt")
-    write_text_file(all_kanji, kanji_text_path)
+    write_text_file(app_chars, kanji_text_path)
 
     # 2. 出力ディレクトリ作成
     jp_out = os.path.join(OUT_DIR, "noto-sans-jp")
@@ -155,7 +151,7 @@ def main():
     os.makedirs(jp_out, exist_ok=True)
     os.makedirs(en_out, exist_ok=True)
 
-    # 3. Noto Sans JP サブセット
+    # 3. Noto Sans JP サブセット（アプリ使用漢字のみ）
     print("\n=== Noto Sans JP ===")
     for weight in WEIGHTS:
         src = os.path.join(SRC_DIR, f"NotoSansJP-{weight}.ttf")
