@@ -54,12 +54,12 @@ export function buildCommand(options: FFmpegOptions): string {
 	} else {
 		parts.push(...buildVideoOptions(options));
 		parts.push(...buildAudioOptions(options));
-	}
 
-	// 8. フィルタ
-	const filterStr = buildVideoFilter(options.filter);
-	if (filterStr) {
-		parts.push('-vf', `"${filterStr}"`);
+		// 8. フィルタ（ストリームコピー時はフィルタ適用不可）
+		const filterStr = buildVideoFilter(options.filter);
+		if (filterStr) {
+			parts.push('-vf', `"${filterStr}"`);
+		}
 	}
 
 	// 9. その他

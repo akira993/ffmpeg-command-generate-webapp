@@ -1,7 +1,7 @@
 /**
  * プリセット定義
  *
- * 7つのプリセットを定義。各プリセットは:
+ * 8つのプリセットを定義。各プリセットは:
  * - デフォルトのFFmpegオプション
  * - ユーザーが編集可能なフィールド
  * - 表示情報（アイコン、i18nキー）
@@ -135,7 +135,7 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 		defaults: {
 			input: { filename: 'input.mp4' },
 			output: { filename: 'output.webm', overwrite: true },
-			video: { codec: 'libvpx-vp9', crf: 30, noVideo: false },
+			video: { codec: 'libvpx-vp9', crf: 30, bitrate: '0', noVideo: false },
 			audio: { codec: 'libopus', bitrate: '128k', noAudio: false },
 			filter: {},
 			misc: { stripMetadata: false, copyStreams: false }

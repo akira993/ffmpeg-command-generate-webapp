@@ -23,6 +23,9 @@ Thumbs.db
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
+# Vitest auto-generated
+vitest.shims.d.ts
+
 # IDE
 .vscode/
 .idea/
