@@ -31,7 +31,7 @@ ffmpeg -i input.mp4 -i palette.png -lavfi "fps=10,scale=320:-1:flags=lanczos [x]
 
 ### 排他ルール
 
-- `copyStreams=true` → 個別コーデック指定は無視
+- `copyStreams=true` → 個別コーデック指定とフィルタ (`-vf`) は無視
 - `noVideo=true` → 映像コーデック設定を無視して `-vn` だけ出力
 - `noAudio=true` → 音声コーデック設定を無視して `-an` だけ出力
 

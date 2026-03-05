@@ -24,6 +24,9 @@ jobs:
       - name: CSS lint (oklch enforcement)
         run: bash scripts/lint-css.sh
 
+      - name: Unit tests
+        run: npm run test
+
       - name: Type check
         run: npm run check
 

@@ -22,7 +22,7 @@ npm run build-storybook  # Storybook 静的ビルド
 |------|------|
 | `src/lib/ffmpeg/builder.ts` | `buildCommand()` — コア生成ロジック |
 | `src/lib/ffmpeg/types.ts` | `FFmpegOptions` など全型定義 |
-| `src/lib/ffmpeg/presets.ts` | 7種のプリセット定義 |
+| `src/lib/ffmpeg/presets.ts` | 8種のプリセット定義 |
 | `src/lib/stores/command.svelte.ts` | `CommandStore` (Svelte 5 Runes) |
 | `src/lib/stores/consent.svelte.ts` | `ConsentStore` — Cookie 同意 + GA4 Consent Mode v2 |
 | `src/lib/i18n/ja.json` / `en.json` | 翻訳ファイル |
