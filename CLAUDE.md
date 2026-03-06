@@ -28,6 +28,9 @@ npm run build-storybook  # Storybook 静的ビルド
 | `src/lib/i18n/ja.json` / `en.json` | 翻訳ファイル |
 | `src/routes/privacy/+page.svelte` | プライバシーポリシーページ（GDPR/CCPA対応、日英切替） |
 | `src/app.css` | デザイントークン（oklch カラー）+ Web フォント定義 |
+| `src/service-worker.ts` | Service Worker — アセットプリキャッシュ + オフライン対応 |
+| `static/manifest.webmanifest` | PWA マニフェスト（アプリ名・アイコン・display:standalone） |
+| `static/icons/` | PWA アイコン（192/512px 標準+マスカブル、180px apple-touch-icon） |
 | `tests/ffmpeg/` | Vitest ユニットテスト |
 | `.storybook/` | Storybook 設定（main.ts, preview.ts） |
 
@@ -44,6 +47,8 @@ npm run build-storybook  # Storybook 静的ビルド
 - **お問い合わせフォーム**: プライバシーポリシーページ（`/privacy`）のセクション11に Google Form へのリンクボタンを設置。GDPR/CCPA の権利行使もこのフォーム経由で受付
 - **Web フォント**: Noto Sans JP（日本語）/ Inter（英語）を静的ウェイト（400/700）の woff2 でセルフホスト。`html[lang]` 属性で言語別に切替（`app.css` の `@layer base`）。サブセット化スクリプトは `scripts/subset-fonts.py`、ソース ttf は `scripts/font-sources/`（gitignore 対象）。Noto Sans JP はアプリ内で使用する漢字のみサブセット（翻訳やページ追加時はスクリプト再実行が必要）。Inter は Variable Font ではなく静的インスタンスで配信
 - **Storybook**: グローバルストア依存のストーリーは `{@const _ = (() => { ... })()}` パターンで状態を設定 → `.claude/rules/storybook.md`
+- **PWA**: `src/service-worker.ts` が存在すれば SvelteKit が自動登録。`$service-worker` モジュールの `build`/`files`/`version` でキャッシュ管理。マニフェストの `theme_color`/`background_color` は hex 値（JSON なので oklch ルール対象外）
+- **PWA アイコン**: `scripts/generate-pwa-icons.mjs` でマスカブルアイコンを生成（`sharp` 使用）。favicon.svg を変更したら再実行が必要
 
 ## デプロイフロー
 
