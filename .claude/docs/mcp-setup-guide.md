@@ -1,3 +1,11 @@
+---
+title: "MCP セットアップガイド"
+description: "CocoIndex/Cipher/Serena/Chrome DevToolsのセットアップとトラブルシューティング"
+category: "docs"
+created: "2026-02-26"
+updated: "2026-03-07"
+---
+
 # MCP セットアップガイド
 
 本プロジェクトでは 4 つの MCP サーバーを使用している。

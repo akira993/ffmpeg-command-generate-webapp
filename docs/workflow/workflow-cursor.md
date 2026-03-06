@@ -1,3 +1,11 @@
+---
+title: "Cursor エディタ ワークフロー完全設計書"
+description: "Cursor IDE設定（.cursor/rules/*.mdc、MCP設定、Agent mode）"
+category: "workflow"
+created: "2026-02-27"
+updated: "2026-03-07"
+---
+
 # Cursor エディタ ワークフロー完全設計書
 
 > **対象**: macOS 環境でモダンフロントエンドプロジェクトに MCP 統合開発環境を構築する

@@ -1,3 +1,11 @@
+---
+title: "perf-test スキル"
+description: "Chrome MCPでNavigation Timing/CLSパフォーマンス計測"
+category: "skills"
+created: "2026-02-19"
+updated: "2026-03-07"
+---
+
 # perf-test
 
 Chrome MCP を使って対象 URL のパフォーマンス計測を実行する。

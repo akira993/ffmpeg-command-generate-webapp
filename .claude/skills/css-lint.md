@@ -1,3 +1,11 @@
+---
+title: "css-lint スキル"
+description: "CSS oklchルール違反チェックスキル"
+category: "skills"
+created: "2026-02-18"
+updated: "2026-03-07"
+---
+
 # css-lint
 
 `app.css` の CSS ルール違反（oklch 強制）をチェックする。

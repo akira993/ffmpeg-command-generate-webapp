@@ -1,3 +1,11 @@
+---
+title: "CSS ルール"
+description: "oklch強制・in oklabグラデーション・clamp()トークン・remユニット"
+category: "rules"
+created: "2026-02-18"
+updated: "2026-03-07"
+---
+
 # CSS ルール
 
 ## 強制ルール（CI でチェック済み）

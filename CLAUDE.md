@@ -1,3 +1,11 @@
+---
+title: "CLAUDE.md — FFmpeg Command Generator"
+description: "プロジェクト概要・コーディングルール・AI行動規範の総合リファレンス"
+category: "root"
+created: "2025-05-18"
+updated: "2026-03-07"
+---
+
 # CLAUDE.md — FFmpeg Command Generator
 
 SvelteKit 2 + Svelte 5 (Runes) + TypeScript + Tailwind CSS v4。フロントエンドのみ（Vercel SSG）。
@@ -49,6 +57,7 @@ npm run build-storybook  # Storybook 静的ビルド
 - **Storybook**: グローバルストア依存のストーリーは `{@const _ = (() => { ... })()}` パターンで状態を設定 → `.claude/rules/storybook.md`
 - **PWA**: `src/service-worker.ts` が存在すれば SvelteKit が自動登録。`$service-worker` モジュールの `build`/`files`/`version` でキャッシュ管理。マニフェストの `theme_color`/`background_color` は hex 値（JSON なので oklch ルール対象外）
 - **PWA アイコン**: `scripts/generate-pwa-icons.mjs` でマスカブルアイコンを生成（`sharp` 使用）。favicon.svg を変更したら再実行が必要
+- **Markdown**: 全 `.md` ファイルに YAML フロントマター必須（`title`, `description`, `category`, `created`, `updated`） → `.claude/rules/markdown.md`
 
 ## デプロイフロー
 
@@ -105,9 +114,16 @@ gh api repos/akira993/ffmpeg-command-generate-webapp/deployments \
 | パス | 内容 |
 |------|------|
 | `CLAUDE.md` | プロジェクト概要・ルール・AI 行動規範（本ファイル） |
-| `.claude/rules/` | CSS・Svelte5・i18n・FFmpeg ビルダー・Storybook のコーディングルール |
+| `.claude/rules/` | CSS・Svelte5・i18n・FFmpeg ビルダー・Storybook・Markdown のコーディングルール |
 | `.claude/skills/` | スキル定義（テスト・デプロイ・実装ワークフローなど） |
 | `.claude/docs/mcp-setup-guide.md` | MCP セットアップ詳細・トラブルシューティング |
+| `docs/design/` | 基本設計・詳細設計・CSS デザイン・要件定義 |
+| `docs/seo/` | SEO/LLMO 戦略・外部セットアップ手順 |
+| `docs/testing/` | テスト設計・手動テストチェックリスト |
+| `docs/deploy/` | Vercel デプロイ・CI/CD 設定 |
+| `docs/workflow/` | Claude Code・Cursor・Codex ワークフロー |
+| `docs/migration/` | 移行レポート・移行計画 |
+| `docs/guides/` | オンボーディング・UI再現ガイド |
 
 ## AI行動規範
 

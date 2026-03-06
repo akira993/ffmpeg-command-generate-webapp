@@ -1,3 +1,11 @@
+---
+title: "Storybook ルール"
+description: "Storybook 10 + Svelte CSFフォーマット・ストーリー配置・ストア依存パターン"
+category: "rules"
+created: "2026-02-27"
+updated: "2026-03-07"
+---
+
 # Storybook ルール
 
 ## 基本構成

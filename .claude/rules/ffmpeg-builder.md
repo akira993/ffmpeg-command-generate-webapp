@@ -1,3 +1,11 @@
+---
+title: "FFmpeg コマンド生成ルール"
+description: "コマンド組立順序・GIF 2パス・排他ルール（copyStreams/noVideo/noAudio）"
+category: "rules"
+created: "2026-02-18"
+updated: "2026-03-07"
+---
+
 # FFmpeg コマンド生成ルール
 
 ## コマンド組立順序

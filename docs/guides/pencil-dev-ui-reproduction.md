@@ -1,3 +1,11 @@
+---
+title: "Pencil.dev UI 再現 調査レポート"
+description: "Pencil.dev 上に FFmpeg Command Generator の UI を再現する可能性の調査"
+category: "guides"
+created: "2026-02-20"
+updated: "2026-03-07"
+---
+
 # Pencil.dev UI 再現 調査レポート
 
 > 調査日: 2026-02-20

@@ -1,3 +1,11 @@
+---
+title: "storybook-check スキル"
+description: "Storybookビルド検証（全ストーリーのコンパイル確認）"
+category: "skills"
+created: "2026-02-27"
+updated: "2026-03-07"
+---
+
 # storybook-check
 
 Storybook の全ストーリーがビルド可能かを検証する。

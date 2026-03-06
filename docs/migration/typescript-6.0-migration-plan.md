@@ -1,3 +1,11 @@
+---
+title: "TypeScript 6.0 移行計画書"
+description: "TypeScript 5.9 から 6.0 への移行計画と影響範囲の分析"
+category: "migration"
+created: "2026-02-20"
+updated: "2026-03-07"
+---
+
 # TypeScript 6.0 移行計画書
 
 **作成日**: 2026-02-20

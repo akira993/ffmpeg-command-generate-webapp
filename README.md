@@ -1,3 +1,11 @@
+---
+title: "FFmpeg Command Generator"
+description: "GUIで簡単にFFmpegコマンドを生成するWebアプリ"
+category: "root"
+created: "2026-02-16"
+updated: "2026-03-07"
+---
+
 # FFmpeg Command Generator
 
 GUIで簡単にFFmpegコマンドを生成するWebアプリ。

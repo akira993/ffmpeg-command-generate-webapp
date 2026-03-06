@@ -1,3 +1,11 @@
+---
+title: "Claude Code ワークフロー完全設計書"
+description: "Claude Code MCP統合ガイド（CocoIndex/Cipher/Serena/Chrome DevTools）"
+category: "workflow"
+created: "2026-02-27"
+updated: "2026-03-07"
+---
+
 # Claude Code（Desktop App）ワークフロー完全設計書
 
 > **対象**: macOS 環境でモダンフロントエンドプロジェクトに MCP 統合開発環境を構築する

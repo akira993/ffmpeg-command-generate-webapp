@@ -1,3 +1,11 @@
+---
+title: "run-tests スキル"
+description: "Vitest+型チェック+Storybookビルドの統合テスト実行"
+category: "skills"
+created: "2026-02-18"
+updated: "2026-03-07"
+---
+
 # run-tests
 
 Vitest ユニットテストと型チェックを実行し、結果をレポートする。

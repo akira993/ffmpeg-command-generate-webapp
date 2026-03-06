@@ -1,3 +1,11 @@
+---
+title: "SEO / LLMO 対策 詳細設計書"
+description: "3フェーズSEO戦略（技術・LLMO・コンテンツ拡充）の設計"
+category: "seo"
+created: "2026-02-20"
+updated: "2026-03-07"
+---
+
 # SEO / LLMO 対策 詳細設計書
 
 > **対象サイト**: https://www.cmd-gen.com

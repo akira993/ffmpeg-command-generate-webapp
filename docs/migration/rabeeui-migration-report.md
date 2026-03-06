@@ -1,3 +1,11 @@
+---
+title: "RabeeUI 移行レポート"
+description: "shadcn-svelte から RabeeUI デザインパターンへの移行調査と実施の記録"
+category: "migration"
+created: "2026-02-20"
+updated: "2026-03-07"
+---
+
 # RabeeUI 移行レポート
 
 > 調査日: 2026-02-20

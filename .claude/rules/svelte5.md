@@ -1,3 +1,11 @@
+---
+title: "Svelte 5 Runes ルール"
+description: "Svelte 5 Runes API使用規則（$state/$derived/$effect、structuredClone禁止）"
+category: "rules"
+created: "2026-02-18"
+updated: "2026-03-07"
+---
+
 # Svelte 5 Runes ルール
 
 ## 使うべきもの

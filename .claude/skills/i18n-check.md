@@ -1,3 +1,11 @@
+---
+title: "i18n-check スキル"
+description: "ja.json/en.jsonのキー整合性チェックスキル"
+category: "skills"
+created: "2026-02-18"
+updated: "2026-03-07"
+---
+
 # i18n-check
 
 `src/lib/i18n/en.json` と `src/lib/i18n/ja.json` の翻訳キー整合性をチェックする。

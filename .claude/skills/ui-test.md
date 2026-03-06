@@ -1,3 +1,11 @@
+---
+title: "ui-test スキル"
+description: "Chrome MCPでPC/モバイル両サイズのUI自動テスト"
+category: "skills"
+created: "2026-02-18"
+updated: "2026-03-07"
+---
+
 # ui-test
 
 Chrome MCP を使ってローカル preview サーバーで PC / モバイル UI テストを実行する。

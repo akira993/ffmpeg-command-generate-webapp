@@ -1,3 +1,11 @@
+---
+title: "deploy スキル"
+description: "push→CI待機→Vercel URL取得の一連デプロイスキル"
+category: "skills"
+created: "2026-02-19"
+updated: "2026-03-07"
+---
+
 # deploy
 
 `main` branch に push して、CI 完了 → Vercel 本番デプロイ URL を取得するまでの一連のフローを実行する。

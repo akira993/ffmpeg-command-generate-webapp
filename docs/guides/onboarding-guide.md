@@ -1,3 +1,11 @@
+---
+title: "初めて使う人向けガイド（Onboarding UX）"
+description: "FFmpeg 初心者向けのガイド UI 設計と各コンポーネントの仕様"
+category: "guides"
+created: "2026-02-16"
+updated: "2026-03-07"
+---
+
 # 初めて使う人向けガイド（Onboarding UX）
 
 ## 概要

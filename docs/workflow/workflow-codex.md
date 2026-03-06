@@ -1,3 +1,11 @@
+---
+title: "Codex CLI ワークフロー完全設計書"
+description: "Codex CLI設定（AGENTS.md、config.toml、OpenAI/Geminiオプション）"
+category: "workflow"
+created: "2026-02-27"
+updated: "2026-03-07"
+---
+
 # Codex CLI（OpenAI）ワークフロー完全設計書
 
 > **対象**: macOS 環境でモダンフロントエンドプロジェクトに MCP 統合開発環境を構築する

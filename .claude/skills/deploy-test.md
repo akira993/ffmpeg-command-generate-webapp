@@ -1,3 +1,11 @@
+---
+title: "deploy-test スキル"
+description: "本番URLに対するChrome MCP UI+パフォーマンステスト"
+category: "skills"
+created: "2026-02-19"
+updated: "2026-03-07"
+---
+
 # deploy-test
 
 デプロイ済みの本番 URL に対して Chrome MCP で UI テストを実行する。

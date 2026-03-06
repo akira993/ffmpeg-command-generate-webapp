@@ -1,3 +1,11 @@
+---
+title: "デプロイ手順書"
+description: "Vercelデプロイフロー・GitHub Actions CI・環境変数・トラブルシューティング"
+category: "deploy"
+created: "2026-02-15"
+updated: "2026-03-07"
+---
+
 # デプロイ手順書
 
 ## 概要

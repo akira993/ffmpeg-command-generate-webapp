@@ -1,3 +1,11 @@
+---
+title: "SEO 外部設定ガイド"
+description: "OG画像作成・Search Console登録・SNS検証・GA4セットアップ手順"
+category: "seo"
+created: "2026-02-25"
+updated: "2026-03-07"
+---
+
 # SEO 外部設定ガイド
 
 このドキュメントでは、コードの変更だけでは完結しない **外部サービス側の設定手順** をまとめています。

@@ -1,3 +1,11 @@
+---
+title: "Changelog"
+description: "プロジェクトのバージョン履歴と変更内容"
+category: "root"
+created: "2026-02-16"
+updated: "2026-03-07"
+---
+
 # Changelog
 
 ## [0.5.2] - 2026-02-18

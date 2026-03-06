@@ -1,3 +1,11 @@
+---
+title: "CSS Design System"
+description: "oklchカラートークン・clamp()タイポグラフィ・ダークモード・グラデーションルール"
+category: "design"
+created: "2026-02-16"
+updated: "2026-03-07"
+---
+
 # CSS Design System
 
 > FFmpeg Command Generator のデザイントークン・テーマ設計仕様。
