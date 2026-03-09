@@ -3,7 +3,7 @@ title: "CSS Design System"
 description: "oklchカラートークン・clamp()タイポグラフィ・ダークモード・グラデーションルール"
 category: "design"
 created: "2026-02-16"
-updated: "2026-03-07"
+updated: "2026-03-09"
 ---
 
 # CSS Design System
@@ -178,3 +178,28 @@ GitHub Actions の `ci.yml` に以下のジョブが含まれる:
 - `app.css` に hex カラー (`#xxx`) が含まれる
 - `app.css` に `rgb()` / `hsl()` が含まれる
 - `app.css` に `in oklab` なしのグラデーションがある
+
+---
+
+## 9. CSS Subgrid レイアウト
+
+### 9.1 PresetCard のアライメント
+
+プリセットカードグリッドでは **CSS Subgrid** を使用し、タイトルの行数が異なるカード間で `card-content`（説明文）の開始位置を揃えている。
+
+```
+PresetGrid (grid, 2-4 cols, gap-3)
+  └── wrapper div (row-span-2, grid, grid-rows-subgrid)  ← 1段目 subgrid
+        └── Card.Root (row-span-2, grid, grid-rows-subgrid)  ← 2段目 subgrid
+              ├── Card.Header (row 1) — アイコン + タイトル
+              └── Card.Content (row 2) — 説明文
+```
+
+- 各カードは親グリッドの **2行トラック** を占有（`row-span-2`）
+- subgrid により、同じ行のカード同士でヘッダー行・コンテンツ行の高さが統一される
+- `gap-3` は親グリッド（PresetGrid）で定義し、行間・列間の両方に適用
+- Card.Root では `gap-0` を指定し、親グリッドの gap のみで間隔を制御
+
+### 9.2 ブラウザ対応
+
+CSS Subgrid は 2023年12月以降の主要ブラウザで Baseline 対応済み（Chrome 117+, Firefox 71+, Safari 16+, Edge 117+）。非対応ブラウザでは Card.Root の基底クラス `flex flex-col` がフォールバックとして機能し、アライメントなしのレイアウトにグレースフルデグラデーションする。

@@ -63,3 +63,20 @@
 		</div>
 	{/snippet}
 </Story>
+
+<Story name="SubgridAlignment">
+	{#snippet template()}
+		<p class="mb-4 text-sm text-muted-foreground">
+			CSS Subgrid により、タイトルの行数が異なっても card-content の開始位置が揃います。
+		</p>
+		<div class="grid grid-cols-4 gap-3">
+			{#each presetList.slice(0, 4) as preset}
+				<PresetCard
+					{preset}
+					selected={false}
+					onselect={() => {}}
+				/>
+			{/each}
+		</div>
+	{/snippet}
+</Story>
