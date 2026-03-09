@@ -42,7 +42,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-	class="cursor-pointer transition-all hover:scale-[1.02]"
+	class="row-span-2 grid grid-rows-subgrid cursor-pointer transition-all hover:scale-[1.02]"
 	onclick={() => onselect(preset.id)}
 	role="button"
 	tabindex="0"
@@ -54,7 +54,7 @@
 	}}
 >
 	<Card.Root
-		class="h-full gap-3 sm:gap-6 {selected
+		class="row-span-2 grid grid-rows-subgrid gap-0 {selected
 			? 'border-primary bg-primary/5 ring-2 ring-primary'
 			: 'hover:border-primary/50'}"
 	>
