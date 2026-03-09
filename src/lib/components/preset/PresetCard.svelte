@@ -54,7 +54,7 @@
 	}}
 >
 	<Card.Root
-		class="h-full {selected
+		class="h-full gap-3 sm:gap-6 {selected
 			? 'border-primary bg-primary/5 ring-2 ring-primary'
 			: 'hover:border-primary/50'}"
 	>
