@@ -135,7 +135,21 @@
       "Bash(xxd:*)",
       "Bash(pip3 install:*)",
       "Bash(pip3 list:*)",
-      "Bash(pyftsubset:*)"
+      "Bash(pyftsubset:*)",
+      "Bash(git pull:*)",
+      "Bash(git:*)",
+      "Bash(brew upgrade:*)",
+      "WebFetch(domain:web.dev)",
+      "mcp__plugin_context7_context7__resolve-library-id",
+      "mcp__plugin_context7_context7__query-docs",
+      "Bash(npx:*)",
+      "Bash(node:*)",
+      "mcp__chrome-devtools__lighthouse_audit",
+      "Bash(for f in docs/design/basic-design.md docs/design/detailed-design.md docs/design/css-design.md docs/design/requirements.md docs/seo/seo-llmo-design.md docs/seo/seo-external-setup.md docs/testing/test-design.md docs/testing/test-manual.md docs/deploy/deployment.md docs/workflow/workflow-claude-code.md docs/workflow/workflow-cursor.md docs/workflow/workflow-codex.md .claude/rules/svelte5.md .claude/rules/storybook.md .claude/rules/i18n.md .claude/rules/css.md .claude/rules/ffmpeg-builder.md .claude/skills/i18n-check.md .claude/skills/deploy.md .claude/skills/perf-test.md .claude/skills/deploy-test.md .claude/skills/ui-test.md .claude/skills/css-lint.md .claude/skills/storybook-check.md .claude/skills/implement_workflow.md .claude/skills/run-tests.md .claude/docs/mcp-setup-guide.md)",
+      "Bash(do echo \"=== $f ===\")",
+      "Read(//Users/akiratakahashi/Projects/ffmpeg-command-generate-webapp/**)",
+      "Bash(for f in docs/migration/rabeeui-migration-report.md docs/migration/typescript-6.0-migration-plan.md docs/guides/onboarding-guide.md docs/guides/pencil-dev-ui-reproduction.md)",
+      "mcp__chrome-devtools__emulate"
     ]
   }
 }
