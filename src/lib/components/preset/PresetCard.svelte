@@ -58,20 +58,18 @@
 			? 'border-primary bg-primary/5 ring-2 ring-primary'
 			: 'hover:border-primary/50'}"
 	>
-		<Card.Header class="pb-2">
-			<div class="flex items-center gap-2.5">
-				<div
-					class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
-					style="background-color: var(--color-icon-{preset.iconColor}-bg); color: var(--color-icon-{preset.iconColor});"
-				>
-					{#if IconComponent}
-						<IconComponent size={18} strokeWidth={2} />
-					{:else}
-						<span class="text-lg">{preset.icon}</span>
-					{/if}
-				</div>
-				<Card.Title class="text-sm">{$t(preset.nameKey)}</Card.Title>
+		<Card.Header class="flex gap-2.5 pb-2">
+			<div
+				class="flex h-8 w-8 shrink-0 self-center items-center justify-center rounded-lg"
+				style="background-color: var(--color-icon-{preset.iconColor}-bg); color: var(--color-icon-{preset.iconColor});"
+			>
+				{#if IconComponent}
+					<IconComponent size={18} strokeWidth={2} />
+				{:else}
+					<span class="text-lg">{preset.icon}</span>
+				{/if}
 			</div>
+			<Card.Title class="self-center text-sm">{$t(preset.nameKey)}</Card.Title>
 		</Card.Header>
 		<Card.Content>
 			<p class="text-xs text-muted-foreground">
