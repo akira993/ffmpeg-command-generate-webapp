@@ -58,7 +58,7 @@
 			? 'border-primary bg-primary/5 ring-2 ring-primary'
 			: 'hover:border-primary/50'}"
 	>
-		<Card.Header class="pb-2">
+		<Card.Header class="items-center pb-2">
 			<div class="flex items-center gap-2.5">
 				<div
 					class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
