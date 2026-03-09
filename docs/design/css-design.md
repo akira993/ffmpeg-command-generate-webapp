@@ -3,7 +3,7 @@ title: "CSS Design System"
 description: "oklchカラートークン・clamp()タイポグラフィ・ダークモード・グラデーションルール"
 category: "design"
 created: "2026-02-16"
-updated: "2026-03-09"
+updated: "2026-03-10"
 ---
 
 # CSS Design System
@@ -183,23 +183,122 @@ GitHub Actions の `ci.yml` に以下のジョブが含まれる:
 
 ## 9. CSS Subgrid レイアウト
 
-### 9.1 PresetCard のアライメント
+### 9.1 解決する課題
 
-プリセットカードグリッドでは **CSS Subgrid** を使用し、タイトルの行数が異なるカード間で `card-content`（説明文）の開始位置を揃えている。
+プリセットカードはタイトルの行数がカードごとに異なる（例: 「GIF生成」= 1行、「画像圧縮（AVIF）」= 2行、「Image Compression (AVIF)」= 3行）。通常の Flexbox レイアウトでは、タイトル行数の違いにより **説明文（Card.Content）の開始位置がカード間でバラバラ** になる。
+
+CSS Subgrid を使うことで、同じグリッド行にあるすべてのカードの **ヘッダー高さが最も高いカードに統一** され、説明文の開始位置が完全に揃う。
+
+### 9.2 DOM 構造とクラス設計
 
 ```
-PresetGrid (grid, 2-4 cols, gap-3)
-  └── wrapper div (row-span-2, grid, grid-rows-subgrid)  ← 1段目 subgrid
-        └── Card.Root (row-span-2, grid, grid-rows-subgrid)  ← 2段目 subgrid
-              ├── Card.Header (row 1) — アイコン + タイトル
-              └── Card.Content (row 2) — 説明文
+PresetGrid (grid, grid-cols-2 lg:grid-cols-3 xl:grid-cols-4, gap-3)
+│
+├── wrapper div (row-span-2, grid, grid-rows-subgrid)  ← 1段目 subgrid
+│     └── Card.Root (row-span-2, grid, grid-rows-subgrid, gap-0)  ← 2段目 subgrid
+│           ├── Card.Header (flex, gap-2.5, pb-2)  ← Row 1
+│           │     ├── Icon div (self-center)  ← 垂直中央
+│           │     └── Card.Title (self-center)  ← 垂直中央
+│           └── Card.Content  ← Row 2（全カードで開始位置が揃う）
+│
+├── wrapper div ...
+│     └── Card.Root ...
+│           ├── Card.Header ...
+│           └── Card.Content ...
+│
+└── ...（8カード）
 ```
 
-- 各カードは親グリッドの **2行トラック** を占有（`row-span-2`）
-- subgrid により、同じ行のカード同士でヘッダー行・コンテンツ行の高さが統一される
-- `gap-3` は親グリッド（PresetGrid）で定義し、行間・列間の両方に適用
-- Card.Root では `gap-0` を指定し、親グリッドの gap のみで間隔を制御
+### 9.3 二重 Subgrid が必要な理由
 
-### 9.2 ブラウザ対応
+CSS Subgrid は **直接の子要素** にしか行トラックを継承しない。しかし PresetGrid の直接の子は wrapper div であり、実際にヘッダーとコンテンツを持つのはその孫要素の Card.Root 内部にある。
 
-CSS Subgrid は 2023年12月以降の主要ブラウザで Baseline 対応済み（Chrome 117+, Firefox 71+, Safari 16+, Edge 117+）。非対応ブラウザでは Card.Root の基底クラス `flex flex-col` がフォールバックとして機能し、アライメントなしのレイアウトにグレースフルデグラデーションする。
+```
+PresetGrid → wrapper div → Card.Root → Card.Header / Card.Content
+             ↑ 1段目        ↑ 2段目
+             subgrid         subgrid
+```
+
+1段目（wrapper div）と2段目（Card.Root）の**両方**に `row-span-2 grid grid-rows-subgrid` を指定することで、PresetGrid が定義した2行トラックが Card.Header / Card.Content まで貫通する。
+
+### 9.4 各レイヤーの役割
+
+| レイヤー | Tailwind クラス | 役割 |
+|---------|----------------|------|
+| **PresetGrid** | `grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4` | 列数・間隔を定義。暗黙の行トラックは `auto` サイズ |
+| **wrapper div** | `row-span-2 grid grid-rows-subgrid` | 2行トラックを占有し、subgrid で親の行サイズを継承 |
+| **Card.Root** | `row-span-2 grid grid-rows-subgrid gap-0` | 同じく2行を subgrid で継承。`gap-0` で内部間隔を親に委譲 |
+| **Card.Header** | `flex gap-2.5 pb-2` | Row 1 を占有。flex で横並び。`pb-2` で下余白を確保 |
+| **Card.Content** | （デフォルト） | Row 2 を占有。全カードで開始位置が揃う |
+
+### 9.5 Card.Header 内部のレイアウト戦略
+
+#### 問題: grid vs flex
+
+Card.Header のベースクラス（shadcn/ui）は `grid auto-rows-min grid-rows-[auto_auto] items-start` だが、Subgrid 環境下でアイコンとタイトルを横並びにするには **flex に変更** する必要がある。`class` prop で `flex gap-2.5 pb-2` を渡すと、Tailwind Merge (`twMerge`) により `grid` → `flex` が正しくオーバーライドされる。
+
+#### アイコン・タイトルの垂直中央揃え
+
+Subgrid により Card.Header の高さは **同じ行で最もタイトルが長いカードに合わせて拡張** される。例えば4列中1枚が3行タイトルなら、残り3枚のヘッダーも同じ高さになる。
+
+この余剰スペース内でアイコンとタイトルを垂直中央に配置するため、**`self-center`** を使用:
+
+```svelte
+<!-- アイコン: self-center で垂直中央 -->
+<div class="flex h-8 w-8 shrink-0 self-center items-center justify-center rounded-lg" ...>
+  <IconComponent size={18} strokeWidth={2} />
+</div>
+
+<!-- タイトル: self-center で垂直中央 -->
+<Card.Title class="self-center text-sm">...</Card.Title>
+```
+
+**`items-center` ではなく `self-center` を使う理由:**
+
+`items-center` を Card.Header に指定すると、flex コンテナの交差軸方向に全子要素を一括で中央揃えにする。これは一見正しいが、**Subgrid で高さが均等化される前提** では問題ない。ただし、将来的にヘッダー内に追加要素（バッジ等）が入る可能性を考慮し、各要素が独立して配置を制御できる `self-center` を採用した。
+
+### 9.6 gap 制御
+
+| 場所 | gap の値 | 説明 |
+|------|----------|------|
+| PresetGrid | `gap-3`（0.75rem） | カード間の列間隔・行間隔を一括定義 |
+| Card.Root | `gap-0` | subgrid 使用時は親の gap が伝搬するため、Card.Root 自体の gap は 0 に |
+| Card.Header 内 | `gap-2.5`（0.625rem） | アイコンとタイトル間の横間隔 |
+
+**重要**: Card.Root のベースクラスに `gap-6` があるが、`gap-0` で上書きしている。これにより Card.Header と Card.Content 間の間隔は PresetGrid の `gap-3` のみで制御される。
+
+### 9.7 レスポンシブ動作
+
+| ブレークポイント | 列数 | 1行あたりのカード数 |
+|----------------|------|-------------------|
+| デフォルト（〜1023px） | 2列 | 2 |
+| `lg`（1024px〜） | 3列 | 3 |
+| `xl`（1280px〜） | 4列 | 4 |
+
+列数が変わるとグリッド行の構成も変わるが、Subgrid は常に同じ行内のカード同士でヘッダー高さを揃える。
+
+### 9.8 フォールバック（非対応ブラウザ）
+
+CSS Subgrid は 2023年12月以降の主要ブラウザで Baseline 対応済み（Chrome 117+, Firefox 71+, Safari 16+, Edge 117+）。非対応ブラウザでは:
+
+- `grid-rows: subgrid` が無視される
+- Card.Root のベースクラス `flex flex-col` がフォールバックとして機能
+- ヘッダー高さは揃わないが、各カード単体のレイアウトは崩れない（グレースフルデグラデーション）
+
+### 9.9 Storybook での検証
+
+`PresetCard.stories.svelte` に **SubgridAlignment** ストーリーを用意:
+
+```svelte
+<Story name="SubgridAlignment">
+  {#snippet template()}
+    <div class="grid grid-cols-4 gap-3">
+      {#each presetList.slice(0, 4) as preset}
+        <PresetCard {preset} selected={false} onselect={() => {}} />
+      {/each}
+    </div>
+  {/snippet}
+</Story>
+```
+
+4列固定でタイトル行数の異なるカードを並べ、Card.Content の開始位置とアイコン・タイトルの垂直中央揃えを視覚的に確認できる。
