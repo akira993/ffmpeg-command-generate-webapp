@@ -158,7 +158,7 @@
 </div>
 
 <!-- モバイル固定バー -->
-<div class="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 p-2 backdrop-blur sm:hidden">
+<div class="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/50 px-6 pb-5 pt-3 backdrop-blur sm:hidden">
 	<ActionButtons
 		variant="mobile"
 		onInstallGuide={() => { installGuideOpen = true; }}
