@@ -248,6 +248,6 @@ window.matchMedia('(display-mode: standalone)').matches
 
 ## 7. 今後の拡張（Phase 2 以降）
 
-- **Chrome拡張版リサイザー**: `chrome.windows.update()` による確実なリサイズ（別プロジェクト）
+- **Chrome拡張版リサイザー**: `chrome.windows.update()` による確実なリサイズ → `docs/design/chrome-extension-design.md`
 - **サイズプリセット**: iPhone / Pixel / タブレット等の端末サイズ選択
 - **自動コンパクト**: ウィンドウ幅が一定以下になったら自動的にコンパクト表示
