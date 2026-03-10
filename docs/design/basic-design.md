@@ -3,7 +3,7 @@ title: "基本設計書"
 description: "システムアーキテクチャ・画面構成・コンポーネント階層・データフローの設計"
 category: "design"
 created: "2026-02-14"
-updated: "2026-03-07"
+updated: "2026-03-11"
 ---
 
 # 基本設計書
@@ -164,7 +164,8 @@ App (+layout.svelte)
 ├── Header
 │   ├── Logo
 │   ├── LanguageSwitcher
-│   └── ThemeToggle (Lucide Sun/Moon)
+│   ├── ThemeToggle (Lucide Sun/Moon)
+│   └── CompactToggle (PWAスタンドアロン時のみ表示)
 ├── DropZone (D&D ファイル/フォルダ入力)
 ├── ModeSwitch
 ├── Main Content (+page.svelte)
@@ -233,6 +234,8 @@ Svelte の組み込みstore機能（`writable` / `derived`）を使用する。
 | `selectedPreset` | `string \| null` | writable | 選択中のプリセットID |
 | `options` | `FFmpegOptions` | writable | 全FFmpegオプション |
 | `commandString` | `string` | derived | 生成されたコマンド文字列 |
+| `isCompact` | `boolean` | writable | コンパクトモード状態（CompactStore） |
+| `isPWA` | `boolean` | writable | PWAスタンドアロン判定（CompactStore） |
 
 ### 5.2 データの流れ
 1. プリセット選択 → プリセットのデフォルト値で `options` を上書き

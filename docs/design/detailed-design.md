@@ -3,7 +3,7 @@ title: "詳細設計書"
 description: "ディレクトリ構造・型定義・ビルダーアルゴリズム・ストア設計・i18nキー定義"
 category: "design"
 created: "2026-02-14"
-updated: "2026-03-07"
+updated: "2026-03-11"
 ---
 
 # 詳細設計書
@@ -46,7 +46,8 @@ src/
 │   │   ├── codecs.ts         # コーデック・フォーマット定数
 │   │   └── validators.ts     # バリデーション関数
 │   ├── stores/
-│   │   └── command.ts        # Svelte Store
+│   │   ├── command.ts        # Svelte Store
+│   │   └── compact.svelte.ts # コンパクトモード Store（PWAリサイズ + UI圧縮）
 │   └── i18n/
 │       ├── index.ts          # i18n設定
 │       ├── en.json           # 英語翻訳
@@ -477,6 +478,13 @@ function isOptionEmpty(value: unknown): boolean
 | 責務 | FFmpegのインストール方法をOS別タブ（macOS/Windows/Linux）で案内。インストール確認コマンド・公式サイトリンク付き |
 | 外部API | `export function show()` — 外部からモーダルを開く |
 
+### 5.11 `CompactToggle`（Header内）
+| 項目 | 内容 |
+|------|------|
+| 表示条件 | PWAスタンドアロンモード時のみ |
+| 責務 | コンパクトモードのトグル。Lucide Smartphoneアイコン使用。ウィンドウリサイズ（1:3比率）+ UI圧縮を実行 |
+| 詳細設計 | `docs/design/compact-mode-design.md` を参照 |
+
 ---
 
 ## 6. Store設計 (`src/lib/stores/command.svelte.ts`)
@@ -515,6 +523,22 @@ class CommandStore {
 }
 
 export const commandStore = new CommandStore();
+```
+
+### 6.2 CompactStore (`src/lib/stores/compact.svelte.ts`)
+
+PWAスタンドアロンモードでのコンパクト表示を管理。詳細は `docs/design/compact-mode-design.md` を参照。
+
+```typescript
+class CompactStore {
+  isCompact = $state(false);   // コンパクトモードのON/OFF
+  isPWA = $state(false);       // PWAスタンドアロン判定
+
+  init(): void { ... }         // onMount 内で呼び出し
+  toggle(): void { ... }       // コンパクトモードをトグル + window.resizeTo()
+}
+
+export const compactStore = new CompactStore();
 ```
 
 ---

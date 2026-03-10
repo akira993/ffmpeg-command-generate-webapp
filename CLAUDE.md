@@ -32,6 +32,7 @@ npm run build-storybook  # Storybook 静的ビルド
 | `src/lib/ffmpeg/types.ts` | `FFmpegOptions` など全型定義 |
 | `src/lib/ffmpeg/presets.ts` | 8種のプリセット定義 |
 | `src/lib/stores/command.svelte.ts` | `CommandStore` (Svelte 5 Runes) |
+| `src/lib/stores/compact.svelte.ts` | `CompactStore` — PWA コンパクトモード（1:3リサイズ + UI圧縮） |
 | `src/lib/stores/consent.svelte.ts` | `ConsentStore` — Cookie 同意 + GA4 Consent Mode v2 |
 | `src/lib/i18n/ja.json` / `en.json` | 翻訳ファイル |
 | `src/routes/privacy/+page.svelte` | プライバシーポリシーページ（GDPR/CCPA対応、日英切替） |
@@ -117,7 +118,7 @@ gh api repos/akira993/ffmpeg-command-generate-webapp/deployments \
 | `.claude/rules/` | CSS・Svelte5・i18n・FFmpeg ビルダー・Storybook・Markdown のコーディングルール |
 | `.claude/skills/` | スキル定義（テスト・デプロイ・実装ワークフローなど） |
 | `.claude/docs/mcp-setup-guide.md` | MCP セットアップ詳細・トラブルシューティング |
-| `docs/design/` | 基本設計・詳細設計・CSS デザイン・要件定義 |
+| `docs/design/` | 基本設計・詳細設計・CSS デザイン・要件定義・コンパクトモード設計 |
 | `docs/seo/` | SEO/LLMO 戦略・外部セットアップ手順 |
 | `docs/testing/` | テスト設計・手動テストチェックリスト |
 | `docs/deploy/` | Vercel デプロイ・CI/CD 設定 |
