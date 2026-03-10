@@ -7,6 +7,7 @@
 	import { commandStore } from '$lib/stores/command.svelte';
 	import { getAllPresets } from '$lib/ffmpeg/presets';
 	import type { PresetId } from '$lib/ffmpeg/types';
+	import { compactStore } from '$lib/stores/compact.svelte';
 	import PresetCard from './PresetCard.svelte';
 
 	const presets = getAllPresets();
@@ -16,7 +17,7 @@
 	}
 </script>
 
-<div class="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4">
+<div class="grid grid-cols-2 {compactStore.isCompact ? 'auto-rows-fr gap-2' : 'gap-3'} lg:grid-cols-3 xl:grid-cols-4">
 	{#each presets as preset (preset.id)}
 		<PresetCard
 			{preset}

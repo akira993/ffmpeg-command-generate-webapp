@@ -42,8 +42,11 @@ class CompactStore {
 		const screenH = window.screen.availHeight;
 		const screenW = window.screen.availWidth;
 		const ratio = 3;
+		const minHeight = 400;
 
-		let h = screenH;
+		// コンテンツ高さを基準にし、画面高さを上限とする
+		const contentH = document.documentElement.scrollHeight;
+		let h = Math.max(minHeight, Math.min(contentH, screenH));
 		let w = Math.round(h / ratio);
 
 		if (w > screenW) {
