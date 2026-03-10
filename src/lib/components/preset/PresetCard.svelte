@@ -8,6 +8,7 @@
 	import { t } from '$lib/i18n';
 	import type { PresetDefinition } from '$lib/ffmpeg/types';
 	import * as Card from '$lib/components/ui/card';
+	import { compactStore } from '$lib/stores/compact.svelte';
 	import ImageIcon from '@lucide/svelte/icons/image';
 	import GlobeIcon from '@lucide/svelte/icons/globe';
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
@@ -42,7 +43,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-	class="row-span-2 grid grid-rows-subgrid cursor-pointer transition-all hover:scale-[1.02]"
+	class="{compactStore.isCompact ? '' : 'row-span-2 grid grid-rows-subgrid'} cursor-pointer transition-all hover:scale-[1.02]"
 	onclick={() => onselect(preset.id)}
 	role="button"
 	tabindex="0"
@@ -54,7 +55,7 @@
 	}}
 >
 	<Card.Root
-		class="row-span-2 grid grid-rows-subgrid gap-0 {selected
+		class="{compactStore.isCompact ? '' : 'row-span-2 grid grid-rows-subgrid'} gap-0 {selected
 			? 'border-primary bg-primary/5 ring-2 ring-primary'
 			: 'hover:border-primary/50'}"
 	>
@@ -71,10 +72,12 @@
 			</div>
 			<Card.Title class="self-center text-sm">{$t(preset.nameKey)}</Card.Title>
 		</Card.Header>
-		<Card.Content>
-			<p class="text-xs text-muted-foreground">
-				{$t(preset.descriptionKey)}
-			</p>
-		</Card.Content>
+		{#if !compactStore.isCompact}
+			<Card.Content>
+				<p class="text-xs text-muted-foreground">
+					{$t(preset.descriptionKey)}
+				</p>
+			</Card.Content>
+		{/if}
 	</Card.Root>
 </div>

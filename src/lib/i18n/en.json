@@ -10,7 +10,9 @@
 	},
 	"header": {
 		"title": "FFmpeg Command Generator",
-		"subtitle": "Easily generate FFmpeg commands with a GUI"
+		"subtitle": "Easily generate FFmpeg commands with a GUI",
+		"compactMode": "Compact view",
+		"normalMode": "Normal view"
 	},
 	"mode": {
 		"preset": "Preset",
