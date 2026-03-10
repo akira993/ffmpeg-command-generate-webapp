@@ -107,7 +107,7 @@
 	})}</script>`}
 </svelte:head>
 
-<div class="mx-auto max-w-4xl pb-20 sm:pb-0 {compactStore.isCompact ? 'space-y-2' : 'space-y-6'}">
+<div class="mx-auto max-w-4xl sm:pb-0 {compactStore.isCompact ? 'space-y-2 pb-6' : 'space-y-6 pb-20'}">
 	<!-- 1. ドラッグ＆ドロップエリア -->
 	<section>
 		<DropZone />
