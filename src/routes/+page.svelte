@@ -24,6 +24,36 @@
 	import LibraryInstallGuide from '$lib/components/common/LibraryInstallGuide.svelte';
 	import { Separator } from '$lib/components/ui/separator';
 	import { compactStore } from '$lib/stores/compact.svelte';
+	import { browser } from '$app/environment';
+	import { onMount } from 'svelte';
+
+	// モバイル固定バーの高さを動的に計測し、CSS変数として設定
+	let mobileBarEl: HTMLDivElement | undefined = $state();
+	let mobileBarHeight = $state(0);
+
+	// mobileBarHeight が変わったら CSS 変数に反映（Footer でも参照）
+	$effect(() => {
+		if (browser) {
+			document.documentElement.style.setProperty(
+				'--mobile-bar-h',
+				`${mobileBarHeight}px`
+			);
+		}
+	});
+
+	onMount(() => {
+		if (!mobileBarEl) return;
+		// 初期値
+		mobileBarHeight = mobileBarEl.offsetHeight;
+		// サイズ変化を監視（テキスト折り返しなど）
+		const ro = new ResizeObserver(() => {
+			if (mobileBarEl) {
+				mobileBarHeight = mobileBarEl.offsetHeight;
+			}
+		});
+		ro.observe(mobileBarEl);
+		return () => ro.disconnect();
+	});
 
 	// モーダル状態管理（一元化）
 	let installGuideOpen = $state(false);
@@ -159,7 +189,7 @@
 </div>
 
 <!-- モバイル固定バー -->
-<div class="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/50 px-6 pb-5 pt-3 backdrop-blur sm:hidden">
+<div bind:this={mobileBarEl} class="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/50 px-6 pb-5 pt-3 backdrop-blur sm:hidden">
 	<ActionButtons
 		variant="mobile"
 		onInstallGuide={() => { installGuideOpen = true; }}

@@ -3,7 +3,7 @@ title: "コンパクトモード設計書"
 description: "PWAスタンドアロン時のウィンドウ1:3縦長リサイズとUI圧縮機能の設計"
 category: "design"
 created: "2026-03-11"
-updated: "2026-03-12"
+updated: "2026-03-11"
 ---
 
 # コンパクトモード設計書
@@ -80,7 +80,7 @@ function calculateCompactSize(): { width: number; height: number } {
 | PresetCard タイトル | `text-sm` | `text-sm`（カード内パディング半減） |
 | PresetCard パディング | `px-6 py-6` | `px-3 py-2` |
 | Footer パディング | `py-4` | `py-1` |
-| Footer モバイル底余白 | `pb-16` | `pb-14` |
+| Footer モバイル底余白 | 動的（CSS変数 `--mobile-bar-h` + 余白） | 同左 |
 | +page.svelte セクション間余白 | `space-y-6` | `space-y-2` |
 | +page.svelte 底余白 | `pb-20` | `pb-6` |
 
