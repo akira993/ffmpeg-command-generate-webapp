@@ -3,7 +3,7 @@
 	import { compactStore } from '$lib/stores/compact.svelte';
 </script>
 
-<footer class="border-t border-border mt-auto {compactStore.isCompact ? 'pb-14 sm:pb-0' : 'pb-16 sm:pb-0'}">
+<footer class="footer-dynamic-pb border-t border-border mt-auto">
 	<div class="container mx-auto flex items-center justify-center gap-3 px-4 text-sm text-muted-foreground {compactStore.isCompact ? 'py-1' : 'py-4'}">
 		<p>{$t('footer.description')}</p>
 		<span class="text-border">|</span>
@@ -22,3 +22,17 @@
 		</a>
 	</div>
 </footer>
+
+<style>
+	/* モバイル: 固定バーの高さ + 余白分のパディング（CSS変数は +page.svelte で設定） */
+	.footer-dynamic-pb {
+		padding-bottom: calc(var(--mobile-bar-h, 4rem) + 0.75rem);
+	}
+
+	/* デスクトップ: 固定バーなし → パディング不要 */
+	@media (min-width: 640px) {
+		.footer-dynamic-pb {
+			padding-bottom: 0;
+		}
+	}
+</style>
