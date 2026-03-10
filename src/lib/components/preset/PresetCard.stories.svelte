@@ -2,6 +2,7 @@
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import PresetCard from './PresetCard.svelte';
 	import { PRESETS } from '$lib/ffmpeg/presets';
+	import { compactStore } from '$lib/stores/compact.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Domain/PresetCard',
@@ -74,6 +75,43 @@
 				<PresetCard
 					{preset}
 					selected={false}
+					onselect={() => {}}
+				/>
+			{/each}
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="CompactMode">
+	{#snippet template()}
+		{@const _ = (() => {
+			compactStore.isCompact = true;
+		})()}
+		<p class="mb-4 text-sm text-muted-foreground">
+			コンパクトモード: 説明文非表示、パディング半減、アイコン+タイトルのみ。全カードが同一高さ。
+		</p>
+		<div class="grid grid-cols-2 auto-rows-fr gap-2 md:grid-cols-3 lg:grid-cols-4">
+			{#each presetList as preset}
+				<PresetCard
+					{preset}
+					selected={false}
+					onselect={() => {}}
+				/>
+			{/each}
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="CompactModeSelected">
+	{#snippet template()}
+		{@const _ = (() => {
+			compactStore.isCompact = true;
+		})()}
+		<div class="grid grid-cols-2 auto-rows-fr gap-2 md:grid-cols-3 lg:grid-cols-4">
+			{#each presetList as preset, i}
+				<PresetCard
+					{preset}
+					selected={i === 0}
 					onselect={() => {}}
 				/>
 			{/each}
