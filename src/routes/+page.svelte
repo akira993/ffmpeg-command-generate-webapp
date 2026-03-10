@@ -23,6 +23,7 @@
 	import PathGuideModal from '$lib/components/common/PathGuideModal.svelte';
 	import LibraryInstallGuide from '$lib/components/common/LibraryInstallGuide.svelte';
 	import { Separator } from '$lib/components/ui/separator';
+	import { compactStore } from '$lib/stores/compact.svelte';
 
 	// モーダル状態管理（一元化）
 	let installGuideOpen = $state(false);
@@ -106,7 +107,7 @@
 	})}</script>`}
 </svelte:head>
 
-<div class="mx-auto max-w-4xl space-y-6 pb-20 sm:pb-0">
+<div class="mx-auto max-w-4xl pb-20 sm:pb-0 {compactStore.isCompact ? 'space-y-2' : 'space-y-6'}">
 	<!-- 1. ドラッグ＆ドロップエリア -->
 	<section>
 		<DropZone />

@@ -8,6 +8,7 @@
 	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';
 	import { consentStore } from '$lib/stores/consent.svelte';
+	import { compactStore } from '$lib/stores/compact.svelte';
 
 	let { children } = $props();
 
@@ -20,6 +21,7 @@
 
 	onMount(() => {
 		consentStore.init();
+		compactStore.init();
 	});
 </script>
 
