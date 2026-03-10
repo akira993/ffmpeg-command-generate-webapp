@@ -118,7 +118,7 @@ gh api repos/akira993/ffmpeg-command-generate-webapp/deployments \
 | `.claude/rules/` | CSS・Svelte5・i18n・FFmpeg ビルダー・Storybook・Markdown のコーディングルール |
 | `.claude/skills/` | スキル定義（テスト・デプロイ・実装ワークフローなど） |
 | `.claude/docs/mcp-setup-guide.md` | MCP セットアップ詳細・トラブルシューティング |
-| `docs/design/` | 基本設計・詳細設計・CSS デザイン・要件定義・コンパクトモード設計 |
+| `docs/design/` | 基本設計・詳細設計・CSS デザイン・要件定義・コンパクトモード設計・Chrome拡張設計 |
 | `docs/seo/` | SEO/LLMO 戦略・外部セットアップ手順 |
 | `docs/testing/` | テスト設計・手動テストチェックリスト |
 | `docs/deploy/` | Vercel デプロイ・CI/CD 設定 |

@@ -557,7 +557,9 @@ export const compactStore = new CompactStore();
   },
   "header": {
     "title": "FFmpeg コマンドジェネレーター",
-    "subtitle": "GUIで簡単にFFmpegコマンドを生成"
+    "subtitle": "GUIで簡単にFFmpegコマンドを生成",
+    "compactMode": "コンパクト表示",
+    "normalMode": "通常表示"
   },
   "mode": {
     "preset": "プリセット",

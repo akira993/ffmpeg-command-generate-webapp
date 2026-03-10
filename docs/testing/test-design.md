@@ -3,7 +3,7 @@ title: "テスト設計書"
 description: "Vitestユニットテスト設計（97テストケース、ビルダー・バリデータ・プリセット）"
 category: "testing"
 created: "2026-02-14"
-updated: "2026-03-07"
+updated: "2026-03-11"
 ---
 
 # テスト設計書
@@ -184,7 +184,36 @@ tests/
 
 ---
 
-## 6. E2Eテスト方針（将来実装）
+## 6. CompactStore テスト
+
+### 6.1 PWA判定
+
+| # | テストケース | 条件 | 期待結果 |
+|---|-------------|------|---------|
+| 66 | スタンドアロンモード判定 | `display-mode: standalone` が true | `isPWA = true` |
+| 67 | 通常ブラウザ判定 | `display-mode: standalone` が false | `isPWA = false` |
+
+### 6.2 コンパクトモードトグル
+
+| # | テストケース | 条件 | 期待結果 |
+|---|-------------|------|---------|
+| 68 | 初期状態 | Store生成直後 | `isCompact = false` |
+| 69 | トグルON | `toggle()` 呼び出し | `isCompact = true` |
+| 70 | トグルOFF | `toggle()` 再呼び出し | `isCompact = false` |
+| 71 | 非PWA時のトグル | `isPWA = false` で `toggle()` | `isCompact` が変更されない |
+
+### 6.3 ウィンドウサイズ計算
+
+| # | テストケース | 条件 | 期待結果 |
+|---|-------------|------|---------|
+| 72 | 1:3比率計算 | `availHeight = 900` | `width = 300, height = 900` |
+| 73 | 画面制約 | `availHeight = 1200, availWidth = 300` | 幅が画面内に収まる |
+| 74 | 元サイズ保持 | トグルON前のサイズ | `previousSize` に保存 |
+| 75 | 元サイズ復元 | トグルOFF | `previousSize` のサイズに復元 |
+
+---
+
+## 7. E2Eテスト方針（将来実装）
 
 ### 6.1 使用ツール
 - Playwright
@@ -197,3 +226,4 @@ tests/
 5. テーマ切替（ライト↔ダーク）
 6. モバイルレイアウト確認
 7. キーボード操作でのフォーム操作
+8. PWAスタンドアロンでコンパクトモードトグル → UI圧縮確認 → 復元

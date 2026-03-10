@@ -67,7 +67,7 @@ updated: "2026-03-11"
 ```
 ┌─────────────────────────────────────────┐
 │  Header                                 │
-│  [Logo] [Title]    [Lang] [Theme]       │
+│  [Logo] [Title]  [Compact] [Lang] [Theme]│
 ├─────────────────────────────────────────┤
 │  Mode Switch                            │
 │  [Preset Mode] | [Advanced Mode]        │
