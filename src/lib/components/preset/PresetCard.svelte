@@ -70,7 +70,7 @@
 					<span class="text-lg">{preset.icon}</span>
 				{/if}
 			</div>
-			<span class="text-xs font-semibold leading-tight">{$t(preset.nameKey)}</span>
+			<span class="text-sm font-semibold leading-tight">{$t(preset.nameKey)}</span>
 		</div>
 	</div>
 {:else}

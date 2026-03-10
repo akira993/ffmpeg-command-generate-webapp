@@ -3,7 +3,7 @@ title: "コンパクトモード設計書"
 description: "PWAスタンドアロン時のウィンドウ1:3縦長リサイズとUI圧縮機能の設計"
 category: "design"
 created: "2026-03-11"
-updated: "2026-03-11"
+updated: "2026-03-12"
 ---
 
 # コンパクトモード設計書
@@ -72,12 +72,17 @@ function calculateCompactSize(): { width: number; height: number } {
 
 | 対象 | 通常時 | コンパクト時 |
 |------|--------|-------------|
+| ヘッダー タイトル | `text-xl` | `text-sm` |
 | ヘッダー サブタイトル | 表示 | 非表示 |
-| PresetCard 説明文（Card.Content） | 表示 | 非表示 |
-| PresetCard Subgrid | `row-span-2` | `row-span-1` |
+| ヘッダー トグルアイコン | Smartphone（OFF） | Monitor + `bg-primary/10`（ON） |
+| PresetCard レイアウト | Subgrid（`row-span-2`） | 独自 `flex items-center`（均一高さ） |
+| PresetCard 説明文 | 表示 | 非表示 |
+| PresetCard タイトル | `text-sm` | `text-sm`（カード内パディング半減） |
+| PresetCard パディング | `px-6 py-6` | `px-3 py-2` |
 | Footer パディング | `py-4` | `py-1` |
-| Footer モバイル底余白 | `pb-16` | `pb-8` |
+| Footer モバイル底余白 | `pb-16` | `pb-14` |
 | +page.svelte セクション間余白 | `space-y-6` | `space-y-2` |
+| +page.svelte 底余白 | `pb-20` | `pb-6` |
 
 ### 2.4 非PWA環境での動作
 
