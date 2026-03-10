@@ -211,6 +211,15 @@ tests/
 | 74 | 元サイズ保持 | トグルON前のサイズ | `previousSize` に保存 |
 | 75 | 元サイズ復元 | トグルOFF | `previousSize` のサイズに復元 |
 
+### 6.4 Footer 動的パディング
+
+| # | テストケース | 条件 | 期待結果 |
+|---|-------------|------|---------|
+| 76 | CSS変数設定 | `+page.svelte` の ResizeObserver 実行後 | `--mobile-bar-h` が `document.documentElement` に設定される |
+| 77 | モバイル Footer パディング | `--mobile-bar-h: 56px` の場合 | `padding-bottom: calc(56px + 0.75rem)` が適用 |
+| 78 | デスクトップ Footer パディング | ビューポート幅 ≥ 640px | `padding-bottom: 0` が適用（メディアクエリ） |
+| 79 | 固定バーリサイズ追従 | テキスト折り返しでバー高さ変化 | ResizeObserver が再計測し `--mobile-bar-h` が更新される |
+
 ---
 
 ## 7. E2Eテスト方針（将来実装）

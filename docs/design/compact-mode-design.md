@@ -176,10 +176,17 @@ export const compactStore = new CompactStore();
 
 - セクション間余白: `space-y-6` → コンパクト時 `space-y-2`
 
+#### `src/routes/+page.svelte`（モバイル固定バー計測）
+
+- `ResizeObserver` でモバイル固定バーの高さを計測
+- CSS変数 `--mobile-bar-h` を `document.documentElement` に設定
+- テキスト折り返しなどによる高さ変化にも動的に追従
+
 #### `src/lib/components/layout/Footer.svelte`
 
-- パディング圧縮: `py-4` → コンパクト時 `py-1`
-- モバイル底余白: `pb-16` → コンパクト時 `pb-8`
+- パディング圧縮: `py-4` → コンパクト時 `py-1`（クラスベース）
+- モバイル底余白: CSS変数 `--mobile-bar-h` を参照し `calc(var(--mobile-bar-h, 4rem) + 0.75rem)` で動的計算
+- デスクトップ（`min-width: 640px`）では `padding-bottom: 0`（メディアクエリ）
 
 #### `src/lib/i18n/ja.json` / `en.json`
 
