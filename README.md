@@ -3,7 +3,7 @@ title: "FFmpeg Command Generator"
 description: "GUIで簡単にFFmpegコマンドを生成するWebアプリ"
 category: "root"
 created: "2026-02-16"
-updated: "2026-03-07"
+updated: "2026-03-18"
 ---
 
 # FFmpeg Command Generator
@@ -14,7 +14,7 @@ GUIで簡単にFFmpegコマンドを生成するWebアプリ。
 
 ## Features
 
-- **8種類のプリセット**: 画像変換(AVIF)、画像変換(WebP)、動画圧縮(AV1)、動画変換(VP9)、音声抽出、音声変換、動画トリム、GIF生成
+- **8種類のプリセット**: 画像変換(AVIF)、画像変換(WebP)、動画圧縮(AV1/SVT-AV1)、動画変換(VP9)、音声抽出、音声変換、動画トリム、GIF生成
 - **ドラッグ＆ドロップ**: ファイル/フォルダをD&Dで入力、メディアの幅/高さを自動検出
 - **アスペクト比ロック**: D&D時にアスペクト比を自動計算・ロック
 - **コーデック/コンテナ選択**: ドロップダウンで簡単切替（互換性フィルタ付き）
@@ -23,9 +23,14 @@ GUIで簡単にFFmpegコマンドを生成するWebアプリ。
 - **日英対応**: 日本語・英語の切り替え（HTML lang属性も連動）
 - **FFmpeg紹介ページ**: `/about-ffmpeg` — FFmpegの歴史・設計思想・ユースケース・圧縮比較表（JA/EN対応）
 - **ダーク/ライトテーマ**: ペールトーン(Light) / サイバーパンク(Dark)
+- **PWA**: インストール可能、オフライン対応（Service Worker によるアセットキャッシュ）
+- **コンパクトモード**: PWA standalone 起動時に 1:3 縦長リサイズ + UI 圧縮を自動適用
+- **SEO**: SSR + OGP / Twitter Cards + JSON-LD 構造化データ + sitemap.xml + GA4
 - **Cookie同意 + GA4 Consent Mode v2**: GDPR/CCPA対応のプライバシー管理
+- **プライバシーポリシー**: `/privacy` — GDPR/CCPA 対応、お問い合わせフォーム付き
 - **Web フォント**: Noto Sans JP（日本語）/ Inter（英語）を woff2 でセルフホスト（言語別切替）
-- **Storybook**: 15コンポーネント / 55ストーリーのUIカタログ
+- **CSS Subgrid**: プリセットカードのアイコン・タイトル・説明文を行単位で揃える
+- **Storybook**: 15コンポーネント / 58ストーリーのUIカタログ
 
 ## Tech Stack
 
@@ -35,13 +40,14 @@ GUIで簡単にFFmpegコマンドを生成するWebアプリ。
 | Svelte | 5.x (Runes) |
 | TypeScript | 5.x |
 | Tailwind CSS | 4.x |
+| Vite | 7.x |
 | UI コンポーネント | 独自実装（CVA + Svelte 5 Runes） |
 | @lucide/svelte | latest |
 | sveltekit-i18n | latest |
 | Vitest | 4.x |
 | Storybook | 10.x |
 
-> UI コンポーネントは [RabeeUI パターン](docs/rabeeui-migration-report.md)（CVA + Context API）で独自実装しています。bits-ui / shadcn-svelte は使用していません。
+> UI コンポーネントは [RabeeUI パターン](docs/migration/rabeeui-migration-report.md)（CVA + Context API）で独自実装しています。bits-ui / shadcn-svelte は使用していません。
 
 ## Getting Started
 
@@ -85,17 +91,27 @@ src/
 │   │                     # LibraryInstallGuide, LanguageSwitcher,
 │   │                     # ModeSwitch, CookieConsent
 │   ├── ffmpeg/           # コマンド生成ロジック・プリセット定義・バリデーション
-│   ├── stores/           # Svelte 5 Runes Store (command, consent)
+│   ├── stores/           # Svelte 5 Runes Store (command, compact, consent)
 │   ├── i18n/             # 日英翻訳ファイル
 │   └── a11y/             # WCAG コントラスト比計算ユーティリティ
 ├── routes/               # SvelteKit ルーティング（/, /about-ffmpeg, /privacy）
+├── service-worker.ts     # PWA オフラインキャッシュ
 ├── app.css               # デザイントークン・テーマ・Web フォント定義
 └── app.html              # FOUC防止スクリプト・GA4 Consent Mode
+static/
+├── manifest.webmanifest  # PWA マニフェスト
+├── icons/                # PWA アイコン（192/512px 標準+マスカブル、180px apple-touch-icon）
+├── fonts/                # セルフホスト woff2（Noto Sans JP / Inter）
+├── og/                   # OGP 画像（ホーム・About × JA/EN）
+├── sitemap.xml           # サイトマップ
+└── robots.txt            # クローラ設定
 tests/
 └── ffmpeg/               # Vitest ユニットテスト
 scripts/
 ├── lint-css.sh           # CSS oklch ルール CI スクリプト
-└── subset-fonts.py       # Web フォントサブセット化
+├── subset-fonts.py       # Web フォントサブセット化
+├── generate-pwa-icons.mjs  # PWA アイコン生成（sharp）
+└── jp-chars.txt          # サブセット対象の日本語文字リスト
 .storybook/               # Storybook 設定（main.ts, preview.ts）
 ```
 
@@ -103,18 +119,21 @@ scripts/
 
 | ドキュメント | 内容 |
 |-------------|------|
-| [docs/requirements.md](docs/requirements.md) | 要件定義 |
-| [docs/basic-design.md](docs/basic-design.md) | 基本設計 |
-| [docs/detailed-design.md](docs/detailed-design.md) | 詳細設計 |
-| [docs/css-design.md](docs/css-design.md) | CSS設計（oklchカラー・テーマ） |
-| [docs/onboarding-guide.md](docs/onboarding-guide.md) | 初めて使う人向けガイドUX |
-| [docs/test-design.md](docs/test-design.md) | テスト設計 |
-| [docs/test-manual.md](docs/test-manual.md) | 手動テスト手順 |
-| [docs/deployment.md](docs/deployment.md) | デプロイ・CI/CD |
-| [docs/seo-llmo-design.md](docs/seo-llmo-design.md) | SEO / LLM 最適化設計 |
-| [docs/seo-external-setup.md](docs/seo-external-setup.md) | SEO 外部サービス設定 |
-| [docs/rabeeui-migration-report.md](docs/rabeeui-migration-report.md) | RabeeUI 移行レポート（bits-ui 排除） |
-| [docs/typescript-6.0-migration-plan.md](docs/typescript-6.0-migration-plan.md) | TypeScript 6.0 移行計画 |
+| [docs/design/requirements.md](docs/design/requirements.md) | 要件定義 |
+| [docs/design/basic-design.md](docs/design/basic-design.md) | 基本設計 |
+| [docs/design/detailed-design.md](docs/design/detailed-design.md) | 詳細設計 |
+| [docs/design/css-design.md](docs/design/css-design.md) | CSS設計（oklchカラー・テーマ） |
+| [docs/design/compact-mode-design.md](docs/design/compact-mode-design.md) | PWA コンパクトモード設計 |
+| [docs/design/chrome-extension-design.md](docs/design/chrome-extension-design.md) | Chrome 拡張機能リサイザー設計 |
+| [docs/guides/onboarding-guide.md](docs/guides/onboarding-guide.md) | 初めて使う人向けガイドUX |
+| [docs/testing/test-design.md](docs/testing/test-design.md) | テスト設計 |
+| [docs/testing/test-manual.md](docs/testing/test-manual.md) | 手動テスト手順 |
+| [docs/deploy/deployment.md](docs/deploy/deployment.md) | デプロイ・CI/CD |
+| [docs/seo/seo-llmo-design.md](docs/seo/seo-llmo-design.md) | SEO / LLM 最適化設計 |
+| [docs/seo/seo-external-setup.md](docs/seo/seo-external-setup.md) | SEO 外部サービス設定 |
+| [docs/migration/rabeeui-migration-report.md](docs/migration/rabeeui-migration-report.md) | RabeeUI 移行レポート（bits-ui 排除） |
+| [docs/migration/typescript-6.0-migration-plan.md](docs/migration/typescript-6.0-migration-plan.md) | TypeScript 6.0 移行計画 |
+| [docs/migration/vite-8.0-migration-plan.md](docs/migration/vite-8.0-migration-plan.md) | Vite 8.0 移行計画 |
 | [CHANGELOG.md](CHANGELOG.md) | 変更履歴 |
 
 ## CSS Rules (Enforced by CI)

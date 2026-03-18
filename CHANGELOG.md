@@ -3,10 +3,104 @@ title: "Changelog"
 description: "プロジェクトのバージョン履歴と変更内容"
 category: "root"
 created: "2026-02-16"
-updated: "2026-03-07"
+updated: "2026-03-18"
 ---
 
 # Changelog
+
+## [0.11.0] - 2026-03-18
+
+### Added
+- PWA コンパクトモード — `display-mode: standalone` 検出で 1:3 縦長リサイズ + UI 圧縮を自動適用
+- `CompactStore`（`src/lib/stores/compact.svelte.ts`）— `isCompact` / `isPWA` 状態管理、前回サイズ復元
+- フッター動的パディング — フッター高さを `ResizeObserver` で計測し `padding-bottom` を自動調整
+- `mobile-web-app-capable` メタタグ追加（iOS PWA 対応）
+- Vite 8.0 移行計画書（`docs/migration/vite-8.0-migration-plan.md`）
+- ブラウザターゲットを Chrome・Safari 最新安定版のみに更新
+
+### Fixed
+- コンパクトモードのカードタイトルサイズ・余白・フッター重なり修正
+- コンパクトモードの UI 改善（カード均一化・状態表示・タイトル縮小）
+
+## [0.10.0] - 2026-03-07
+
+### Added
+- PWA 対応 — `manifest.webmanifest`、`service-worker.ts`（オフラインキャッシュ）、アイコン（192/512px 標準+マスカブル、180px apple-touch-icon）
+- `scripts/generate-pwa-icons.mjs` — `sharp` で SVG ファビコンからマスカブルアイコンを自動生成
+- CSS Subgrid でプリセットカードのアイコン・タイトル・説明文のアライメントを統一
+- CSS Subgrid レイアウト設計ドキュメント（`docs/design/css-subgrid-layout.md`）
+- Chrome 拡張機能リサイザー設計書（`docs/design/chrome-extension-design.md`）
+
+### Fixed
+- PresetCard のアイコンとタイトルの垂直中央揃え統一
+- モバイル固定バーの UI 改善
+- スマホ時の PresetCard gap 縮小
+
+## [0.9.0] - 2026-03-04
+
+### Added
+- Web フォント セルフホスティング — Noto Sans JP（日本語）/ Inter（英語）を woff2 で配信、`html[lang]` 属性で言語別切替
+- `scripts/subset-fonts.py` — アプリ内使用漢字のみをサブセット化するスクリプト
+- builder ユニットテスト追加（`tests/ffmpeg/builder.test.ts`）+ 監査指摘の修正
+
+### Changed
+- 英語フォントを Noto Sans → Inter に変更
+
+### Performance
+- フォントファイル最適化 — 944KB → 305KB (-67.7%)
+
+## [0.8.0] - 2026-02-27
+
+### Added
+- Storybook 10 導入 — 15コンポーネント / 58ストーリーの UI カタログ + `@storybook/addon-svelte-csf` v5
+- Storybook CI 検証（`npm run build-storybook`）を GitHub Actions に追加
+- i18n デコレータ（ja/en 切替）+ テーマデコレータ（light/dark 切替）
+
+### Changed
+- RabeeUI パターンへの完全移行 — bits-ui 依存を排除し CVA + Context API の独自 UI コンポーネントに統一
+- `docs/rabeeui-migration-report.md` → `docs/migration/rabeeui-migration-report.md` へ移動
+
+### Fixed
+- 英語切替時のコーデック/ライブラリガイドで日本語ラベルが残る問題を修正
+
+## [0.7.0] - 2026-02-25
+
+### Added
+- プライバシーポリシーページ（`/privacy`）— GDPR/CCPA 対応、日英切替、セクション11にお問い合わせフォーム
+- Cookie 同意バナー（`CookieConsent` コンポーネント）+ GA4 Consent Mode v2 統合
+- `ConsentStore`（`src/lib/stores/consent.svelte.ts`）— 同意状態の永続化 + `analytics_storage` 制御
+- お問い合わせフォーム（Google Form リンクボタン）
+
+### Changed
+- WebP 変換を `ffmpeg` → `cwebp` コマンドに置換（より高品質・高速）
+- ライブラリインストールガイドに `cwebp` の手順を追加
+
+## [0.6.0] - 2026-02-20
+
+### Added
+- SSR 有効化 + OGP / Twitter Cards メタタグ（全ページ）
+- JSON-LD 構造化データ（`SoftwareApplication` スキーマ）
+- GA4（Google Analytics 4）統合（Consent Mode v2 準拠）
+- `sitemap.xml` / `robots.txt` 自動生成
+- OGP 画像 4 枚（ホーム・About FFmpeg × JA/EN）
+- `fb:app_id` メタタグ
+
+### Fixed
+- X (Twitter) Card 画像表示修正 — `twitter:card` 先頭配置・`image:alt` 追加
+- OG 画像 URL にキャッシュバスター追加
+- `fb:app_id` を `app.html` に移動（Facebook Debugger 警告修正）
+
+## [0.5.3] - 2026-02-19
+
+### Changed
+- AV1 エンコーダを `libaom-av1` → `libsvtav1` に統一（高速エンコード）
+- バッチスクリプト（Bash / PowerShell / cmd）を `libsvtav1` 対応に全面改修
+
+### Fixed
+- ModeSwitch の固定幅レイアウト・ホバー改善
+- outline ボタンのダークテーマ時テキスト色修正
+- ファビコン設定、ModeSwitch 余白調整
+- モバイル時の zoom 制御、フォントサイズ 1.1 倍化
 
 ## [0.5.2] - 2026-02-18
 
