@@ -59,7 +59,7 @@ npm view @tailwindcss/vite@latest version peerDependencies
 ### 環境要件
 
 - **Node.js**: 20.19+ or 22.12+ → 現在 22.21.1 ✅
-- **ブラウザターゲット**: Chrome 111+, Firefox 114+, Safari 16.4+（Vite 7 の Safari 16.0 から若干上昇）
+- **ブラウザターゲット**: Chrome・Safari 最新安定版のみサポート（Vite デフォルトに準拠）
 
 ---
 
@@ -80,7 +80,7 @@ npm view @tailwindcss/vite@latest version peerDependencies
 |------|--------|------|
 | CJS interop の変更 | 中 | デフォルトインポートの挙動が統一される。`sveltekit-i18n`（CJS）が影響を受ける可能性 |
 | CSS minification | 低 | Lightning CSS がデフォルトに。oklch() のみ使用のため問題なしの見込み |
-| ブラウザターゲット引き上げ | 低 | Safari 16.0 → 16.4。実質的に影響軽微 |
+| ブラウザターゲット引き上げ | なし | Chrome・Safari 最新安定版のみサポートする方針のため影響なし |
 
 ---
 
