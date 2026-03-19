@@ -3,10 +3,19 @@ title: "Changelog"
 description: "プロジェクトのバージョン履歴と変更内容"
 category: "root"
 created: "2026-02-16"
-updated: "2026-03-18"
+updated: "2026-03-19"
 ---
 
 # Changelog
+
+## [0.11.1] - 2026-03-19
+
+### Changed
+- `/about-ffmpeg` ページの「最新のFFmpeg」セクションを FFmpeg 8.1 "Hoare"（2026年3月16日リリース）情報で更新
+  - Vulkan コンピュートシェーダ強化、D3D12 H.264/AV1エンコーダ、JPEG-XS完全サポート等
+  - 歴史セクションに 8.0 "Huffman" / 8.1 "Hoare" の言及追加
+  - SEO meta description に FFmpeg 8.1 を追記
+- 調査ドキュメントを `docs/guides/ffmpeg-8.1-release-notes.md` として整理
 
 ## [0.11.0] - 2026-03-18
 

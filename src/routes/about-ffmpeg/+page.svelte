@@ -16,7 +16,7 @@
 	<meta name="twitter:card" content="summary_large_image" />
 	{#if $locale === 'ja'}
 		<title>FFmpegとは？ — 歴史・設計思想・使い方を徹底解説 | FFmpegコマンドジェネレーター</title>
-		<meta name="description" content="FFmpegとは何か？ 25年以上の歴史を持つオープンソース動画・音声処理ツールの設計思想、主な機能、コマンド例、最新情報、JPEG→AVIF/H.264→AV1の圧縮比較データを詳しく解説します。" />
+		<meta name="description" content="FFmpegとは何か？ 25年以上の歴史を持つオープンソース動画・音声処理ツールの設計思想、主な機能、コマンド例、FFmpeg 8.1最新情報、JPEG→AVIF/H.264→AV1の圧縮比較データを詳しく解説します。" />
 		<meta property="og:title" content="FFmpegとは？ — 歴史・設計思想・使い方を徹底解説" />
 		<meta property="og:description" content="25年以上の歴史を持つオープンソース動画・音声処理ツールFFmpegの完全ガイド" />
 		<meta property="og:image" content="https://www.cmd-gen.com/og-about-ja.png?v=2" />
@@ -29,7 +29,7 @@
 		<meta name="twitter:image:alt" content="FFmpegとは？" />
 	{:else}
 		<title>What is FFmpeg? — History, Design, and Use Cases | FFmpeg Command Generator</title>
-		<meta name="description" content="What is FFmpeg? A comprehensive guide to the open-source multimedia framework with 25+ years of history. Learn about its design philosophy, features, command examples, and JPEG→AVIF/H.264→AV1 compression benchmarks." />
+		<meta name="description" content="What is FFmpeg? A comprehensive guide to the open-source multimedia framework with 25+ years of history. Learn about its design philosophy, features, command examples, FFmpeg 8.1 updates, and JPEG→AVIF/H.264→AV1 compression benchmarks." />
 		<meta property="og:title" content="What is FFmpeg? — History, Design, and Use Cases" />
 		<meta property="og:description" content="A comprehensive guide to FFmpeg, the open-source multimedia framework" />
 		<meta property="og:image" content="https://www.cmd-gen.com/og-about-en.png?v=2" />
@@ -164,7 +164,9 @@
 				<p class="text-sm leading-relaxed text-muted-foreground">
 					2024〜2025年にかけてはFFmpeg 7.x系がリリースされ、AV1エンコーダーの最適化、
 					Vulkanベースのハードウェアアクセラレーション対応、VVC（H.266）デコーダーの追加など、
-					最新の映像技術への対応が進んでいます。2025年にはFFmpeg 8.0がリリースされました。
+					最新の映像技術への対応が進んでいます。
+					2025年8月にはFFmpeg 8.0 "Huffman"、2026年3月にはFFmpeg 8.1 "Hoare" がリリースされ、
+					GPU処理パイプラインの成熟が大きなテーマとなっています。
 				</p>
 			</section>
 
@@ -376,24 +378,36 @@
 
 			<!-- 最新情報 -->
 			<section class="space-y-3">
-				<h2 class="text-xl font-semibold border-b border-border pb-2">最新のFFmpeg（2024〜2025年）</h2>
+				<h2 class="text-xl font-semibold border-b border-border pb-2">最新のFFmpeg（2024〜2026年）</h2>
 				<p class="text-sm leading-relaxed text-muted-foreground">
 					FFmpeg 7.0（2024年4月リリース）では、VVC（H.266）デコーダーの実験的サポート、
 					IAMF（Immersive Audio Model and Formats）対応、Vulkanベースの映像フィルター強化などが追加されました。
-				</p>
-				<p class="text-sm leading-relaxed text-muted-foreground">
 					FFmpeg 7.1（2024年9月）ではMulti-threaded decodingの改善やAV1エンコードの最適化が行われ、
 					より高速なトランスコーディングが可能になっています。
 				</p>
 				<p class="text-sm leading-relaxed text-muted-foreground">
-					FFmpeg 8.0（2025年）では、さらなるハードウェアアクセラレーション対応の拡大、
-					新しいフィルター群の追加、メモリ効率の改善など、
-					継続的に進化が続いています。
+					FFmpeg 8.0 "Huffman"（2025年8月）では、ハードウェアアクセラレーション対応の拡大、
+					新しいフィルター群の追加、メモリ効率の改善などが行われました。
 				</p>
 				<p class="text-sm leading-relaxed text-muted-foreground">
-					特にAV1コーデックのサポートは急速に成熟しており、
-					SVT-AV1はIntelとNetflixの共同開発により、
-					リアルタイムエンコードに近い速度を実現しています。
+					最新の<strong>FFmpeg 8.1 "Hoare"（2026年3月16日リリース）</strong>では、GPU処理パイプラインの成熟が大きなテーマとなっています。
+					Vulkanコンピュートシェーダの大幅な強化により、ProResのフルGPUエンコード・デコード、DPXのGPUデコード、
+					swscale Vulkanサポートが追加されました。さらにVulkanベースのコーデックが実行時GLSLコンパイルに依存しなくなり、
+					初期化時間が大幅に短縮されています。
+				</p>
+				<p class="text-sm leading-relaxed text-muted-foreground">
+					Windows環境向けにはD3D12 H.264/AV1エンコーダやD3D12映像フィルタ（スケーリング・デインターレース等）が追加され、
+					GPUネイティブな映像処理パイプラインが充実しました。
+					新コーデックとしては、超低遅延・高品質圧縮のJPEG-XS完全サポート、
+					xHE-AACステレオ拡張（実験的）、MPEG-H 3D Audioデコード対応なども加わっています。
+				</p>
+				<p class="text-sm leading-relaxed text-muted-foreground">
+					コードネーム "Hoare" は、2026年3月5日に逝去したコンピュータ科学者
+					Sir Charles Antony Richard Hoare（クイックソートの考案者）に敬意を表して名付けられました。
+				</p>
+				<p class="text-sm leading-relaxed text-muted-foreground">
+					AV1コーデックのサポートも急速に成熟しており、
+					SVT-AV1はIntelとNetflixの共同開発によりリアルタイムエンコードに近い速度を実現しています。
 					これにより、従来はH.264/H.265が主流だった用途でもAV1への移行が加速しています。
 				</p>
 			</section>
@@ -514,7 +528,8 @@
 				<p class="text-sm leading-relaxed text-muted-foreground">
 					In 2024–2025, FFmpeg 7.x series was released with AV1 encoder optimizations,
 					Vulkan-based hardware acceleration, VVC (H.266) decoder support, and more.
-					FFmpeg 8.0 was released in 2025, continuing the rapid evolution.
+					FFmpeg 8.0 "Huffman" was released in August 2025, followed by FFmpeg 8.1 "Hoare" in March 2026,
+					with GPU processing pipeline maturity as a major theme.
 				</p>
 			</section>
 
@@ -725,21 +740,35 @@
 
 			<!-- Latest Info -->
 			<section class="space-y-3">
-				<h2 class="text-xl font-semibold border-b border-border pb-2">Latest FFmpeg (2024–2025)</h2>
+				<h2 class="text-xl font-semibold border-b border-border pb-2">Latest FFmpeg (2024–2026)</h2>
 				<p class="text-sm leading-relaxed text-muted-foreground">
 					FFmpeg 7.0 (April 2024) introduced experimental VVC (H.266) decoder support,
 					IAMF (Immersive Audio Model and Formats) support, and enhanced Vulkan-based video filters.
-				</p>
-				<p class="text-sm leading-relaxed text-muted-foreground">
 					FFmpeg 7.1 (September 2024) improved multi-threaded decoding and AV1 encoding optimizations,
 					enabling faster transcoding workflows.
 				</p>
 				<p class="text-sm leading-relaxed text-muted-foreground">
-					FFmpeg 8.0 (2025) expanded hardware acceleration support, added new filter sets,
-					and improved memory efficiency. The evolution continues at a rapid pace.
+					FFmpeg 8.0 "Huffman" (August 2025) expanded hardware acceleration support, added new filter sets,
+					and improved memory efficiency.
 				</p>
 				<p class="text-sm leading-relaxed text-muted-foreground">
-					AV1 codec support has matured rapidly. SVT-AV1, co-developed by Intel and Netflix,
+					The latest <strong>FFmpeg 8.1 "Hoare" (released March 16, 2026)</strong> marks a major leap in GPU processing pipeline maturity.
+					Vulkan compute shader support was significantly enhanced, enabling full-GPU ProRes encoding/decoding,
+					GPU-accelerated DPX decoding, and swscale Vulkan support. Vulkan-based codecs no longer depend on
+					runtime GLSL compilation, dramatically reducing initialization time.
+				</p>
+				<p class="text-sm leading-relaxed text-muted-foreground">
+					For Windows, D3D12 H.264/AV1 hardware encoders and D3D12 video filters (scaling, deinterlacing, motion estimation)
+					were added, completing native GPU video processing pipelines.
+					New codec support includes full JPEG-XS support (ultra-low latency, professional-grade compression),
+					experimental xHE-AAC Mps212 stereo decoding, and MPEG-H 3D Audio decoding.
+				</p>
+				<p class="text-sm leading-relaxed text-muted-foreground">
+					The codename "Hoare" honors Sir Charles Antony Richard Hoare, the inventor of Quicksort,
+					who passed away on March 5, 2026.
+				</p>
+				<p class="text-sm leading-relaxed text-muted-foreground">
+					AV1 codec support has also matured rapidly. SVT-AV1, co-developed by Intel and Netflix,
 					now achieves near-real-time encoding speeds, accelerating the migration from
 					H.264/H.265 to AV1 across the industry.
 				</p>
