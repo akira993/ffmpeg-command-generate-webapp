@@ -5,7 +5,7 @@
   <!-- ホームページ -->
   <url>
     <loc>https://www.cmd-gen.com/</loc>
-    <lastmod>2025-06-20</lastmod>
+    <lastmod>2026-03-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="ja" href="https://www.cmd-gen.com/" />
@@ -16,7 +16,7 @@
   <!-- FFmpegとは？ 記事ページ -->
   <url>
     <loc>https://www.cmd-gen.com/about-ffmpeg</loc>
-    <lastmod>2025-06-20</lastmod>
+    <lastmod>2026-03-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="ja" href="https://www.cmd-gen.com/about-ffmpeg" />
