@@ -3,7 +3,7 @@ title: "Claude Code ワークフロー完全設計書"
 description: "Claude Code MCP統合ガイド（CocoIndex/Cipher/Serena/Chrome DevTools）"
 category: "workflow"
 created: "2026-02-27"
-updated: "2026-03-07"
+updated: "2026-03-25"
 ---
 
 # Claude Code（Desktop App）ワークフロー完全設計書
@@ -40,9 +40,9 @@ updated: "2026-03-07"
 # Homebrew
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-# Node.js 20+
-brew install node@20
-# または nvm 経由: nvm install 20 && nvm use 20
+# Node.js 22+
+brew install node@22
+# または nvm 経由: nvm install 22 && nvm use 22
 
 # Python 3.11+ と uv（uvx コマンド提供）
 brew install uv

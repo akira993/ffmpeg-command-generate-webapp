@@ -3,7 +3,7 @@ title: "Cursor エディタ ワークフロー完全設計書"
 description: "Cursor IDE設定（.cursor/rules/*.mdc、MCP設定、Agent mode）"
 category: "workflow"
 created: "2026-02-27"
-updated: "2026-03-07"
+updated: "2026-03-25"
 ---
 
 # Cursor エディタ ワークフロー完全設計書
@@ -40,8 +40,8 @@ updated: "2026-03-07"
 # Homebrew
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-# Node.js 20+
-brew install node@20
+# Node.js 22+
+brew install node@22
 
 # Python 3.11+ と uv（uvx コマンド提供）
 brew install uv
