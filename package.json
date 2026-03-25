@@ -42,5 +42,10 @@
 	"dependencies": {
 		"class-variance-authority": "^0.7.1",
 		"sveltekit-i18n": "^2.4.2"
+	},
+	"overrides": {
+		"@sveltejs/kit": {
+			"typescript": "$typescript"
+		}
 	}
 }
