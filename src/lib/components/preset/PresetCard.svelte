@@ -22,9 +22,17 @@
 		preset: PresetDefinition;
 		selected: boolean;
 		onselect: (id: string) => void;
+		index?: number;
 	}
 
-	let { preset, selected, onselect }: Props = $props();
+	let { preset, selected, onselect, index = 0 }: Props = $props();
+
+	/** CSS custom properties for staggered entrance animation */
+	const entranceStyle = $derived(
+		compactStore.isCompact
+			? `--stagger:${index}; --entrance-duration:300ms; --entrance-stagger:50ms; --entrance-y:0.9375rem`
+			: `--stagger:${index}`
+	);
 
 	const ICON_MAP: Record<string, typeof ImageIcon> = {
 		image: ImageIcon,
@@ -44,7 +52,8 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 {#if compactStore.isCompact}
 	<div
-		class="cursor-pointer transition-all hover:scale-[1.02]"
+		class="animate-card-entrance cursor-pointer transition-transform duration-200 ease-out hover:scale-[1.02] active:scale-[0.97]"
+		style={entranceStyle}
 		onclick={() => onselect(preset.id)}
 		role="button"
 		tabindex="0"
@@ -56,8 +65,8 @@
 		}}
 	>
 		<div
-			class="flex h-full items-center gap-1.5 rounded-xl border px-3 py-2 shadow-sm bg-card text-card-foreground {selected
-				? 'border-primary bg-primary/5 ring-2 ring-primary'
+			class="flex h-full items-center gap-1.5 rounded-xl border px-3 py-2 shadow-sm bg-card text-card-foreground transition-shadow duration-200 {selected
+				? 'border-primary bg-primary/5 ring-2 ring-primary shadow-lg shadow-primary/20'
 				: 'hover:border-primary/50'}"
 		>
 			<div
@@ -75,7 +84,8 @@
 	</div>
 {:else}
 	<div
-		class="row-span-2 grid grid-rows-subgrid cursor-pointer transition-all hover:scale-[1.02]"
+		class="animate-card-entrance row-span-2 grid grid-rows-subgrid cursor-pointer transition-transform duration-200 ease-out hover:scale-[1.02] active:scale-[0.97]"
+		style={entranceStyle}
 		onclick={() => onselect(preset.id)}
 		role="button"
 		tabindex="0"
@@ -87,8 +97,8 @@
 		}}
 	>
 		<Card.Root
-			class="row-span-2 grid grid-rows-subgrid gap-0 {selected
-				? 'border-primary bg-primary/5 ring-2 ring-primary'
+			class="row-span-2 grid grid-rows-subgrid gap-0 transition-shadow duration-200 {selected
+				? 'border-primary bg-primary/5 ring-2 ring-primary shadow-lg shadow-primary/20'
 				: 'hover:border-primary/50'}"
 		>
 			<Card.Header class="flex gap-2.5 pb-2">

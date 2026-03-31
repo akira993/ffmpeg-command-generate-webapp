@@ -40,11 +40,12 @@
 <Story name="AllPresets">
 	{#snippet template()}
 		<div class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
-			{#each presetList as preset}
+			{#each presetList as preset, i}
 				<PresetCard
 					{preset}
 					selected={false}
 					onselect={() => {}}
+					index={i}
 				/>
 			{/each}
 		</div>
@@ -59,6 +60,7 @@
 					{preset}
 					selected={i === 0}
 					onselect={() => {}}
+					index={i}
 				/>
 			{/each}
 		</div>
@@ -71,11 +73,30 @@
 			CSS Subgrid により、タイトルの行数が異なっても card-content の開始位置が揃います。
 		</p>
 		<div class="grid grid-cols-4 gap-3">
-			{#each presetList.slice(0, 4) as preset}
+			{#each presetList.slice(0, 4) as preset, i}
 				<PresetCard
 					{preset}
 					selected={false}
 					onselect={() => {}}
+					index={i}
+				/>
+			{/each}
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="StaggeredEntrance">
+	{#snippet template()}
+		<p class="mb-4 text-sm text-muted-foreground">
+			ページ読み込み時の逐次フリップインアニメーション。カードが上から順にフェードイン＋スライドします。
+		</p>
+		<div class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
+			{#each presetList as preset, i}
+				<PresetCard
+					{preset}
+					selected={false}
+					onselect={() => {}}
+					index={i}
 				/>
 			{/each}
 		</div>
@@ -91,11 +112,12 @@
 			コンパクトモード: 説明文非表示、パディング半減、アイコン+タイトルのみ。全カードが同一高さ。
 		</p>
 		<div class="grid grid-cols-2 auto-rows-fr gap-2 md:grid-cols-3 lg:grid-cols-4">
-			{#each presetList as preset}
+			{#each presetList as preset, i}
 				<PresetCard
 					{preset}
 					selected={false}
 					onselect={() => {}}
+					index={i}
 				/>
 			{/each}
 		</div>
@@ -113,6 +135,7 @@
 					{preset}
 					selected={i === 0}
 					onselect={() => {}}
+					index={i}
 				/>
 			{/each}
 		</div>

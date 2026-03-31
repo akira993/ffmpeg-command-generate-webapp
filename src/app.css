@@ -267,3 +267,55 @@
 		);
 	}
 }
+
+/* --- Entrance Animations --- */
+
+@keyframes card-entrance {
+	from {
+		opacity: 0;
+		transform: translateY(var(--entrance-y, 1.875rem));
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes section-entrance {
+	from {
+		opacity: 0;
+		transform: translateY(1.25rem);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@layer base {
+	/* PresetCard staggered entrance
+	   Custom properties (set via inline style):
+	   --stagger: card index (0, 1, 2, ...)
+	   --entrance-duration: animation duration (default 600ms, compact 300ms)
+	   --entrance-stagger: delay per card (default 100ms, compact 50ms)
+	   --entrance-y: fly distance (default 1.875rem, compact 0.9375rem) */
+	.animate-card-entrance {
+		animation: card-entrance var(--entrance-duration, 600ms) cubic-bezier(0.33, 1, 0.68, 1) backwards;
+		animation-delay: calc(var(--stagger, 0) * var(--entrance-stagger, 100ms));
+	}
+
+	/* Page section entrance
+	   Custom property: --section-delay (default 0ms) */
+	.animate-section-entrance {
+		animation: section-entrance 500ms cubic-bezier(0.33, 1, 0.68, 1) backwards;
+		animation-delay: var(--section-delay, 0ms);
+	}
+
+	/* Respect prefers-reduced-motion */
+	@media (prefers-reduced-motion: reduce) {
+		.animate-card-entrance,
+		.animate-section-entrance {
+			animation: none;
+		}
+	}
+}

@@ -18,11 +18,12 @@
 </script>
 
 <div class="grid grid-cols-2 {compactStore.isCompact ? 'auto-rows-fr gap-2' : 'gap-3'} lg:grid-cols-3 xl:grid-cols-4">
-	{#each presets as preset (preset.id)}
+	{#each presets as preset, i (preset.id)}
 		<PresetCard
 			{preset}
 			selected={commandStore.selectedPreset === preset.id}
 			onselect={handleSelect}
+			index={i}
 		/>
 	{/each}
 </div>

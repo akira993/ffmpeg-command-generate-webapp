@@ -26,6 +26,8 @@
 	import { compactStore } from '$lib/stores/compact.svelte';
 	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';
+	import { slide } from 'svelte/transition';
+	import { cubicOut } from 'svelte/easing';
 
 	// モバイル固定バーの高さを動的に計測し、CSS変数として設定
 	let mobileBarEl: HTMLDivElement | undefined = $state();
@@ -139,26 +141,26 @@
 
 <div class="mx-auto max-w-4xl sm:pb-0 {compactStore.isCompact ? 'space-y-2 pb-6' : 'space-y-6 pb-20'}">
 	<!-- 1. ドラッグ＆ドロップエリア -->
-	<section>
+	<section class="{compactStore.isCompact ? '' : 'animate-section-entrance'}">
 		<DropZone />
 	</section>
 
 	<Separator />
 
 	<!-- 2. モード切替 -->
-	<section class="flex items-center justify-center">
+	<section class="flex items-center justify-center {compactStore.isCompact ? '' : 'animate-section-entrance'}" style="--section-delay: 100ms">
 		<ModeSwitch />
 	</section>
 
 	<!-- 3. プリセットモード -->
 	{#if commandStore.mode === 'preset'}
-		<section>
+		<section class="{compactStore.isCompact ? '' : 'animate-section-entrance'}" style="--section-delay: 200ms">
 			<PresetGrid />
 		</section>
 
 		<!-- 4. プリセットカスタマイザー -->
 		{#if commandStore.selectedPreset}
-			<section>
+			<section transition:slide={{ duration: compactStore.isCompact ? 200 : 350, easing: cubicOut }}>
 				<PresetCustomizer />
 			</section>
 		{/if}
@@ -174,7 +176,7 @@
 	<Separator />
 
 	<!-- 5. アクションボタン（デスクトップのみ表示） -->
-	<section class="hidden sm:block">
+	<section class="hidden sm:block {compactStore.isCompact ? '' : 'animate-section-entrance'}" style="--section-delay: 300ms">
 		<ActionButtons
 			onInstallGuide={() => { installGuideOpen = true; }}
 			onPathGuide={() => { pathGuideOpen = true; }}
@@ -183,7 +185,7 @@
 	</section>
 
 	<!-- 6. コマンド出力 -->
-	<section>
+	<section class="{compactStore.isCompact ? '' : 'animate-section-entrance'}" style="--section-delay: 300ms">
 		<CommandOutput />
 	</section>
 </div>
