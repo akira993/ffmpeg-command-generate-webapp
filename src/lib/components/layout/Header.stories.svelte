@@ -9,7 +9,15 @@
 		component: Header,
 		tags: ['autodocs'],
 		parameters: {
-			layout: 'fullscreen'
+			layout: 'fullscreen',
+			// `compactStore` シングルトンの state leak 対策。docs view で各ストーリーを
+			// iframe 分離して isPWA / isCompact の干渉を防ぐ
+			docs: {
+				story: {
+					inline: false,
+					iframeHeight: '140px'
+				}
+			}
 		}
 	});
 </script>

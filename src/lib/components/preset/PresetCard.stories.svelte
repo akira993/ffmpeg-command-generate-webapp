@@ -8,7 +8,18 @@
 	const { Story } = defineMeta({
 		title: 'Domain/PresetCard',
 		component: PresetCard,
-		tags: ['autodocs']
+		tags: ['autodocs'],
+		parameters: {
+			// `compactStore` はシングルトンのため、docs view で複数ストーリーが同じ state を
+			// 共有するとコンパクト/非コンパクトが衝突する。`inline: false` で各ストーリーを
+			// iframe 分離し、グローバル state の leak を防ぐ。
+			docs: {
+				story: {
+					inline: false,
+					iframeHeight: '320px'
+				}
+			}
+		}
 	});
 
 	const presetList = Object.values(PRESETS);

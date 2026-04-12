@@ -8,7 +8,17 @@
 	const { Story } = defineMeta({
 		title: 'Domain/PresetGrid',
 		component: PresetGrid,
-		tags: ['autodocs']
+		tags: ['autodocs'],
+		parameters: {
+			// `compactStore` / `commandStore` シングルトンの state leak 対策。
+			// docs view で各ストーリーを iframe 分離
+			docs: {
+				story: {
+					inline: false,
+					iframeHeight: '420px'
+				}
+			}
+		}
 	});
 </script>
 

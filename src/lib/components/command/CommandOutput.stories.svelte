@@ -7,7 +7,16 @@
 	const { Story } = defineMeta({
 		title: 'Domain/CommandOutput',
 		component: CommandOutput,
-		tags: ['autodocs']
+		tags: ['autodocs'],
+		parameters: {
+			// `commandStore` シングルトンの state leak 対策。各ストーリーを iframe 分離
+			docs: {
+				story: {
+					inline: false,
+					iframeHeight: '220px'
+				}
+			}
+		}
 	});
 </script>
 

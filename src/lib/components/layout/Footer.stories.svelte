@@ -9,7 +9,14 @@
 		component: Footer,
 		tags: ['autodocs'],
 		parameters: {
-			layout: 'fullscreen'
+			layout: 'fullscreen',
+			// `compactStore` シングルトンの state leak 対策。各ストーリーを iframe 分離
+			docs: {
+				story: {
+					inline: false,
+					iframeHeight: '160px'
+				}
+			}
 		}
 	});
 </script>

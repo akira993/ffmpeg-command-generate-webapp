@@ -7,7 +7,16 @@
 	const { Story } = defineMeta({
 		title: 'Domain/DropZone',
 		component: DropZone,
-		tags: ['autodocs']
+		tags: ['autodocs'],
+		parameters: {
+			// `commandStore` シングルトンの state leak 対策。各ストーリーを iframe 分離
+			docs: {
+				story: {
+					inline: false,
+					iframeHeight: '280px'
+				}
+			}
+		}
 	});
 </script>
 
