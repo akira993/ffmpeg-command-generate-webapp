@@ -2,6 +2,7 @@
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import PresetCard from './PresetCard.svelte';
 	import { PRESETS } from '$lib/ffmpeg/presets';
+	import { untrack } from 'svelte';
 	import { compactStore } from '$lib/stores/compact.svelte';
 
 	const { Story } = defineMeta({
@@ -39,7 +40,7 @@
 
 <Story name="AllPresets">
 	{#snippet template()}
-		<div class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
+		<div class="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4">
 			{#each presetList as preset, i}
 				<PresetCard
 					{preset}
@@ -54,7 +55,7 @@
 
 <Story name="SelectedInGrid">
 	{#snippet template()}
-		<div class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
+		<div class="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4">
 			{#each presetList as preset, i}
 				<PresetCard
 					{preset}
@@ -88,9 +89,9 @@
 <Story name="StaggeredEntrance">
 	{#snippet template()}
 		<p class="mb-4 text-sm text-muted-foreground">
-			ページ読み込み時の逐次フリップインアニメーション。カードが上から順にフェードイン＋スライドします。
+			ページ読み込み時の逐次フリップインアニメーション。カードが上から順にフェードイン＋スライドします (y:1.875rem / duration:600ms / delay:i*100ms)。
 		</p>
-		<div class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
+		<div class="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4">
 			{#each presetList as preset, i}
 				<PresetCard
 					{preset}
@@ -105,13 +106,13 @@
 
 <Story name="CompactMode">
 	{#snippet template()}
-		{@const _ = (() => {
+		{@const _ = untrack(() => {
 			compactStore.isCompact = true;
-		})()}
+		})}
 		<p class="mb-4 text-sm text-muted-foreground">
-			コンパクトモード: 説明文非表示、パディング半減、アイコン+タイトルのみ。全カードが同一高さ。
+			コンパクトモード: Card.Root を使わず独自 flex レイアウト (gap-1.5 / px-3 py-2)、説明文非表示、アイコン+タイトルのみ、入場アニメーションも短縮 (y:0.9375rem / duration:300ms / delay:i*50ms)。auto-rows-fr で全カードが同一高さ。
 		</p>
-		<div class="grid grid-cols-2 auto-rows-fr gap-2 md:grid-cols-3 lg:grid-cols-4">
+		<div class="grid grid-cols-2 auto-rows-fr gap-2 lg:grid-cols-3 xl:grid-cols-4">
 			{#each presetList as preset, i}
 				<PresetCard
 					{preset}
@@ -126,10 +127,10 @@
 
 <Story name="CompactModeSelected">
 	{#snippet template()}
-		{@const _ = (() => {
+		{@const _ = untrack(() => {
 			compactStore.isCompact = true;
-		})()}
-		<div class="grid grid-cols-2 auto-rows-fr gap-2 md:grid-cols-3 lg:grid-cols-4">
+		})}
+		<div class="grid grid-cols-2 auto-rows-fr gap-2 lg:grid-cols-3 xl:grid-cols-4">
 			{#each presetList as preset, i}
 				<PresetCard
 					{preset}

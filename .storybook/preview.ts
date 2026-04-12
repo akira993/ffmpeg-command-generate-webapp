@@ -1,6 +1,8 @@
 import type { Preview } from '@storybook/sveltekit';
+import { untrack } from 'svelte';
 import '../src/app.css';
 import { loadTranslations, locale } from '../src/lib/i18n';
+import { compactStore } from '../src/lib/stores/compact.svelte';
 
 // Pre-load both locales so switching is instant
 loadTranslations('ja');
@@ -52,6 +54,16 @@ const preview: Preview = {
 			const loc = context.globals.locale || 'ja';
 			locale.set(loc);
 			document.documentElement.lang = loc;
+
+			// Reset compact mode state to defaults before each story.
+			// Stories that need compact/pwa must opt in via <CompactDecorator>.
+			// This prevents global state from leaking between stories.
+			// Wrapped in untrack() to avoid Svelte 5 state_unsafe_mutation,
+			// since Storybook svelte-csf runs decorators in a reactive context.
+			untrack(() => {
+				compactStore.isCompact = false;
+				compactStore.isPWA = false;
+			});
 
 			return storyFn();
 		}
