@@ -2,8 +2,8 @@
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import PresetCard from './PresetCard.svelte';
 	import { PRESETS } from '$lib/ffmpeg/presets';
-	import { untrack } from 'svelte';
 	import { compactStore } from '$lib/stores/compact.svelte';
+	import StorySetup from '../../../../.storybook/StorySetup.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Domain/PresetCard',
@@ -117,39 +117,41 @@
 
 <Story name="CompactMode">
 	{#snippet template()}
-		{@const _ = untrack(() => {
-			compactStore.isCompact = true;
-		})}
-		<p class="mb-4 text-sm text-muted-foreground">
-			コンパクトモード: Card.Root を使わず独自 flex レイアウト (gap-1.5 / px-3 py-2)、説明文非表示、アイコン+タイトルのみ、入場アニメーションも短縮 (y:0.9375rem / duration:300ms / delay:i*50ms)。auto-rows-fr で全カードが同一高さ。
-		</p>
-		<div class="grid grid-cols-2 auto-rows-fr gap-2 lg:grid-cols-3 xl:grid-cols-4">
-			{#each presetList as preset, i}
-				<PresetCard
-					{preset}
-					selected={false}
-					onselect={() => {}}
-					index={i}
-				/>
-			{/each}
-		</div>
+		<StorySetup setup={() => { compactStore.isCompact = true; }}>
+			{#snippet children()}
+				<p class="mb-4 text-sm text-muted-foreground">
+					コンパクトモード: Card.Root を使わず独自 flex レイアウト (gap-1.5 / px-3 py-2)、説明文非表示、アイコン+タイトルのみ、入場アニメーションも短縮 (y:0.9375rem / duration:300ms / delay:i*50ms)。auto-rows-fr で全カードが同一高さ。
+				</p>
+				<div class="grid grid-cols-2 auto-rows-fr gap-2 lg:grid-cols-3 xl:grid-cols-4">
+					{#each presetList as preset, i}
+						<PresetCard
+							{preset}
+							selected={false}
+							onselect={() => {}}
+							index={i}
+						/>
+					{/each}
+				</div>
+			{/snippet}
+		</StorySetup>
 	{/snippet}
 </Story>
 
 <Story name="CompactModeSelected">
 	{#snippet template()}
-		{@const _ = untrack(() => {
-			compactStore.isCompact = true;
-		})}
-		<div class="grid grid-cols-2 auto-rows-fr gap-2 lg:grid-cols-3 xl:grid-cols-4">
-			{#each presetList as preset, i}
-				<PresetCard
-					{preset}
-					selected={i === 0}
-					onselect={() => {}}
-					index={i}
-				/>
-			{/each}
-		</div>
+		<StorySetup setup={() => { compactStore.isCompact = true; }}>
+			{#snippet children()}
+				<div class="grid grid-cols-2 auto-rows-fr gap-2 lg:grid-cols-3 xl:grid-cols-4">
+					{#each presetList as preset, i}
+						<PresetCard
+							{preset}
+							selected={i === 0}
+							onselect={() => {}}
+							index={i}
+						/>
+					{/each}
+				</div>
+			{/snippet}
+		</StorySetup>
 	{/snippet}
 </Story>
