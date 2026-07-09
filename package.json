@@ -16,7 +16,7 @@
 		"build-storybook": "storybook build"
 	},
 	"devDependencies": {
-		"@lucide/svelte": "^0.561.0",
+		"@lucide/svelte": "^1.23.0",
 		"@storybook/addon-a11y": "^10.4.6",
 		"@storybook/addon-docs": "^10.4.6",
 		"@storybook/addon-svelte-csf": "^5.1.2",
