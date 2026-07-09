@@ -42,6 +42,7 @@ storybook-static/
 .cipher/
 .serena/
 .cocoindex_code/
+.brv/
 
 # Local runtime data
 data/
