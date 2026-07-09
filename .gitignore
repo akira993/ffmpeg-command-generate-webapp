@@ -49,3 +49,11 @@ data/
 
 # Font source files (raw .ttf)
 scripts/font-sources/
+
+# Local-only docs / internal instructions (kept on disk, never published)
+docs/
+.claude/
+CLAUDE.md
+CHANGELOG.md
+skill-creator-max/
+tasks/
