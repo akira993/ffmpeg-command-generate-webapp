@@ -151,7 +151,7 @@
 				<h2 class="text-xl font-semibold border-b border-border pb-2">歴史と開発の経緯</h2>
 				<p class="text-sm leading-relaxed text-muted-foreground">
 					FFmpegは2000年にFabrice Bellardによって開発が開始されました。
-					プロジェクト名の「FF」は「Fast Forward」の略で、「mpeg」はMultimedia Processing Expert Groupに由来します。
+					プロジェクト名の「FF」は「Fast Forward」の略で、「mpeg」はMoving Picture Experts Groupに由来します。
 					当初はLinux環境向けの動画処理ツールとして誕生しましたが、
 					その後macOS、Windows、FreeBSDなど多数のプラットフォームに対応しています。
 				</p>
@@ -192,7 +192,7 @@
 					<li><strong>libswresample</strong> — 音声リサンプリング</li>
 				</ul>
 				<p class="text-sm leading-relaxed text-muted-foreground">
-					この模倣的な構造により、FFmpegは単なるコマンドラインツールではなく、
+					このモジュール構造により、FFmpegは単なるコマンドラインツールではなく、
 					他のソフトウェアに組み込み可能な強力なライブラリ群としても機能します。
 					VLCやChromium、Androidのメディアフレームワークなど、
 					多くのプロジェクトがlibavcodecやlibavformatを直接利用しています。
@@ -321,7 +321,7 @@
 					</table>
 				</div>
 				<p class="text-xs text-muted-foreground">
-					※ 実際の結果は画像の内容、解像度、エンコード設定により大きく異なります。上記は一般的な写真での目安値です。
+					※ 数値は実測値ではなく、画像の内容、解像度、エンコード設定により大きく変わる目安値です。
 				</p>
 			</section>
 
@@ -372,7 +372,7 @@
 				</div>
 				<p class="text-xs text-muted-foreground">
 					※ SVT-AV1は速度と品質のバランスに優れ、Homebrew ffmpegで標準利用可能な実用的な選択肢です。
-					実際のパフォーマンスはハードウェア、ソース映像の特性、設定により異なります。
+					表の数値は実測値ではなく、ハードウェア、ソース映像の特性、設定により大きく変わる目安値です。
 				</p>
 			</section>
 
@@ -381,34 +381,40 @@
 				<h2 class="text-xl font-semibold border-b border-border pb-2">最新のFFmpeg（2024〜2026年）</h2>
 				<p class="text-sm leading-relaxed text-muted-foreground">
 					FFmpeg 7.0（2024年4月リリース）では、VVC（H.266）デコーダーの実験的サポート、
-					IAMF（Immersive Audio Model and Formats）対応、Vulkanベースの映像フィルター強化などが追加されました。
-					FFmpeg 7.1（2024年9月）ではMulti-threaded decodingの改善やAV1エンコードの最適化が行われ、
-					より高速なトランスコーディングが可能になっています。
+					IAMF（Immersive Audio Model and Formats）対応、マルチスレッド対応のffmpeg CLIなどが追加されました。
+					FFmpeg 7.1（2024年9月）ではxHE-AACデコーダー、外部libvvenc経由のVVCエンコード、
+					Vulkan H.264/H.265エンコーダーなどが追加されました。
 				</p>
 				<p class="text-sm leading-relaxed text-muted-foreground">
-					FFmpeg 8.0 "Huffman"（2025年8月）では、ハードウェアアクセラレーション対応の拡大、
-					新しいフィルター群の追加、メモリ効率の改善などが行われました。
+					FFmpeg 8.0 "Huffman"（2025年8月）では、RealVideo 6.0デコーダー、APVのデコード・パーサー・
+					raw bitstream mux/demuxと外部libopenapv経由のエンコード、Vulkan AV1エンコーダーなどが追加されました。
 				</p>
 				<p class="text-sm leading-relaxed text-muted-foreground">
-					最新の<strong>FFmpeg 8.1 "Hoare"（2026年3月16日リリース）</strong>では、GPU処理パイプラインの成熟が大きなテーマとなっています。
-					Vulkanコンピュートシェーダの大幅な強化により、ProResのフルGPUエンコード・デコード、DPXのGPUデコード、
-					swscale Vulkanサポートが追加されました。さらにVulkanベースのコーデックが実行時GLSLコンパイルに依存しなくなり、
-					初期化時間が大幅に短縮されています。
+					2026年7月時点で8.1系の最新安定版は<strong>FFmpeg 8.1.2 "Hoare"（2026年6月17日リリース）</strong>です。
+					8.1.2は重要なバグ修正のみを含むpoint releaseで、新機能は含みません。以下の新機能は
+					2026年3月16日にリリースされたFFmpeg 8.1で追加されたものです。
 				</p>
 				<p class="text-sm leading-relaxed text-muted-foreground">
-					Windows環境向けにはD3D12 H.264/AV1エンコーダやD3D12映像フィルタ（スケーリング・デインターレース等）が追加され、
-					GPUネイティブな映像処理パイプラインが充実しました。
-					新コーデックとしては、超低遅延・高品質圧縮のJPEG-XS完全サポート、
-					xHE-AACステレオ拡張（実験的）、MPEG-H 3D Audioデコード対応なども加わっています。
+					FFmpeg 8.1ではVulkanコンピュートコーデックの最適化、ProResのVulkanエンコーダーとhwaccel、
+					DPXのVulkan hwaccel、swscaleのVulkan対応が追加されました。Vulkanコーデックの初期化も高速化されています。
+					Windows向けにはD3D12 H.264/AV1エンコーダーと、スケーリング・動き推定・デインターレース用の
+					<code>vf_scale_d3d12</code>、<code>vf_mestimate_d3d12</code>、<code>vf_deinterlace_d3d12</code>が追加されました。
+					Rockchip H.264/HEVCハードウェアエンコーダーも追加されています。
+				</p>
+				<p class="text-sm leading-relaxed text-muted-foreground">
+					JPEG-XSではパーサーとraw bitstreamのmux/demuxが追加されました。エンコードとデコードは、
+					外部ライブラリlibsvtjpegxsを有効にしたビルド（<code>--enable-libsvtjpegxs</code>）で利用できます。
+					MPEG-H 3D Audioのデコードも外部<code>mpeghdec</code>経由です。
+					また、xHE-AAC Mps212デコードが実験的機能として追加されました。
+				</p>
+				<p class="text-sm leading-relaxed text-muted-foreground">
+					そのほか、EXIFメタデータ解析、外部libcairo経由の<code>drawvg</code>フィルター、
+					LCEVCパーサーとmetadata bitstream filter、ffmpeg CLIのtiled HEIF対応、HXVS/HXVT IPカメラ形式用の
+					<code>hxvs</code> demuxer、IAMF Projection mode Ambisonic Audio Elementsのmux/demuxが追加されています。
 				</p>
 				<p class="text-sm leading-relaxed text-muted-foreground">
 					コードネーム "Hoare" は、2026年3月5日に逝去したコンピュータ科学者
 					Sir Charles Antony Richard Hoare（クイックソートの考案者）に敬意を表して名付けられました。
-				</p>
-				<p class="text-sm leading-relaxed text-muted-foreground">
-					AV1コーデックのサポートも急速に成熟しており、
-					SVT-AV1はIntelとNetflixの共同開発によりリアルタイムエンコードに近い速度を実現しています。
-					これにより、従来はH.264/H.265が主流だった用途でもAV1への移行が加速しています。
 				</p>
 			</section>
 
@@ -517,7 +523,7 @@
 				<p class="text-sm leading-relaxed text-muted-foreground">
 					FFmpeg development began in 2000 by Fabrice Bellard.
 					The "FF" in the project name stands for "Fast Forward," and "mpeg" refers to the
-					Multimedia Processing Expert Group. Originally created as a video processing tool
+					Moving Picture Experts Group. Originally created as a video processing tool
 					for Linux, it has since expanded to support macOS, Windows, FreeBSD, and many more platforms.
 				</p>
 				<p class="text-sm leading-relaxed text-muted-foreground">
@@ -683,7 +689,7 @@
 					</table>
 				</div>
 				<p class="text-xs text-muted-foreground">
-					* Actual results vary significantly depending on image content, resolution, and encoding settings. Values above are estimates for typical photographs.
+					* These are estimates, not measured results, and vary significantly with image content, resolution, and encoding settings.
 				</p>
 			</section>
 
@@ -734,7 +740,7 @@
 				</div>
 				<p class="text-xs text-muted-foreground">
 					* SVT-AV1 offers excellent speed-quality balance and is available in Homebrew ffmpeg by default.
-					Actual performance varies with hardware, source content, and settings.
+					The table contains estimates, not measured results, and the values vary significantly with hardware, source content, and settings.
 				</p>
 			</section>
 
@@ -743,34 +749,42 @@
 				<h2 class="text-xl font-semibold border-b border-border pb-2">Latest FFmpeg (2024–2026)</h2>
 				<p class="text-sm leading-relaxed text-muted-foreground">
 					FFmpeg 7.0 (April 2024) introduced experimental VVC (H.266) decoder support,
-					IAMF (Immersive Audio Model and Formats) support, and enhanced Vulkan-based video filters.
-					FFmpeg 7.1 (September 2024) improved multi-threaded decoding and AV1 encoding optimizations,
-					enabling faster transcoding workflows.
+					IAMF (Immersive Audio Model and Formats) support, and a multi-threaded ffmpeg CLI.
+					FFmpeg 7.1 (September 2024) added the xHE-AAC decoder, VVC encoding through the external
+					libvvenc library, and Vulkan H.264/H.265 encoders.
 				</p>
 				<p class="text-sm leading-relaxed text-muted-foreground">
-					FFmpeg 8.0 "Huffman" (August 2025) expanded hardware acceleration support, added new filter sets,
-					and improved memory efficiency.
+					FFmpeg 8.0 "Huffman" (August 2025) added the RealVideo 6.0 decoder, APV decoding, parsing,
+					raw bitstream muxing/demuxing and encoding through the external libopenapv library, and a Vulkan AV1 encoder.
 				</p>
 				<p class="text-sm leading-relaxed text-muted-foreground">
-					The latest <strong>FFmpeg 8.1 "Hoare" (released March 16, 2026)</strong> marks a major leap in GPU processing pipeline maturity.
-					Vulkan compute shader support was significantly enhanced, enabling full-GPU ProRes encoding/decoding,
-					GPU-accelerated DPX decoding, and swscale Vulkan support. Vulkan-based codecs no longer depend on
-					runtime GLSL compilation, dramatically reducing initialization time.
+					As of July 2026, the latest stable release in the 8.1 branch is
+					<strong>FFmpeg 8.1.2 "Hoare" (released June 17, 2026)</strong>.
+					FFmpeg 8.1.2 is a point release containing important bug fixes only and no new features.
+					The features below were introduced in FFmpeg 8.1, released March 16, 2026.
 				</p>
 				<p class="text-sm leading-relaxed text-muted-foreground">
-					For Windows, D3D12 H.264/AV1 hardware encoders and D3D12 video filters (scaling, deinterlacing, motion estimation)
-					were added, completing native GPU video processing pipelines.
-					New codec support includes full JPEG-XS support (ultra-low latency, professional-grade compression),
-					experimental xHE-AAC Mps212 stereo decoding, and MPEG-H 3D Audio decoding.
+					FFmpeg 8.1 added Vulkan compute codec optimizations, a ProRes Vulkan encoder and hwaccel,
+					DPX Vulkan hwaccel, and Vulkan support in swscale. Vulkan codec initialization was also sped up.
+					For Windows, it added D3D12 H.264/AV1 encoders and the <code>vf_scale_d3d12</code>,
+					<code>vf_mestimate_d3d12</code>, and <code>vf_deinterlace_d3d12</code> filters for scaling,
+					motion estimation, and deinterlacing. Rockchip H.264/HEVC hardware encoders were also added.
+				</p>
+				<p class="text-sm leading-relaxed text-muted-foreground">
+					For JPEG-XS, FFmpeg 8.1 added a parser and raw bitstream muxer/demuxer. Encoding and decoding
+					are available in builds configured with the external libsvtjpegxs library
+					(<code>--enable-libsvtjpegxs</code>). MPEG-H 3D Audio decoding is likewise provided through
+					the external <code>mpeghdec</code> library. Experimental xHE-AAC Mps212 decoding was also added.
+				</p>
+				<p class="text-sm leading-relaxed text-muted-foreground">
+					Other additions include EXIF metadata parsing, the <code>drawvg</code> filter through external
+					libcairo, an LCEVC parser and metadata bitstream filter, tiled HEIF support in the ffmpeg CLI,
+					the <code>hxvs</code> demuxer for HXVS/HXVT IP camera formats, and muxing/demuxing for
+					IAMF Projection mode Ambisonic Audio Elements.
 				</p>
 				<p class="text-sm leading-relaxed text-muted-foreground">
 					The codename "Hoare" honors Sir Charles Antony Richard Hoare, the inventor of Quicksort,
 					who passed away on March 5, 2026.
-				</p>
-				<p class="text-sm leading-relaxed text-muted-foreground">
-					AV1 codec support has also matured rapidly. SVT-AV1, co-developed by Intel and Netflix,
-					now achieves near-real-time encoding speeds, accelerating the migration from
-					H.264/H.265 to AV1 across the industry.
 				</p>
 			</section>
 
