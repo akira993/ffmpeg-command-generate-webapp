@@ -29,6 +29,10 @@ function requireScript(script: BatchScript | null): BatchScript {
 	return script as BatchScript;
 }
 
+function getPresetOptions(presetId: PresetId): FFmpegOptions {
+	return structuredClone(PRESETS[presetId].defaults) as FFmpegOptions;
+}
+
 describe('batch input policy', () => {
 	it('CC2-01 uses only the preset allowlist independently of dropped filenames', () => {
 		commandStore.applyPreset('image-convert');
@@ -185,7 +189,7 @@ describe('shell consistency', () => {
 			expect(generatedScript.bash).toContain('if has_seen_base "$base"; then');
 			expect(generatedScript.powershell).toContain('if (-not $seenBaseNames.Add($_.BaseName))');
 			expect(generatedScript.cmd).toContain('type nul > "%SEEN_FILE%"');
-			expect(generatedScript.cmd).toContain('findstr /l /x /c:"%~n1" "%SEEN_FILE%"');
+			expect(generatedScript.cmd).toContain('findstr /l /x /c:"%%~nf" "%SEEN_FILE%"');
 			expect(generatedScript.cmd).toContain('if not errorlevel 1');
 			expect(generatedScript.cmd).toContain('del "%SEEN_FILE%"');
 			expect(generatedScript.cmd).not.toContain('SEEN_%~n1');
@@ -199,9 +203,40 @@ describe('shell consistency', () => {
 		for (const generatedScript of [script, cwebpScript]) {
 			expect(generatedScript.bash).toContain("tr '[:upper:]' '[:lower:]'");
 			expect(generatedScript.powershell).toContain('.ToLower()');
-			expect(generatedScript.cmd).toContain('for %%f in (*.jpg) do call :convert "%%f" jpg');
-			expect(generatedScript.cmd).toContain('set "INPUT_EXT=%~2"');
-			expect(generatedScript.cmd).not.toContain('set "INPUT_EXT=%~x1"');
+			expect(generatedScript.cmd).toContain('for %%f in (*.jpg) do (');
+			expect(generatedScript.cmd).toContain('%%~nf_jpg.%OUTPUT_EXT%');
 		}
 	});
+
+	it('CC3-05 emits CRLF line endings only for cmd scripts', () => {
+		for (const generatedScript of [script, cwebpScript]) {
+			expect(generatedScript.cmd).toContain('\r\n');
+			expect(generatedScript.cmd.replaceAll('\r\n', '')).not.toContain('\n');
+			expect(generatedScript.bash).not.toContain('\r\n');
+			expect(generatedScript.powershell).not.toContain('\r\n');
+		}
+	});
+
+	for (const preset of Object.values(PRESETS)) {
+		it(`CC3-06 does not use position-dependent label lookup for ${preset.id}`, () => {
+			const batch = inferBatchOptions(preset);
+			const options = getPresetOptions(preset.id);
+			const generatedScript = requireScript(
+				preset.id === 'image-webp'
+					? buildCwebpBatchCommand(options, batch)
+					: buildBatchCommand(options, batch)
+			);
+			const expectedLoopCount = resolveBatchInputExtensions(
+				batch,
+				getValidatedOutputExtension(options.output.filename) as string
+			).length;
+
+			expect(generatedScript.cmd).not.toMatch(/\bcall\s+:/i);
+			expect(generatedScript.cmd).not.toMatch(/^\s*:[^:]/m);
+			expect(generatedScript.cmd).not.toMatch(/\bgoto\b/i);
+			expect(generatedScript.cmd).not.toMatch(/\benabledelayedexpansion\b/i);
+			expect(generatedScript.cmd).toContain('setlocal DisableDelayedExpansion');
+			expect(generatedScript.cmd.match(/^for %%f in /gm)).toHaveLength(expectedLoopCount);
+		});
+	}
 });

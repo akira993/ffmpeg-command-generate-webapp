@@ -438,7 +438,7 @@ function buildCmdScript(
 
 	const lines: string[] = [
 		'@echo off',
-		'setlocal',
+		'setlocal DisableDelayedExpansion',
 		`set "OUTPUT_EXT=${outExt}"`,
 		'for %%I in (.) do set "FOLDER_NAME=%%~nxI"',
 		'set "OUTPUT_DIR=%FOLDER_NAME%_%OUTPUT_EXT%"',
@@ -450,29 +450,27 @@ function buildCmdScript(
 
 	// cmd では拡張子ごとに for ループを回す（case-insensitive なので大文字も自動マッチ）
 	for (const ext of extensions) {
-		lines.push(`for %%f in (*.${ext}) do call :convert "%%f" ${ext}`);
+		lines.push(
+			`for %%f in (*.${ext}) do (`,
+			'  findstr /l /x /c:"%%~nf" "%SEEN_FILE%" >nul 2>&1',
+			'  if not errorlevel 1 (',
+			`    ffmpeg ${inputOpts}-i "%%f" ${optionParts} "%OUTPUT_DIR%\\%%~nf_${ext}.%OUTPUT_EXT%"`,
+			'  ) else (',
+			'    >>"%SEEN_FILE%" <nul set /p "=%%~nf"',
+			'    >>"%SEEN_FILE%" echo(',
+			`    ffmpeg ${inputOpts}-i "%%f" ${optionParts} "%OUTPUT_DIR%\\%%~nf.%OUTPUT_EXT%"`,
+			'  )',
+			')'
+		);
 	}
 
 	lines.push(
 		'del "%SEEN_FILE%" >nul 2>&1',
-		'exit /b',
-		'',
-		':convert',
-		'set "INPUT=%~1"',
-		'set "INPUT_EXT=%~2"',
-		'set "OUT=%OUTPUT_DIR%\\%~n1.%OUTPUT_EXT%"',
-		'findstr /l /x /c:"%~n1" "%SEEN_FILE%" >nul 2>&1',
-		'if not errorlevel 1 (',
-		'  set "OUT=%OUTPUT_DIR%\\%~n1_%INPUT_EXT%.%OUTPUT_EXT%"',
-		') else (',
-		'  >>"%SEEN_FILE%" <nul set /p "=%~n1"',
-		'  >>"%SEEN_FILE%" echo(',
-		')',
-		`ffmpeg ${inputOpts}-i "%INPUT%" ${optionParts} "%OUT%"`,
 		'exit /b'
 	);
 
-	return lines.join('\n');
+	// Windows の cmd スクリプトとして標準の CRLF で出力する。
+	return lines.join('\r\n');
 }
 
 // ============================================================
@@ -616,7 +614,7 @@ function buildCwebpCmdScript(
 ): string {
 	const lines: string[] = [
 		'@echo off',
-		'setlocal',
+		'setlocal DisableDelayedExpansion',
 		`set "OUTPUT_EXT=${outExt}"`,
 		'for %%I in (.) do set "FOLDER_NAME=%%~nxI"',
 		'set "OUTPUT_DIR=%FOLDER_NAME%_%OUTPUT_EXT%"',
@@ -627,29 +625,27 @@ function buildCwebpCmdScript(
 	];
 
 	for (const ext of extensions) {
-		lines.push(`for %%f in (*.${ext}) do call :convert "%%f" ${ext}`);
+		lines.push(
+			`for %%f in (*.${ext}) do (`,
+			'  findstr /l /x /c:"%%~nf" "%SEEN_FILE%" >nul 2>&1',
+			'  if not errorlevel 1 (',
+			`    cwebp -q ${quality}${resizeOpts} "%%f" -o "%OUTPUT_DIR%\\%%~nf_${ext}.%OUTPUT_EXT%"`,
+			'  ) else (',
+			'    >>"%SEEN_FILE%" <nul set /p "=%%~nf"',
+			'    >>"%SEEN_FILE%" echo(',
+			`    cwebp -q ${quality}${resizeOpts} "%%f" -o "%OUTPUT_DIR%\\%%~nf.%OUTPUT_EXT%"`,
+			'  )',
+			')'
+		);
 	}
 
 	lines.push(
 		'del "%SEEN_FILE%" >nul 2>&1',
-		'exit /b',
-		'',
-		':convert',
-		'set "INPUT=%~1"',
-		'set "INPUT_EXT=%~2"',
-		'set "OUT=%OUTPUT_DIR%\\%~n1.%OUTPUT_EXT%"',
-		'findstr /l /x /c:"%~n1" "%SEEN_FILE%" >nul 2>&1',
-		'if not errorlevel 1 (',
-		'  set "OUT=%OUTPUT_DIR%\\%~n1_%INPUT_EXT%.%OUTPUT_EXT%"',
-		') else (',
-		'  >>"%SEEN_FILE%" <nul set /p "=%~n1"',
-		'  >>"%SEEN_FILE%" echo(',
-		')',
-		`cwebp -q ${quality}${resizeOpts} "%INPUT%" -o "%OUT%"`,
 		'exit /b'
 	);
 
-	return lines.join('\n');
+	// Windows の cmd スクリプトとして標準の CRLF で出力する。
+	return lines.join('\r\n');
 }
 
 // ============================================================

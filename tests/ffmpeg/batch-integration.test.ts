@@ -1,5 +1,6 @@
 import {
 	chmodSync,
+	copyFileSync,
 	existsSync,
 	mkdirSync,
 	mkdtempSync,
@@ -13,8 +14,8 @@ import { basename, delimiter, join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { afterEach, describe, expect, it } from 'vitest';
 import { buildBatchCommand, buildCwebpBatchCommand } from '../../src/lib/ffmpeg/builder';
-import { PRESETS, inferBatchOptions } from '../../src/lib/ffmpeg/presets';
-import type { BatchScript, FFmpegOptions } from '../../src/lib/ffmpeg/types';
+import { PRESETS, getValidatedOutputExtension, inferBatchOptions } from '../../src/lib/ffmpeg/presets';
+import type { BatchScript, FFmpegOptions, PresetId } from '../../src/lib/ffmpeg/types';
 
 const temporaryDirectories: string[] = [];
 
@@ -38,6 +39,10 @@ function createOptions(outputFilename: string): FFmpegOptions {
 function requireScript(script: BatchScript | null): BatchScript {
 	expect(script).not.toBeNull();
 	return script as BatchScript;
+}
+
+function getPresetOptions(presetId: PresetId): FFmpegOptions {
+	return structuredClone(PRESETS[presetId].defaults) as FFmpegOptions;
 }
 
 function createFixture(): string {
@@ -112,6 +117,52 @@ function expectImageOutputs(fixture: string, outputExtension: string): void {
 	expect(existsSync(join(outputDirectory, `upper.${outputExtension}`))).toBe(true);
 	expect(existsSync(join(outputDirectory, `camera.${outputExtension}`))).toBe(true);
 	expect(existsSync(join(outputDirectory, `inside.${outputExtension}`))).toBe(false);
+}
+
+type FixtureCategory = 'audio' | 'image' | 'video';
+
+const fixtureExtensions: Record<FixtureCategory, readonly [string, string]> = {
+	image: ['jpg', 'png'],
+	video: ['mp4', 'mov'],
+	audio: ['flac', 'wav']
+};
+
+function createCategoryFixture(root: string, name: string, category: FixtureCategory): string {
+	const fixture = join(root, name);
+	mkdirSync(fixture);
+	const [firstExtension, secondExtension] = fixtureExtensions[category];
+
+	for (const baseName of ['sample', 'my holiday']) {
+		writeFileSync(join(fixture, `${baseName}.${firstExtension}`), '');
+		writeFileSync(join(fixture, `${baseName}.${secondExtension}`), '');
+	}
+	writeFileSync(join(fixture, 'ignored.txt'), '');
+	mkdirSync(join(fixture, 'nested'));
+	writeFileSync(join(fixture, 'nested', `inside.${firstExtension}`), '');
+	return fixture;
+}
+
+function expectCategoryOutputs(
+	fixture: string,
+	outputExtension: string,
+	category: FixtureCategory
+): void {
+	const outputDirectory = join(fixture, `${basename(fixture)}_${outputExtension}`);
+	const outputs = readdirSync(outputDirectory).sort();
+	const inputExtensions = fixtureExtensions[category];
+
+	expect(outputs).toHaveLength(4);
+	for (const baseName of ['sample', 'my holiday']) {
+		expect(outputs).toContain(`${baseName}.${outputExtension}`);
+		expect(
+			outputs.some(
+				(output) =>
+					output === `${baseName}_${inputExtensions[0]}.${outputExtension}` ||
+					output === `${baseName}_${inputExtensions[1]}.${outputExtension}`
+			)
+		).toBe(true);
+	}
+	expect(outputs).not.toContain(`inside.${outputExtension}`);
 }
 
 describe('generated bash scripts', () => {
@@ -235,53 +286,130 @@ describe('generated bash scripts', () => {
 });
 
 if (process.platform === 'win32') {
-	it('CC4-04 executes PowerShell and cmd scripts with a fake ffmpeg.cmd on Windows', () => {
-		for (const shell of ['powershell', 'cmd'] as const) {
-			const fixture = createFixture();
-			const root = join(fixture, '..');
-			const binDirectory = join(root, 'bin');
-			mkdirSync(binDirectory);
-			const fakeLog = join(root, `${shell}.log`);
-			writeFileSync(
-				join(binDirectory, 'ffmpeg.cmd'),
-				`@echo off
-echo %*>>"%FAKE_LOG%"
-:find_last
-if "%~2"=="" goto have_last
-shift
-goto find_last
-:have_last
-set "OUT=%~1"
-for %%D in ("%OUT%") do if not exist "%%~dpD" mkdir "%%~dpD"
-type nul > "%OUT%"
+	it('CC4-04 executes all 8 presets in PowerShell and cmd on Windows', () => {
+		const root = mkdtempSync(join(tmpdir(), 'ffmpeg-batch-windows-'));
+		temporaryDirectories.push(root);
+		const binDirectory = join(root, 'bin');
+		mkdirSync(binDirectory);
+
+		const fakeSourcePath = join(root, 'FakeMediaTool.cs');
+		const fakeExecutablePath = join(root, 'FakeMediaTool.exe');
+		const compileScriptPath = join(root, 'compile-fake.ps1');
+		writeFileSync(
+			fakeSourcePath,
+			`using System;
+using System.IO;
+
+public static class FakeMediaTool
+{
+    public static int Main(string[] args)
+    {
+        File.AppendAllText(
+            Environment.GetEnvironmentVariable("FAKE_LOG"),
+            string.Join(" ", args) + Environment.NewLine
+        );
+
+        int outputFlag = Array.IndexOf(args, "-o");
+        string output = outputFlag >= 0 ? args[outputFlag + 1] : args[args.Length - 1];
+        string directory = Path.GetDirectoryName(output);
+        if (!string.IsNullOrEmpty(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+        File.WriteAllText(output, "");
+        return 0;
+    }
+}
 `
-			);
+		);
+		writeFileSync(
+			compileScriptPath,
+			`param([string]$SourcePath, [string]$OutputPath)
+$source = Get-Content -LiteralPath $SourcePath -Raw
+Add-Type -TypeDefinition $source -OutputAssembly $OutputPath -OutputType ConsoleApplication
+`
+		);
+		const compileResult = spawnSync(
+			'powershell.exe',
+			[
+				'-NoProfile',
+				'-ExecutionPolicy',
+				'Bypass',
+				'-File',
+				compileScriptPath,
+				fakeSourcePath,
+				fakeExecutablePath
+			],
+			{ encoding: 'utf8' }
+		);
+		expect(compileResult.status, compileResult.stderr).toBe(0);
+		copyFileSync(fakeExecutablePath, join(binDirectory, 'ffmpeg.exe'));
+		copyFileSync(fakeExecutablePath, join(binDirectory, 'cwebp.exe'));
 
+		const presetCases: {
+			id: PresetId;
+			fixtureCategory: FixtureCategory;
+			tool: 'cwebp' | 'ffmpeg';
+		}[] = [
+			{ id: 'image-convert', fixtureCategory: 'image', tool: 'ffmpeg' },
+			{ id: 'video-convert', fixtureCategory: 'video', tool: 'ffmpeg' },
+			{ id: 'video-compress', fixtureCategory: 'video', tool: 'ffmpeg' },
+			{ id: 'video-trim', fixtureCategory: 'video', tool: 'ffmpeg' },
+			{ id: 'gif-generate', fixtureCategory: 'video', tool: 'ffmpeg' },
+			{ id: 'audio-extract', fixtureCategory: 'video', tool: 'ffmpeg' },
+			{ id: 'audio-convert', fixtureCategory: 'audio', tool: 'ffmpeg' },
+			{ id: 'image-webp', fixtureCategory: 'image', tool: 'cwebp' }
+		];
+
+		for (const presetCase of presetCases) {
+			const preset = PRESETS[presetCase.id];
+			const options = getPresetOptions(presetCase.id);
+			const outputExtension = getValidatedOutputExtension(options.output.filename) as string;
 			const script = requireScript(
-				buildBatchCommand(
-					createOptions('output.avif'),
-					inferBatchOptions(PRESETS['image-convert'])
-				)
+				presetCase.tool === 'cwebp'
+					? buildCwebpBatchCommand(options, inferBatchOptions(preset))
+					: buildBatchCommand(options, inferBatchOptions(preset))
 			);
-			const scriptPath = join(root, shell === 'powershell' ? 'batch.ps1' : 'batch.cmd');
-			writeFileSync(scriptPath, script[shell]);
-			const command = shell === 'powershell' ? 'powershell.exe' : 'cmd.exe';
-			const args = shell === 'powershell'
-				? ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', scriptPath]
-				: ['/d', '/c', scriptPath];
-			const result = spawnSync(command, args, {
-				cwd: fixture,
-				encoding: 'utf8',
-				env: {
-					...process.env,
-					PATH: `${binDirectory}${delimiter}${process.env.PATH ?? ''}`,
-					FAKE_LOG: fakeLog
-				}
-			});
 
-			expect(result.status, result.stderr).toBe(0);
-			expect(readFileSync(fakeLog, 'utf8').trim().split('\n')).toHaveLength(6);
-			expectImageOutputs(fixture, 'avif');
+			for (const shell of ['powershell', 'cmd'] as const) {
+				const fixture = createCategoryFixture(
+					root,
+					`${presetCase.id}-${shell}`,
+					presetCase.fixtureCategory
+				);
+				const fakeLog = join(root, `${presetCase.id}-${shell}.log`);
+				const scriptPath = join(
+					root,
+					`${presetCase.id}-${shell}.${shell === 'powershell' ? 'ps1' : 'cmd'}`
+				);
+				writeFileSync(scriptPath, script[shell]);
+				const command = shell === 'powershell' ? 'powershell.exe' : 'cmd.exe';
+				const args =
+					shell === 'powershell'
+						? ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', scriptPath]
+						: ['/d', '/c', scriptPath];
+				const result = spawnSync(command, args, {
+					cwd: fixture,
+					encoding: 'utf8',
+					env: {
+						...process.env,
+						PATH: `${binDirectory}${delimiter}${process.env.PATH ?? ''}`,
+						FAKE_LOG: fakeLog
+					}
+				});
+				const diagnostics = JSON.stringify({
+					preset: presetCase.id,
+					shell,
+					status: result.status,
+					stdout: result.stdout,
+					stderr: result.stderr
+				});
+
+				expect(result.status, diagnostics).toBe(0);
+				expect(existsSync(fakeLog), diagnostics).toBe(true);
+				expect(readFileSync(fakeLog, 'utf8').trim().split(/\r?\n/), diagnostics).toHaveLength(4);
+				expectCategoryOutputs(fixture, outputExtension, presetCase.fixtureCategory);
+			}
 		}
 	});
 }
