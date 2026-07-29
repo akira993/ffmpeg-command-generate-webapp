@@ -111,8 +111,8 @@ export interface MiscOptions {
 export interface BatchOptions {
 	/** 入力ファイル拡張子フィルタ (e.g. ['jpg', 'jpeg', 'png']) */
 	inputExtensions: string[];
-	/** 出力拡張子 (e.g. 'avif') */
-	outputExtension: string;
+	/** 入出力が同一形式ファミリーでも処理する */
+	allowSameFormatInput: boolean;
 }
 
 /** 一括処理スクリプトの出力形式 */

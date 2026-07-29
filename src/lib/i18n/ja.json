@@ -103,7 +103,10 @@
 		"filesDetected": "ファイル検出",
 		"batchMode": "一括処理",
 		"clear": "クリア",
-		"moreFiles": "他{{count}}ファイル"
+		"moreFiles": "他{{count}}ファイル",
+		"batchTargets": "対象 {{target}}件 / 対象外 {{excluded}}件",
+		"excludedExtensions": "対象外の拡張子: {{extensions}}",
+		"noExtension": "拡張子なし"
 	},
 	"pathGuide": {
 		"buttonLabel": "実行方法",

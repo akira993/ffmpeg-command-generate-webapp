@@ -35,3 +35,20 @@ jobs:
 
       - name: Build Storybook
         run: npm run build-storybook
+
+  batch-scripts-windows:
+    name: Batch Scripts (PowerShell & cmd)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run generated script integration tests
+        run: npm run test -- tests/ffmpeg/batch-integration.test.ts -t CC4-04

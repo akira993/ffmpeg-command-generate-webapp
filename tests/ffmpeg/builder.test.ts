@@ -21,7 +21,7 @@ import {
 	buildCwebpBatchCommand,
 	isOptionEmpty
 } from '../../src/lib/ffmpeg/builder';
-import type { FFmpegOptions, BatchOptions, FilterOptions } from '../../src/lib/ffmpeg/types';
+import type { FFmpegOptions, BatchOptions, BatchScript, FilterOptions } from '../../src/lib/ffmpeg/types';
 
 // ─── ヘルパー: デフォルトオプション生成 ──────────────────────────────────────
 
@@ -41,6 +41,11 @@ function createDefaultOptions(overrides: Partial<{
 		filter: { ...overrides.filter },
 		misc: { stripMetadata: false, copyStreams: false, ...overrides.misc }
 	};
+}
+
+function requireBatchScript(script: BatchScript | null): BatchScript {
+	expect(script).not.toBeNull();
+	return script as BatchScript;
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -583,7 +588,7 @@ describe('buildCwebpCommand', () => {
 describe('buildBatchCommand', () => {
 	const batch: BatchOptions = {
 		inputExtensions: ['mp4', 'mov', 'avi'],
-		outputExtension: 'mkv'
+		allowSameFormatInput: true
 	};
 
 	it('Bash / PowerShell / cmd の3形式を返す', () => {
@@ -591,7 +596,7 @@ describe('buildBatchCommand', () => {
 			video: { codec: 'libx264', crf: 23, noVideo: false },
 			audio: { codec: 'aac', noAudio: false }
 		});
-		const result = buildBatchCommand(opts, batch);
+		const result = requireBatchScript(buildBatchCommand(opts, batch));
 		expect(result).toHaveProperty('bash');
 		expect(result).toHaveProperty('powershell');
 		expect(result).toHaveProperty('cmd');
@@ -599,19 +604,19 @@ describe('buildBatchCommand', () => {
 
 	it('Bash スクリプトが shebang で始まる', () => {
 		const opts = createDefaultOptions();
-		const result = buildBatchCommand(opts, batch);
+		const result = requireBatchScript(buildBatchCommand(opts, batch));
 		expect(result.bash).toMatch(/^#!\/bin\/bash/);
 	});
 
 	it('Bash スクリプトに case パターンを含む', () => {
 		const opts = createDefaultOptions();
-		const result = buildBatchCommand(opts, batch);
+		const result = requireBatchScript(buildBatchCommand(opts, batch));
 		expect(result.bash).toContain('mp4|mov|avi');
 	});
 
 	it('PowerShell スクリプトに Include フィルタを含む', () => {
 		const opts = createDefaultOptions();
-		const result = buildBatchCommand(opts, batch);
+		const result = requireBatchScript(buildBatchCommand(opts, batch));
 		expect(result.powershell).toContain('"*.mp4"');
 		expect(result.powershell).toContain('"*.mov"');
 		expect(result.powershell).toContain('"*.avi"');
@@ -619,17 +624,17 @@ describe('buildBatchCommand', () => {
 
 	it('cmd スクリプトが @echo off で始まる', () => {
 		const opts = createDefaultOptions();
-		const result = buildBatchCommand(opts, batch);
+		const result = requireBatchScript(buildBatchCommand(opts, batch));
 		expect(result.cmd).toMatch(/^@echo off/);
 	});
 
 	it('cmd スクリプトで出力拡張子と同一の入力拡張子をスキップする', () => {
 		const batchSameExt: BatchOptions = {
 			inputExtensions: ['mp4', 'mov', 'mkv'],
-			outputExtension: 'mkv'
+			allowSameFormatInput: false
 		};
-		const opts = createDefaultOptions();
-		const result = buildBatchCommand(opts, batchSameExt);
+		const opts = createDefaultOptions({ output: { filename: 'output.mkv' } });
+		const result = requireBatchScript(buildBatchCommand(opts, batchSameExt));
 		// mkv → mkv の for ループは生成されない
 		const forLines = result.cmd.split('\n').filter(l => l.startsWith('for'));
 		expect(forLines.every(l => !l.includes('*.mkv'))).toBe(true);
@@ -637,7 +642,7 @@ describe('buildBatchCommand', () => {
 
 	it('copyStreams=true でバッチスクリプトに -c copy が含まれる', () => {
 		const opts = createDefaultOptions({ misc: { copyStreams: true, stripMetadata: false } });
-		const result = buildBatchCommand(opts, batch);
+		const result = requireBatchScript(buildBatchCommand(opts, batch));
 		expect(result.bash).toContain('-c copy');
 		expect(result.powershell).toContain('-c copy');
 		expect(result.cmd).toContain('-c copy');
@@ -647,7 +652,7 @@ describe('buildBatchCommand', () => {
 		const opts = createDefaultOptions({
 			input: { filename: 'input.mp4', startTime: '00:01:00' }
 		});
-		const result = buildBatchCommand(opts, batch);
+		const result = requireBatchScript(buildBatchCommand(opts, batch));
 		expect(result.bash).toContain('-ss 00:01:00');
 		expect(result.powershell).toContain('-ss 00:01:00');
 		expect(result.cmd).toContain('-ss 00:01:00');
@@ -657,20 +662,26 @@ describe('buildBatchCommand', () => {
 describe('buildCwebpBatchCommand', () => {
 	const batch: BatchOptions = {
 		inputExtensions: ['jpg', 'jpeg', 'png'],
-		outputExtension: 'webp'
+		allowSameFormatInput: false
 	};
 
 	it('3形式のスクリプトを返す', () => {
-		const opts = createDefaultOptions({ video: { quality: 80, noVideo: false } });
-		const result = buildCwebpBatchCommand(opts, batch);
+		const opts = createDefaultOptions({
+			output: { filename: 'output.webp' },
+			video: { quality: 80, noVideo: false }
+		});
+		const result = requireBatchScript(buildCwebpBatchCommand(opts, batch));
 		expect(result).toHaveProperty('bash');
 		expect(result).toHaveProperty('powershell');
 		expect(result).toHaveProperty('cmd');
 	});
 
 	it('cwebp コマンドを使用する（ffmpeg ではない）', () => {
-		const opts = createDefaultOptions({ video: { quality: 80, noVideo: false } });
-		const result = buildCwebpBatchCommand(opts, batch);
+		const opts = createDefaultOptions({
+			output: { filename: 'output.webp' },
+			video: { quality: 80, noVideo: false }
+		});
+		const result = requireBatchScript(buildCwebpBatchCommand(opts, batch));
 		expect(result.bash).toContain('cwebp');
 		expect(result.bash).not.toContain('ffmpeg');
 		expect(result.powershell).toContain('cwebp');
@@ -678,17 +689,21 @@ describe('buildCwebpBatchCommand', () => {
 	});
 
 	it('品質オプションが含まれる', () => {
-		const opts = createDefaultOptions({ video: { quality: 90, noVideo: false } });
-		const result = buildCwebpBatchCommand(opts, batch);
+		const opts = createDefaultOptions({
+			output: { filename: 'output.webp' },
+			video: { quality: 90, noVideo: false }
+		});
+		const result = requireBatchScript(buildCwebpBatchCommand(opts, batch));
 		expect(result.bash).toContain('-q 90');
 	});
 
 	it('リサイズオプションが含まれる', () => {
 		const opts = createDefaultOptions({
+			output: { filename: 'output.webp' },
 			video: { quality: 75, noVideo: false },
 			filter: { scale: { width: 800, height: 600 } }
 		});
-		const result = buildCwebpBatchCommand(opts, batch);
+		const result = requireBatchScript(buildCwebpBatchCommand(opts, batch));
 		expect(result.bash).toContain('-resize 800 600');
 	});
 });

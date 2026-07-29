@@ -236,6 +236,26 @@
 				</Button>
 			</div>
 
+			{#if commandStore.batchFileSummary}
+				<div class="mb-2 text-xs text-muted-foreground">
+					<p>
+						{$t('dropzone.batchTargets')
+							.replace('{{target}}', String(commandStore.batchFileSummary.targetCount))
+							.replace('{{excluded}}', String(commandStore.batchFileSummary.excludedCount))}
+					</p>
+					{#if commandStore.batchFileSummary.excludedCount > 0}
+						<p>
+							{$t('dropzone.excludedExtensions').replace(
+								'{{extensions}}',
+								commandStore.batchFileSummary.excludedExtensions
+									.map((extension) => extension ?? $t('dropzone.noExtension'))
+									.join(', ')
+							)}
+						</p>
+					{/if}
+				</div>
+			{/if}
+
 			<ul class="space-y-0.5 text-xs text-muted-foreground">
 				{#each commandStore.droppedFiles.slice(0, MAX_DISPLAY_FILES) as file}
 					<li class="truncate font-mono">

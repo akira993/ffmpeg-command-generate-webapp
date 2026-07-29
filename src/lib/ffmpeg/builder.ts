@@ -19,6 +19,7 @@
  */
 
 import type { FFmpegOptions, BatchOptions, BatchScript, FilterOptions } from './types';
+import { getValidatedOutputExtension, resolveBatchInputExtensions } from './presets';
 
 // ============================================================
 // メイン関数: 個別コマンド生成
@@ -80,12 +81,13 @@ export function buildCommand(options: FFmpegOptions): string {
  *
  * 個別コマンドのオプション部分を抽出し、forループで囲む。
  */
-export function buildBatchCommand(options: FFmpegOptions, batch: BatchOptions): BatchScript {
+export function buildBatchCommand(options: FFmpegOptions, batch: BatchOptions): BatchScript | null {
+	const outExt = getValidatedOutputExtension(options.output.filename);
+	if (!outExt) return null;
+
 	// コマンドのオプション部分を生成（入力/出力ファイル名は変数に置換）
 	const optionParts = buildOptionParts(options);
-
-	const outExt = batch.outputExtension;
-	const extensions = batch.inputExtensions;
+	const extensions = resolveBatchInputExtensions(batch, outExt);
 
 	// case パターン文字列（Bash / cmd 用）
 	const casePattern = extensions.join('|');
@@ -334,7 +336,8 @@ function buildOptionParts(options: FFmpegOptions): string {
  *
  * - 全ファイルを走査し、拡張子を小文字化して case で判定
  * - 大文字拡張子（.JPG 等）にも対応
- * - 出力拡張子と同一のファイルはスキップ
+ * - 入力拡張子の大文字小文字を区別しない
+ * - 出力名が衝突した場合のみ入力拡張子を付与
  * - 出力先フォルダを自動作成
  */
 function buildBashScript(
@@ -350,6 +353,16 @@ function buildBashScript(
 		`OUTPUT_EXT="${outExt}"`,
 		`OUTPUT_DIR="$(basename "$(pwd)")_\${OUTPUT_EXT}"`,
 		'mkdir -p "$OUTPUT_DIR"',
+		"SEEN_BASES=''",
+		'',
+		'has_seen_base() {',
+		'  while IFS= read -r seen_base; do',
+		'    [ "$seen_base" = "x$1" ] && return 0',
+		'  done <<EOF',
+		'$SEEN_BASES',
+		'EOF',
+		'  return 1',
+		'}',
 		'',
 		'for f in *; do',
 		'  [ -f "$f" ] || continue',
@@ -357,8 +370,14 @@ function buildBashScript(
 		'  ext_lower=$(echo "$ext" | tr \'[:upper:]\' \'[:lower:]\')',
 		`  case "$ext_lower" in`,
 		`    ${casePattern})`,
-		'      [ "$ext_lower" = "$OUTPUT_EXT" ] && continue',
-		`      ffmpeg ${inputOpts}-i "$f" ${optionParts} "$OUTPUT_DIR/\${f%.*}.$OUTPUT_EXT"`,
+		'      base="${f%.*}"',
+		'      out="$OUTPUT_DIR/${base}.$OUTPUT_EXT"',
+		'      if has_seen_base "$base"; then',
+		'        out="$OUTPUT_DIR/${base}_${ext_lower}.$OUTPUT_EXT"',
+		'      else',
+		'        SEEN_BASES="${SEEN_BASES}\nx${base}"',
+		'      fi',
+		`      ffmpeg ${inputOpts}-i "$f" ${optionParts} "$out"`,
 		'      ;;',
 		'  esac',
 		'done'
@@ -371,7 +390,8 @@ function buildBashScript(
  * PowerShell スクリプト生成（Windows）
  *
  * - -Include で大文字小文字両方にマッチ（PowerShell は case-insensitive）
- * - Where-Object で出力拡張子と同一のファイルを除外
+ * - -Path * を明示して非再帰で走査
+ * - 出力名が衝突した場合のみ入力拡張子を付与
  * - 出力先フォルダを自動作成
  */
 function buildPowerShellScript(
@@ -387,11 +407,14 @@ function buildPowerShellScript(
 		`$outputExt = "${outExt}"`,
 		`$outputDir = "$(Split-Path -Leaf (Get-Location))_$outputExt"`,
 		'New-Item -ItemType Directory -Force -Path $outputDir | Out-Null',
+		'$seenBaseNames = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)',
 		'',
-		`Get-ChildItem -File -Include ${includeFilter} -Recurse |`,
-		'  Where-Object { $_.Extension.TrimStart(\'.\').ToLower() -ne $outputExt } |',
+		`Get-ChildItem -Path * -File -Include ${includeFilter} |`,
 		'  ForEach-Object {',
-		`    ffmpeg ${inputOpts}-i $_.FullName ${optionParts} "$outputDir\\$($_.BaseName).$outputExt"`,
+		'    $inputExt = $_.Extension.TrimStart(\'.\').ToLower()',
+		'    $out = Join-Path $outputDir "$($_.BaseName).$outputExt"',
+		'    if (-not $seenBaseNames.Add($_.BaseName)) { $out = Join-Path $outputDir "$($_.BaseName)_$inputExt.$outputExt" }',
+		`    ffmpeg ${inputOpts}-i $_.FullName ${optionParts} $out`,
 		'  }'
 	];
 
@@ -402,7 +425,7 @@ function buildPowerShellScript(
  * cmd スクリプト生成（Windows バッチ）
  *
  * - 拡張子ごとに for ループ（cmd は case-insensitive で大文字も自動マッチ）
- * - 出力拡張子と同一のファイルはスキップ
+ * - 出力名が衝突した場合のみ入力拡張子を付与
  * - 出力先フォルダを自動作成
  */
 function buildCmdScript(
@@ -415,20 +438,39 @@ function buildCmdScript(
 
 	const lines: string[] = [
 		'@echo off',
+		'setlocal',
 		`set "OUTPUT_EXT=${outExt}"`,
 		'for %%I in (.) do set "FOLDER_NAME=%%~nxI"',
 		'set "OUTPUT_DIR=%FOLDER_NAME%_%OUTPUT_EXT%"',
 		'if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"',
+		'set "SEEN_FILE=%TEMP%\\ffmpeg-batch-seen-%RANDOM%-%RANDOM%.tmp"',
+		'type nul > "%SEEN_FILE%"',
 		''
 	];
 
 	// cmd では拡張子ごとに for ループを回す（case-insensitive なので大文字も自動マッチ）
 	for (const ext of extensions) {
-		if (ext.toLowerCase() === outExt.toLowerCase()) continue;
-		lines.push(
-			`for %%f in (*.${ext}) do ffmpeg ${inputOpts}-i "%%f" ${optionParts} "%OUTPUT_DIR%\\%%~nf.%OUTPUT_EXT%"`
-		);
+		lines.push(`for %%f in (*.${ext}) do call :convert "%%f" ${ext}`);
 	}
+
+	lines.push(
+		'del "%SEEN_FILE%" >nul 2>&1',
+		'exit /b',
+		'',
+		':convert',
+		'set "INPUT=%~1"',
+		'set "INPUT_EXT=%~2"',
+		'set "OUT=%OUTPUT_DIR%\\%~n1.%OUTPUT_EXT%"',
+		'findstr /l /x /c:"%~n1" "%SEEN_FILE%" >nul 2>&1',
+		'if not errorlevel 1 (',
+		'  set "OUT=%OUTPUT_DIR%\\%~n1_%INPUT_EXT%.%OUTPUT_EXT%"',
+		') else (',
+		'  >>"%SEEN_FILE%" <nul set /p "=%~n1"',
+		'  >>"%SEEN_FILE%" echo(',
+		')',
+		`ffmpeg ${inputOpts}-i "%INPUT%" ${optionParts} "%OUT%"`,
+		'exit /b'
+	);
 
 	return lines.join('\n');
 }
@@ -472,10 +514,12 @@ export function buildCwebpCommand(options: FFmpegOptions): string {
  *
  * Bash / PowerShell / cmd の3形式で出力。
  */
-export function buildCwebpBatchCommand(options: FFmpegOptions, batch: BatchOptions): BatchScript {
+export function buildCwebpBatchCommand(options: FFmpegOptions, batch: BatchOptions): BatchScript | null {
+	const outExt = getValidatedOutputExtension(options.output.filename);
+	if (!outExt) return null;
+
 	const quality = options.video.quality ?? 75;
-	const outExt = batch.outputExtension;
-	const extensions = batch.inputExtensions;
+	const extensions = resolveBatchInputExtensions(batch, outExt);
 	const casePattern = extensions.join('|');
 
 	// リサイズオプション
@@ -505,6 +549,16 @@ function buildCwebpBashScript(
 		`OUTPUT_EXT="${outExt}"`,
 		`OUTPUT_DIR="$(basename "$(pwd)")_\${OUTPUT_EXT}"`,
 		'mkdir -p "$OUTPUT_DIR"',
+		"SEEN_BASES=''",
+		'',
+		'has_seen_base() {',
+		'  while IFS= read -r seen_base; do',
+		'    [ "$seen_base" = "x$1" ] && return 0',
+		'  done <<EOF',
+		'$SEEN_BASES',
+		'EOF',
+		'  return 1',
+		'}',
 		'',
 		'for f in *; do',
 		'  [ -f "$f" ] || continue',
@@ -512,8 +566,14 @@ function buildCwebpBashScript(
 		'  ext_lower=$(echo "$ext" | tr \'[:upper:]\' \'[:lower:]\')',
 		`  case "$ext_lower" in`,
 		`    ${casePattern})`,
-		'      [ "$ext_lower" = "$OUTPUT_EXT" ] && continue',
-		`      cwebp -q ${quality}${resizeOpts} "$f" -o "$OUTPUT_DIR/\${f%.*}.$OUTPUT_EXT"`,
+		'      base="${f%.*}"',
+		'      out="$OUTPUT_DIR/${base}.$OUTPUT_EXT"',
+		'      if has_seen_base "$base"; then',
+		'        out="$OUTPUT_DIR/${base}_${ext_lower}.$OUTPUT_EXT"',
+		'      else',
+		'        SEEN_BASES="${SEEN_BASES}\nx${base}"',
+		'      fi',
+		`      cwebp -q ${quality}${resizeOpts} "$f" -o "$out"`,
 		'      ;;',
 		'  esac',
 		'done'
@@ -534,11 +594,14 @@ function buildCwebpPowerShellScript(
 		`$outputExt = "${outExt}"`,
 		`$outputDir = "$(Split-Path -Leaf (Get-Location))_$outputExt"`,
 		'New-Item -ItemType Directory -Force -Path $outputDir | Out-Null',
+		'$seenBaseNames = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)',
 		'',
-		`Get-ChildItem -File -Include ${includeFilter} -Recurse |`,
-		'  Where-Object { $_.Extension.TrimStart(\'.\').ToLower() -ne $outputExt } |',
+		`Get-ChildItem -Path * -File -Include ${includeFilter} |`,
 		'  ForEach-Object {',
-		`    cwebp -q ${quality}${resizeOpts} $_.FullName -o "$outputDir\\$($_.BaseName).$outputExt"`,
+		'    $inputExt = $_.Extension.TrimStart(\'.\').ToLower()',
+		'    $out = Join-Path $outputDir "$($_.BaseName).$outputExt"',
+		'    if (-not $seenBaseNames.Add($_.BaseName)) { $out = Join-Path $outputDir "$($_.BaseName)_$inputExt.$outputExt" }',
+		`    cwebp -q ${quality}${resizeOpts} $_.FullName -o $out`,
 		'  }'
 	];
 
@@ -553,19 +616,38 @@ function buildCwebpCmdScript(
 ): string {
 	const lines: string[] = [
 		'@echo off',
+		'setlocal',
 		`set "OUTPUT_EXT=${outExt}"`,
 		'for %%I in (.) do set "FOLDER_NAME=%%~nxI"',
 		'set "OUTPUT_DIR=%FOLDER_NAME%_%OUTPUT_EXT%"',
 		'if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"',
+		'set "SEEN_FILE=%TEMP%\\cwebp-batch-seen-%RANDOM%-%RANDOM%.tmp"',
+		'type nul > "%SEEN_FILE%"',
 		''
 	];
 
 	for (const ext of extensions) {
-		if (ext.toLowerCase() === outExt.toLowerCase()) continue;
-		lines.push(
-			`for %%f in (*.${ext}) do cwebp -q ${quality}${resizeOpts} "%%f" -o "%OUTPUT_DIR%\\%%~nf.%OUTPUT_EXT%"`
-		);
+		lines.push(`for %%f in (*.${ext}) do call :convert "%%f" ${ext}`);
 	}
+
+	lines.push(
+		'del "%SEEN_FILE%" >nul 2>&1',
+		'exit /b',
+		'',
+		':convert',
+		'set "INPUT=%~1"',
+		'set "INPUT_EXT=%~2"',
+		'set "OUT=%OUTPUT_DIR%\\%~n1.%OUTPUT_EXT%"',
+		'findstr /l /x /c:"%~n1" "%SEEN_FILE%" >nul 2>&1',
+		'if not errorlevel 1 (',
+		'  set "OUT=%OUTPUT_DIR%\\%~n1_%INPUT_EXT%.%OUTPUT_EXT%"',
+		') else (',
+		'  >>"%SEEN_FILE%" <nul set /p "=%~n1"',
+		'  >>"%SEEN_FILE%" echo(',
+		')',
+		`cwebp -q ${quality}${resizeOpts} "%INPUT%" -o "%OUT%"`,
+		'exit /b'
+	);
 
 	return lines.join('\n');
 }

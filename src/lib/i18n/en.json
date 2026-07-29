@@ -103,7 +103,10 @@
 		"filesDetected": " files detected",
 		"batchMode": "Batch Mode",
 		"clear": "Clear",
-		"moreFiles": "{{count}} more files"
+		"moreFiles": "{{count}} more files",
+		"batchTargets": "{{target}} targeted / {{excluded}} excluded",
+		"excludedExtensions": "Excluded extensions: {{extensions}}",
+		"noExtension": "no extension"
 	},
 	"pathGuide": {
 		"buttonLabel": "How to Run",

@@ -9,7 +9,7 @@
  * 画像圧縮(AVIF)と動画圧縮(AV1)は最新の推奨パラメータで最適化済み。
  */
 
-import type { PresetDefinition, PresetId } from './types';
+import type { BatchOptions, PresetDefinition, PresetId } from './types';
 import { AVIF_DEFAULTS, SVT_AV1_DEFAULTS, WEBP_DEFAULTS } from './codecs';
 
 // ============================================================
@@ -267,6 +267,39 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 // ヘルパー
 // ============================================================
 
+export const VIDEO_INPUT_EXTENSIONS = [
+	'mp4', 'mov', 'avi', 'mkv', 'webm', 'flv', 'wmv', 'm4v',
+	'mpg', 'mpeg', 'ts', 'm2ts', 'mts', '3gp', 'ogv'
+];
+
+export const AUDIO_INPUT_EXTENSIONS = [
+	'mp3', 'm4a', 'aac', 'flac', 'wav', 'aiff', 'aif',
+	'ogg', 'oga', 'opus', 'wma', 'mka'
+];
+
+export const FFMPEG_IMAGE_INPUT_EXTENSIONS = [
+	'jpg', 'jpeg', 'jfif', 'png', 'gif', 'webp', 'bmp',
+	'tif', 'tiff', 'heic', 'heif', 'avif'
+];
+
+export const CWEBP_IMAGE_INPUT_EXTENSIONS = [
+	'png', 'jpg', 'jpeg', 'tif', 'tiff', 'pnm', 'pgm', 'ppm', 'pam'
+];
+
+const FORMAT_FAMILIES: Record<string, string> = {
+	jpg: 'jpg',
+	jpeg: 'jpg',
+	jfif: 'jpg',
+	tif: 'tif',
+	tiff: 'tif',
+	aif: 'aif',
+	aiff: 'aif',
+	mpg: 'mpg',
+	mpeg: 'mpg',
+	ogg: 'ogg',
+	oga: 'ogg'
+};
+
 /** 全プリセットを配列で取得 */
 export function getAllPresets(): PresetDefinition[] {
 	return Object.values(PRESETS);
@@ -282,45 +315,63 @@ export function getPresetsByCategory(category: 'video' | 'audio' | 'image'): Pre
 	return getAllPresets().filter((p) => p.category === category);
 }
 
-/**
- * プリセットのデフォルト値からBatchOptionsを推定する
- *
- * ファイル名の拡張子から入力/出力の拡張子を取得。
- */
-export function inferBatchOptions(preset: PresetDefinition): {
-	inputExtensions: string[];
-	outputExtension: string;
-} {
-	const inputFilename = preset.defaults.input?.filename ?? '';
-	const outputFilename = preset.defaults.output?.filename ?? '';
-
-	const inputExt = getExtension(inputFilename);
-	const outputExt = getExtension(outputFilename);
-
-	// 画像の場合は主要な画像拡張子すべて
-	if (preset.category === 'image') {
-		return {
-			inputExtensions: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'tiff', 'heic', 'heif'],
-			outputExtension: outputExt || 'avif'
-		};
+/** プリセット固有の一括処理入力ポリシーを返す */
+export function inferBatchOptions(preset: PresetDefinition): BatchOptions {
+	switch (preset.id) {
+		case 'image-convert':
+			return {
+				inputExtensions: [...FFMPEG_IMAGE_INPUT_EXTENSIONS],
+				allowSameFormatInput: false
+			};
+		case 'image-webp':
+			return {
+				inputExtensions: [...CWEBP_IMAGE_INPUT_EXTENSIONS],
+				allowSameFormatInput: false
+			};
+		case 'video-compress':
+		case 'video-trim':
+			return {
+				inputExtensions: [...VIDEO_INPUT_EXTENSIONS],
+				allowSameFormatInput: true
+			};
+		case 'video-convert':
+		case 'audio-extract':
+		case 'gif-generate':
+			return {
+				inputExtensions: [...VIDEO_INPUT_EXTENSIONS],
+				allowSameFormatInput: false
+			};
+		case 'audio-convert':
+			return {
+				inputExtensions: [...AUDIO_INPUT_EXTENSIONS],
+				allowSameFormatInput: false
+			};
 	}
-
-	// 動画の場合
-	if (preset.category === 'video') {
-		return {
-			inputExtensions: ['mp4', 'mov', 'avi', 'mkv', 'webm', 'flv', 'wmv', 'm4v'],
-			outputExtension: outputExt || 'mkv'
-		};
-	}
-
-	// 音声の場合
-	return {
-		inputExtensions: ['mp3', 'aac', 'flac', 'wav', 'ogg', 'm4a', 'opus', 'wma'],
-		outputExtension: outputExt || 'mp3'
-	};
 }
 
-function getExtension(filename: string): string {
-	const parts = filename.split('.');
-	return parts.length > 1 ? parts[parts.length - 1].toLowerCase() : '';
+/** ユーザー指定の出力ファイル名から安全な拡張子を取得する */
+export function getValidatedOutputExtension(filename: string): string | null {
+	const extension = getFileExtension(filename);
+	return extension && /^[a-z0-9]{1,5}$/.test(extension) ? extension : null;
+}
+
+/** ファイル名から小文字化した拡張子を取得する */
+export function getFileExtension(filename: string): string | null {
+	const lastDot = filename.lastIndexOf('.');
+	if (lastDot < 0 || lastDot === filename.length - 1) return null;
+	return filename.slice(lastDot + 1).toLowerCase();
+}
+
+/** 同一形式入力を許可しないプリセットでは出力形式ファミリーを除外する */
+export function resolveBatchInputExtensions(
+	batch: BatchOptions,
+	outputExtension: string
+): string[] {
+	if (batch.allowSameFormatInput) return [...batch.inputExtensions];
+
+	const outputFamily = FORMAT_FAMILIES[outputExtension] ?? outputExtension;
+	return batch.inputExtensions.filter((extension) => {
+		const inputFamily = FORMAT_FAMILIES[extension] ?? extension;
+		return inputFamily !== outputFamily;
+	});
 }

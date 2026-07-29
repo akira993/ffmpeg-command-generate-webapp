@@ -15,7 +15,13 @@ import type {
 	ScriptType
 } from '$lib/ffmpeg/types';
 import { buildCommand, buildBatchCommand, buildCwebpCommand, buildCwebpBatchCommand } from '$lib/ffmpeg/builder';
-import { PRESETS, inferBatchOptions } from '$lib/ffmpeg/presets';
+import {
+	PRESETS,
+	getFileExtension,
+	getValidatedOutputExtension,
+	inferBatchOptions,
+	resolveBatchInputExtensions
+} from '$lib/ffmpeg/presets';
 
 // ============================================================
 // デフォルト値
@@ -86,18 +92,6 @@ class CommandStore {
 
 		const batchOptions: BatchOptions = inferBatchOptions(preset);
 
-		// D&Dファイルから拡張子を推定
-		if (this.droppedFiles.length > 0) {
-			const extensions = new Set<string>();
-			for (const file of this.droppedFiles) {
-				const ext = file.name.split('.').pop()?.toLowerCase();
-				if (ext) extensions.add(ext);
-			}
-			if (extensions.size > 0) {
-				batchOptions.inputExtensions = [...extensions];
-			}
-		}
-
 		return this.selectedPreset === 'image-webp'
 			? buildCwebpBatchCommand(this.options, batchOptions)
 			: buildBatchCommand(this.options, batchOptions);
@@ -111,6 +105,44 @@ class CommandStore {
 
 	/** ドロップされたファイル数 */
 	fileCount = $derived(this.droppedFiles.length);
+
+	/** 一括処理の対象件数と対象外拡張子 */
+	batchFileSummary = $derived.by(() => {
+		if (!this.batchMode || !this.selectedPreset) return null;
+
+		const outputExtension = getValidatedOutputExtension(this.options.output.filename);
+		if (!outputExtension) {
+			return {
+				targetCount: 0,
+				excludedCount: this.droppedFiles.length,
+				excludedExtensions: [...new Set(this.droppedFiles.map((file) => getFileExtension(file.name)))]
+			};
+		}
+
+		const allowedExtensions = new Set(
+			resolveBatchInputExtensions(
+				inferBatchOptions(PRESETS[this.selectedPreset]),
+				outputExtension
+			)
+		);
+		let targetCount = 0;
+		const excludedExtensions = new Set<string | null>();
+
+		for (const file of this.droppedFiles) {
+			const extension = getFileExtension(file.name);
+			if (extension && allowedExtensions.has(extension)) {
+				targetCount += 1;
+			} else {
+				excludedExtensions.add(extension);
+			}
+		}
+
+		return {
+			targetCount,
+			excludedCount: this.droppedFiles.length - targetCount,
+			excludedExtensions: [...excludedExtensions]
+		};
+	});
 
 	// ============================================================
 	// アクション
