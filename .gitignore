@@ -57,3 +57,9 @@ CLAUDE.md
 CHANGELOG.md
 skill-creator-max/
 tasks/
+
+# direnv (local env: CODEX_HOME 等)
+.envrc
+
+# Codex 設定（machine-local。ルート直下のみ対象）
+/config.toml
