@@ -95,7 +95,9 @@
 		"cwebpNote": "※ この変換は cwebp（WebP公式ツール）を使用します",
 		"cwebpInstallMac": "brew install webp",
 		"cwebpInstallLinux": "sudo apt install webp",
-		"cwebpInstallWindows": "choco install webp"
+		"cwebpInstallWindows": "choco install webp",
+		"cwebpPreprocessNote": "この入力形式（HEIC/HEIF/AVIF/BMP）は cwebp が直接読めないため、ffmpeg で PNG に変換してから cwebp に渡します。そのため cwebp に加えて ffmpeg のインストールも必要です。変換後に残る「.tmp.png」は削除して問題ありません。透過 AVIF/HEIC は透明部分が失われます。",
+		"cwebpGifNote": "GIF の変換には webp パッケージに同梱の gif2webp を使用します（別途インストール不要）。アニメーションは保持されますが、可逆圧縮のため品質設定は適用されません。サイズを指定した場合のみ ffmpeg も必要になり、残る「.tmp.gif」は削除して問題ありません。"
 	},
 	"dropzone": {
 		"title": "ファイルまたはフォルダをドラッグ＆ドロップ",

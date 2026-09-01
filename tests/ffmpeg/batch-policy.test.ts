@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { buildBatchCommand, buildCwebpBatchCommand } from '../../src/lib/ffmpeg/builder';
 import {
 	AUDIO_INPUT_EXTENSIONS,
+	CWEBP_DIRECT_EXTENSIONS,
 	CWEBP_IMAGE_INPUT_EXTENSIONS,
+	CWEBP_PREPROCESS_EXTENSIONS,
 	PRESETS,
 	VIDEO_INPUT_EXTENSIONS,
 	getFileExtension,
@@ -134,15 +136,29 @@ describe('batch input policy', () => {
 		expect(script.cmd).toContain('(*.heif)');
 	});
 
-	it('CC2-07 limits image-webp inputs to formats supported by cwebp', () => {
+	it('CC2-07 routes image-webp inputs across the three cwebp conversion paths', () => {
 		const batch = inferBatchOptions(PRESETS['image-webp']);
 		expect(batch.inputExtensions).toEqual(CWEBP_IMAGE_INPUT_EXTENSIONS);
-		expect(batch.inputExtensions).not.toEqual(
-			expect.arrayContaining(['heic', 'heif', 'gif', 'bmp'])
+		expect(batch.inputExtensions).toEqual(
+			expect.arrayContaining(['heic', 'heif', 'avif', 'bmp', 'gif'])
 		);
 
 		const script = requireScript(buildCwebpBatchCommand(createOptions('output.webp'), batch));
-		expect(script.bash).not.toMatch(/heic|heif|gif|bmp/);
+
+		// ① 直接 cwebp: png/jpg/jfif/tif/pnm 等はそのまま case パターンに含まれる
+		for (const ext of CWEBP_DIRECT_EXTENSIONS) {
+			expect(script.bash).toContain(ext);
+		}
+
+		// ② ffmpeg → PNG → cwebp: heic/heif/avif/bmp は ffmpeg 前処理を経由する
+		for (const ext of CWEBP_PREPROCESS_EXTENSIONS) {
+			expect(script.bash).toContain(ext);
+		}
+		expect(script.bash).toContain('ffmpeg -nostdin');
+		expect(script.bash).toContain('cwebp -q');
+
+		// ③ gif2webp: gif はアニメ保持のため gif2webp 単独で処理する
+		expect(script.bash).toContain('gif2webp');
 	});
 
 	it('CC2-08 uses video inputs for audio extraction and audio inputs for audio conversion', () => {

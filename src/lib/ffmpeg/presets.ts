@@ -282,8 +282,21 @@ export const FFMPEG_IMAGE_INPUT_EXTENSIONS = [
 	'tif', 'tiff', 'heic', 'heif', 'avif'
 ];
 
+/** ① 直接 cwebp で読める入力形式 */
+export const CWEBP_DIRECT_EXTENSIONS = [
+	'png', 'jpg', 'jpeg', 'jfif', 'tif', 'tiff', 'pnm', 'pgm', 'ppm', 'pam'
+];
+
+/** ② ffmpeg で PNG に変換してから cwebp に渡す入力形式（cwebp が直接読めない） */
+export const CWEBP_PREPROCESS_EXTENSIONS = ['heic', 'heif', 'avif', 'bmp'];
+
+/** ③ gif2webp でアニメーションを保持したまま変換する入力形式 */
+export const CWEBP_GIF_EXTENSIONS = ['gif'];
+
 export const CWEBP_IMAGE_INPUT_EXTENSIONS = [
-	'png', 'jpg', 'jpeg', 'tif', 'tiff', 'pnm', 'pgm', 'ppm', 'pam'
+	...CWEBP_DIRECT_EXTENSIONS,
+	...CWEBP_PREPROCESS_EXTENSIONS,
+	...CWEBP_GIF_EXTENSIONS
 ];
 
 const FORMAT_FAMILIES: Record<string, string> = {
