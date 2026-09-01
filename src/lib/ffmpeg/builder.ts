@@ -19,7 +19,14 @@
  */
 
 import type { FFmpegOptions, BatchOptions, BatchScript, FilterOptions } from './types';
-import { getValidatedOutputExtension, resolveBatchInputExtensions } from './presets';
+import {
+	getFileExtension,
+	getValidatedOutputExtension,
+	resolveBatchInputExtensions,
+	CWEBP_DIRECT_EXTENSIONS,
+	CWEBP_PREPROCESS_EXTENSIONS,
+	CWEBP_GIF_EXTENSIONS
+} from './presets';
 
 // ============================================================
 // メイン関数: 個別コマンド生成
@@ -292,10 +299,12 @@ function buildGifCommands(options: FFmpegOptions): string {
 	const overwrite = options.output.overwrite ? '-y ' : '';
 
 	// パス1: パレット生成
-	const pass1 = `ffmpeg ${overwrite}${inputOpts}-i ${input}${durationOpt} -vf "${filterBase},palettegen" palette.png`;
+	// -nostdin: 2コマンドをまとめてコピペ実行した際、2行目を標準入力として
+	// 読み捨ててしまい無言で失敗する事故を防ぐ（複数コマンドを返す経路のみ付与）
+	const pass1 = `ffmpeg -nostdin ${overwrite}${inputOpts}-i ${input}${durationOpt} -vf "${filterBase},palettegen" palette.png`;
 
 	// パス2: GIF生成（パレット使用）
-	const pass2 = `ffmpeg ${overwrite}${inputOpts}-i ${input} -i palette.png${durationOpt} -lavfi "${filterBase} [x]; [x][1:v] paletteuse" ${output}`;
+	const pass2 = `ffmpeg -nostdin ${overwrite}${inputOpts}-i ${input} -i palette.png${durationOpt} -lavfi "${filterBase} [x]; [x][1:v] paletteuse" ${output}`;
 
 	return `${pass1}\n${pass2}`;
 }
@@ -477,32 +486,89 @@ function buildCmdScript(
 // cwebp コマンド生成（WebP 画像圧縮）
 // ============================================================
 
+/** cwebp -resize（0=自動）の値。null は「リサイズ指定なし」 */
+type CwebpResize = { width: number; height: number } | null;
+
+/** 拡張子を direct / preprocess / gif の3群に分類したもの */
+interface CwebpExtensionGroups {
+	direct: string[];
+	preprocess: string[];
+	gif: string[];
+}
+
+/** filter.scale から cwebp -resize 用の値（0=自動）を計算する */
+function computeCwebpResize(scale: FFmpegOptions['filter']['scale']): CwebpResize {
+	if (!scale || (!scale.width && !scale.height)) return null;
+	const w = scale.width ?? 0;
+	const h = scale.height ?? 0;
+	return { width: w <= 0 ? 0 : w, height: h <= 0 ? 0 : h };
+}
+
+/** cwebp の -resize 値（0=自動）を ffmpeg の -vf scale 値（-1=自動）に変換する */
+function cwebpResizeToFfmpegScale(resize: { width: number; height: number }): string {
+	const w = resize.width <= 0 ? -1 : resize.width;
+	const h = resize.height <= 0 ? -1 : resize.height;
+	return `scale=${w}:${h}`;
+}
+
+/** 拡張子を direct / preprocess / gif の3群に分類する（C6: 空群のアームは呼び出し側で出力しない） */
+function partitionCwebpExtensions(extensions: string[]): CwebpExtensionGroups {
+	return {
+		direct: extensions.filter((ext) => CWEBP_DIRECT_EXTENSIONS.includes(ext)),
+		preprocess: extensions.filter((ext) => CWEBP_PREPROCESS_EXTENSIONS.includes(ext)),
+		gif: extensions.filter((ext) => CWEBP_GIF_EXTENSIONS.includes(ext))
+	};
+}
+
+/** 出力ファイル名から一時ファイル名を生成する（出力ベース名 + .tmp.<ext>、D9） */
+function tmpFilename(outputFilename: string, tmpExt: string): string {
+	const dot = outputFilename.lastIndexOf('.');
+	const base = dot > 0 ? outputFilename.slice(0, dot) : outputFilename;
+	return `${base}.tmp.${tmpExt}`;
+}
+
 /**
  * cwebp コマンドを生成する（単一ファイル）
  *
  * Homebrew の ffmpeg には libwebp が含まれないため、
  * WebP 変換には Google 公式の cwebp コマンドを使用する。
  * インストール: brew install webp (macOS) / sudo apt install webp (Ubuntu)
+ *
+ * 入力形式によって3経路に振り分ける:
+ *   ① 直接 cwebp（png/jpg/jfif/tif/pnm 等）
+ *   ② ffmpeg で PNG に変換してから cwebp（heic/heif/avif/bmp — cwebp が直接読めない）
+ *   ③ gif2webp（gif — アニメーション保持。可逆圧縮のため -q は付けない）
  */
 export function buildCwebpCommand(options: FFmpegOptions): string {
-	const parts: string[] = ['cwebp'];
-
-	// 品質 (-q)
 	const quality = options.video.quality ?? 75;
-	parts.push('-q', String(quality));
+	const inputExt = (getFileExtension(options.input.filename) ?? '').toLowerCase();
+	const input = quoteFilename(options.input.filename);
+	const output = quoteFilename(options.output.filename);
+	const resize = computeCwebpResize(options.filter.scale);
+	const resizeOpts = resize ? ` -resize ${resize.width} ${resize.height}` : '';
 
-	// リサイズ (-resize width height) — -1 は 0（自動算出）にマッピング
-	if (options.filter.scale && (options.filter.scale.width || options.filter.scale.height)) {
-		const w = options.filter.scale.width ?? 0;
-		const h = options.filter.scale.height ?? 0;
-		parts.push('-resize', String(w <= 0 ? 0 : w), String(h <= 0 ? 0 : h));
+	// ② ffmpeg → PNG → cwebp（&& で連鎖: ffmpeg 失敗時に cwebp が空の tmp を読むのを防ぐ, D7）
+	if (CWEBP_PREPROCESS_EXTENSIONS.includes(inputExt)) {
+		const tmp = quoteFilename(tmpFilename(options.output.filename, 'png'));
+		return `ffmpeg -nostdin -y -i ${input} ${tmp} && cwebp -q ${quality}${resizeOpts} ${tmp} -o ${output}`;
 	}
 
-	// 入力ファイル
-	parts.push(quoteFilename(options.input.filename));
+	// ③ gif2webp（アニメ保持。リサイズ指定時のみ ffmpeg で先に scale してから渡す）
+	if (CWEBP_GIF_EXTENSIONS.includes(inputExt)) {
+		if (resize) {
+			const tmp = quoteFilename(tmpFilename(options.output.filename, 'gif'));
+			const scale = cwebpResizeToFfmpegScale(resize);
+			return `ffmpeg -nostdin -y -i ${input} -vf "${scale}" ${tmp} && gif2webp ${tmp} -o ${output}`;
+		}
+		return `gif2webp ${input} -o ${output}`;
+	}
 
-	// 出力ファイル (-o)
-	parts.push('-o', quoteFilename(options.output.filename));
+	// ① 直接 cwebp
+	const parts: string[] = ['cwebp', '-q', String(quality)];
+	if (resize) {
+		parts.push('-resize', String(resize.width), String(resize.height));
+	}
+	parts.push(input, '-o', output);
 
 	return parts.join(' ');
 }
@@ -510,7 +576,8 @@ export function buildCwebpCommand(options: FFmpegOptions): string {
 /**
  * cwebp 一括処理スクリプトを生成する
  *
- * Bash / PowerShell / cmd の3形式で出力。
+ * Bash / PowerShell / cmd の3形式で出力。入力拡張子を direct / preprocess / gif の
+ * 3群に分類し、該当拡張子が1つも無い経路のコマンドは出力しない（C6）。
  */
 export function buildCwebpBatchCommand(options: FFmpegOptions, batch: BatchOptions): BatchScript | null {
 	const outExt = getValidatedOutputExtension(options.output.filename);
@@ -518,29 +585,51 @@ export function buildCwebpBatchCommand(options: FFmpegOptions, batch: BatchOptio
 
 	const quality = options.video.quality ?? 75;
 	const extensions = resolveBatchInputExtensions(batch, outExt);
-	const casePattern = extensions.join('|');
+	const groups = partitionCwebpExtensions(extensions);
+	const resize = computeCwebpResize(options.filter.scale);
 
-	// リサイズオプション
-	let resizeOpts = '';
-	if (options.filter.scale && (options.filter.scale.width || options.filter.scale.height)) {
-		const w = options.filter.scale.width ?? 0;
-		const h = options.filter.scale.height ?? 0;
-		resizeOpts = ` -resize ${w <= 0 ? 0 : w} ${h <= 0 ? 0 : h}`;
-	}
-
-	const bash = buildCwebpBashScript(quality, resizeOpts, casePattern, outExt);
-	const powershell = buildCwebpPowerShellScript(quality, resizeOpts, extensions, outExt);
-	const cmd = buildCwebpCmdScript(quality, resizeOpts, extensions, outExt);
+	const bash = buildCwebpBashScript(quality, resize, groups, outExt);
+	const powershell = buildCwebpPowerShellScript(quality, resize, groups, outExt);
+	const cmd = buildCwebpCmdScript(quality, resize, groups, outExt);
 
 	return { bash, powershell, cmd };
 }
 
 function buildCwebpBashScript(
 	quality: number,
-	resizeOpts: string,
-	casePattern: string,
+	resize: CwebpResize,
+	groups: CwebpExtensionGroups,
 	outExt: string
 ): string {
+	const resizeOpts = resize ? ` -resize ${resize.width} ${resize.height}` : '';
+	const casePattern = [...groups.direct, ...groups.preprocess, ...groups.gif].join('|');
+
+	// 入れ子 case（C2）: 外側で base/out/衝突回避を確定させてから、内側で経路ごとに分岐する
+	const innerArms: string[] = [];
+
+	if (groups.preprocess.length > 0) {
+		innerArms.push(
+			`        ${groups.preprocess.join('|')})`,
+			'          tmp="${out%.*}.tmp.png"',
+			`          ffmpeg -nostdin -y -loglevel error -i "$f" "$tmp" && cwebp -q ${quality}${resizeOpts} "$tmp" -o "$out"`,
+			'          rm -f "$tmp"',
+			'          ;;'
+		);
+	}
+
+	if (groups.gif.length > 0) {
+		const gifBody = resize
+			? [
+					'          tmp="${out%.*}.tmp.gif"',
+					`          ffmpeg -nostdin -y -loglevel error -i "$f" -vf "${cwebpResizeToFfmpegScale(resize)}" "$tmp" && gif2webp "$tmp" -o "$out"`,
+					'          rm -f "$tmp"'
+				]
+			: ['          gif2webp "$f" -o "$out"'];
+		innerArms.push(`        ${groups.gif.join('|')})`, ...gifBody, '          ;;');
+	}
+
+	innerArms.push('        *)', `          cwebp -q ${quality}${resizeOpts} "$f" -o "$out"`, '          ;;');
+
 	const lines: string[] = [
 		'#!/bin/bash',
 		'',
@@ -571,7 +660,9 @@ function buildCwebpBashScript(
 		'      else',
 		'        SEEN_BASES="${SEEN_BASES}\nx${base}"',
 		'      fi',
-		`      cwebp -q ${quality}${resizeOpts} "$f" -o "$out"`,
+		'      case "$ext_lower" in',
+		...innerArms,
+		'      esac',
 		'      ;;',
 		'  esac',
 		'done'
@@ -582,11 +673,50 @@ function buildCwebpBashScript(
 
 function buildCwebpPowerShellScript(
 	quality: number,
-	resizeOpts: string,
-	extensions: string[],
+	resize: CwebpResize,
+	groups: CwebpExtensionGroups,
 	outExt: string
 ): string {
+	const resizeOpts = resize ? ` -resize ${resize.width} ${resize.height}` : '';
+	const extensions = [...groups.direct, ...groups.preprocess, ...groups.gif];
 	const includeFilter = extensions.map((ext) => `"*.${ext}"`).join(', ');
+
+	// switch ($inputExt) の中では $_ は switch の入力値（文字列）を指し、パイプラインの
+	// FileInfo ではなくなるため、switch の前に $file = $_ を捕獲してアーム内で使う（D6）
+	const switchArms: string[] = [];
+
+	if (groups.preprocess.length > 0) {
+		const pattern = groups.preprocess.map((ext) => `'${ext}'`).join(', ');
+		switchArms.push(
+			`      { ${pattern} -contains $_ } {`,
+			'        $tmp = $out -replace "\\.$outputExt$", \'.tmp.png\'',
+			'        ffmpeg -nostdin -y -i $file.FullName $tmp',
+			`        if ($LASTEXITCODE -eq 0) { cwebp -q ${quality}${resizeOpts} $tmp -o $out }`,
+			'        Remove-Item -LiteralPath $tmp -Force -ErrorAction SilentlyContinue',
+			'      }'
+		);
+	}
+
+	if (groups.gif.length > 0) {
+		if (resize) {
+			switchArms.push(
+				"      'gif' {",
+				'        $tmp = $out -replace "\\.$outputExt$", \'.tmp.gif\'',
+				`        ffmpeg -nostdin -y -i $file.FullName -vf "${cwebpResizeToFfmpegScale(resize)}" $tmp`,
+				'        if ($LASTEXITCODE -eq 0) { gif2webp $tmp -o $out }',
+				'        Remove-Item -LiteralPath $tmp -Force -ErrorAction SilentlyContinue',
+				'      }'
+			);
+		} else {
+			switchArms.push("      'gif' {", '        gif2webp $file.FullName -o $out', '      }');
+		}
+	}
+
+	switchArms.push(
+		'      default {',
+		`        cwebp -q ${quality}${resizeOpts} $file.FullName -o $out`,
+		'      }'
+	);
 
 	const lines: string[] = [
 		`$outputExt = "${outExt}"`,
@@ -599,19 +729,57 @@ function buildCwebpPowerShellScript(
 		'    $inputExt = $_.Extension.TrimStart(\'.\').ToLower()',
 		'    $out = Join-Path $outputDir "$($_.BaseName).$outputExt"',
 		'    if (-not $seenBaseNames.Add($_.BaseName)) { $out = Join-Path $outputDir "$($_.BaseName)_$inputExt.$outputExt" }',
-		`    cwebp -q ${quality}${resizeOpts} $_.FullName -o $out`,
+		'    $file = $_',
+		'    switch ($inputExt) {',
+		...switchArms,
+		'    }',
 		'  }'
 	];
 
 	return lines.join('\n');
 }
 
+/** ext の分類に応じた cmd コマンド行を生成する（if 分岐/else 分岐で共用、outBase は拡張子を含まないパス） */
+function cwebpCmdCommandLines(
+	ext: string,
+	groups: CwebpExtensionGroups,
+	quality: number,
+	resize: CwebpResize,
+	outBase: string
+): string[] {
+	const resizeOpts = resize ? ` -resize ${resize.width} ${resize.height}` : '';
+	const out = `"${outBase}.%OUTPUT_EXT%"`;
+
+	if (groups.preprocess.includes(ext)) {
+		const tmp = `"${outBase}.tmp.png"`;
+		return [
+			`ffmpeg -nostdin -y -loglevel error -i "%%f" ${tmp} && cwebp -q ${quality}${resizeOpts} ${tmp} -o ${out}`,
+			`del ${tmp} >nul 2>&1`
+		];
+	}
+
+	if (groups.gif.includes(ext)) {
+		if (resize) {
+			const tmp = `"${outBase}.tmp.gif"`;
+			return [
+				`ffmpeg -nostdin -y -loglevel error -i "%%f" -vf "${cwebpResizeToFfmpegScale(resize)}" ${tmp} && gif2webp ${tmp} -o ${out}`,
+				`del ${tmp} >nul 2>&1`
+			];
+		}
+		return [`gif2webp "%%f" -o ${out}`];
+	}
+
+	return [`cwebp -q ${quality}${resizeOpts} "%%f" -o ${out}`];
+}
+
 function buildCwebpCmdScript(
 	quality: number,
-	resizeOpts: string,
-	extensions: string[],
+	resize: CwebpResize,
+	groups: CwebpExtensionGroups,
 	outExt: string
 ): string {
+	const extensions = [...groups.direct, ...groups.preprocess, ...groups.gif];
+
 	const lines: string[] = [
 		'@echo off',
 		'setlocal DisableDelayedExpansion',
@@ -624,16 +792,18 @@ function buildCwebpCmdScript(
 		''
 	];
 
+	// ffmpeg / gif2webp は必ず if not errorlevel 1 (...) / else (...) の各ブランチ内に置く。
+	// findstr の直後に置くと直前のコマンド終了コードが上書きされ「全ファイル既出」判定になる（C3）
 	for (const ext of extensions) {
 		lines.push(
 			`for %%f in (*.${ext}) do (`,
 			'  findstr /l /x /c:"%%~nf" "%SEEN_FILE%" >nul 2>&1',
 			'  if not errorlevel 1 (',
-			`    cwebp -q ${quality}${resizeOpts} "%%f" -o "%OUTPUT_DIR%\\%%~nf_${ext}.%OUTPUT_EXT%"`,
+			...cwebpCmdCommandLines(ext, groups, quality, resize, `%OUTPUT_DIR%\\%%~nf_${ext}`).map((l) => `    ${l}`),
 			'  ) else (',
 			'    >>"%SEEN_FILE%" <nul set /p "=%%~nf"',
 			'    >>"%SEEN_FILE%" echo(',
-			`    cwebp -q ${quality}${resizeOpts} "%%f" -o "%OUTPUT_DIR%\\%%~nf.%OUTPUT_EXT%"`,
+			...cwebpCmdCommandLines(ext, groups, quality, resize, '%OUTPUT_DIR%\\%%~nf').map((l) => `    ${l}`),
 			'  )',
 			')'
 		);

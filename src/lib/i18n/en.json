@@ -95,7 +95,9 @@
 		"cwebpNote": "Uses cwebp (official WebP tool by Google)",
 		"cwebpInstallMac": "brew install webp",
 		"cwebpInstallLinux": "sudo apt install webp",
-		"cwebpInstallWindows": "choco install webp"
+		"cwebpInstallWindows": "choco install webp",
+		"cwebpPreprocessNote": "cwebp cannot read this input format (HEIC/HEIF/AVIF/BMP) directly, so ffmpeg first converts it to PNG before cwebp runs. This means ffmpeg must be installed in addition to cwebp. The leftover \".tmp.png\" file can be safely deleted. Transparency in AVIF/HEIC inputs will be lost.",
+		"cwebpGifNote": "GIF conversion uses gif2webp, bundled with the webp package (no separate install needed). Animation is preserved, but the quality setting has no effect since the conversion is lossless. ffmpeg is also required when a size is specified, and the leftover \".tmp.gif\" file can be safely deleted."
 	},
 	"dropzone": {
 		"title": "Drag & drop files or folders here",

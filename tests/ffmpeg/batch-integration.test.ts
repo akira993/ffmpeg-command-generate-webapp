@@ -14,7 +14,12 @@ import { basename, delimiter, join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { buildBatchCommand, buildCwebpBatchCommand } from '../../src/lib/ffmpeg/builder';
-import { PRESETS, getValidatedOutputExtension, inferBatchOptions } from '../../src/lib/ffmpeg/presets';
+import {
+	CWEBP_PREPROCESS_EXTENSIONS,
+	PRESETS,
+	getValidatedOutputExtension,
+	inferBatchOptions
+} from '../../src/lib/ffmpeg/presets';
 import type { BatchScript, FFmpegOptions, PresetId } from '../../src/lib/ffmpeg/types';
 
 const temporaryDirectories: string[] = [];
@@ -80,7 +85,7 @@ mkdir -p "$(dirname "$out")"
 : > "$out"
 `;
 
-	for (const name of ['ffmpeg', 'cwebp']) {
+	for (const name of ['ffmpeg', 'cwebp', 'gif2webp']) {
 		const path = join(binDirectory, name);
 		writeFileSync(path, fakeBinary);
 		chmodSync(path, 0o755);
@@ -121,8 +126,10 @@ function expectImageOutputs(fixture: string, outputExtension: string): void {
 
 type FixtureCategory = 'audio' | 'image' | 'video';
 
-const fixtureExtensions: Record<FixtureCategory, readonly [string, string]> = {
-	image: ['jpg', 'png'],
+// image は cwebp の3経路（直接/ffmpeg前処理/gif2webp）を Windows 実行でも踏ませるため
+// heic（②経路）・gif（③経路）・bmp（②経路）を含む。video/audio は既存のまま2拡張子。
+const fixtureExtensions: Record<FixtureCategory, readonly string[]> = {
+	image: ['jpg', 'png', 'heic', 'gif', 'bmp'],
 	video: ['mp4', 'mov'],
 	audio: ['flac', 'wav']
 };
@@ -130,15 +137,16 @@ const fixtureExtensions: Record<FixtureCategory, readonly [string, string]> = {
 function createCategoryFixture(root: string, name: string, category: FixtureCategory): string {
 	const fixture = join(root, name);
 	mkdirSync(fixture);
-	const [firstExtension, secondExtension] = fixtureExtensions[category];
+	const extensions = fixtureExtensions[category];
 
 	for (const baseName of ['sample', 'my holiday']) {
-		writeFileSync(join(fixture, `${baseName}.${firstExtension}`), '');
-		writeFileSync(join(fixture, `${baseName}.${secondExtension}`), '');
+		for (const extension of extensions) {
+			writeFileSync(join(fixture, `${baseName}.${extension}`), '');
+		}
 	}
 	writeFileSync(join(fixture, 'ignored.txt'), '');
 	mkdirSync(join(fixture, 'nested'));
-	writeFileSync(join(fixture, 'nested', `inside.${firstExtension}`), '');
+	writeFileSync(join(fixture, 'nested', `inside.${extensions[0]}`), '');
 	return fixture;
 }
 
@@ -151,18 +159,27 @@ function expectCategoryOutputs(
 	const outputs = readdirSync(outputDirectory).sort();
 	const inputExtensions = fixtureExtensions[category];
 
-	expect(outputs).toHaveLength(4);
+	expect(outputs).toHaveLength(2 * inputExtensions.length);
 	for (const baseName of ['sample', 'my holiday']) {
 		expect(outputs).toContain(`${baseName}.${outputExtension}`);
-		expect(
-			outputs.some(
-				(output) =>
-					output === `${baseName}_${inputExtensions[0]}.${outputExtension}` ||
-					output === `${baseName}_${inputExtensions[1]}.${outputExtension}`
-			)
-		).toBe(true);
+		// 拡張子ごとの走査順は shell によって異なるため、どれが無印になるかは決め打ちしない。
+		// 無印1つ + 残り全てが _ext サフィックス付きであることだけを検証する。
+		const suffixedCount = inputExtensions.filter((extension) =>
+			outputs.includes(`${baseName}_${extension}.${outputExtension}`)
+		).length;
+		expect(suffixedCount).toBe(inputExtensions.length - 1);
 	}
 	expect(outputs).not.toContain(`inside.${outputExtension}`);
+}
+
+/** cwebp 経路では②（ffmpeg+cwebp）だけ拡張子1つにつき2回バイナリが呼ばれる */
+function expectedInvocationCount(tool: 'cwebp' | 'ffmpeg', category: FixtureCategory): number {
+	const extensions = fixtureExtensions[category];
+	const perFileCalls = extensions.reduce((total, extension) => {
+		if (tool === 'ffmpeg') return total + 1;
+		return total + (CWEBP_PREPROCESS_EXTENSIONS.includes(extension) ? 2 : 1);
+	}, 0);
+	return perFileCalls * 2; // 'sample' と 'my holiday' の2 baseName分
 }
 
 describe('generated bash scripts', () => {
@@ -214,14 +231,23 @@ describe('generated bash scripts', () => {
 		);
 		const cwebpCalls = runBashScript(cwebpFixture, cwebpScript.bash, 'cwebp-batch.sh');
 
-		expect(cwebpCalls).toHaveLength(5);
-		expect(cwebpCalls.join('\n')).not.toMatch(/camera\.HEIC|already\.avif|notes\.txt/);
+		// camera.HEIC / already.avif は② ffmpeg→PNG→cwebp 経路に入り、ffmpeg と cwebp の
+		// 2回ずつログされる（5つの直接 cwebp 呼び出し + 2ファイル×2呼び出し = 9, D2）
+		expect(cwebpCalls).toHaveLength(9);
+		expect(cwebpCalls.join('\n')).not.toMatch(/notes\.txt/);
+		expect(cwebpCalls.join('\n')).toContain('-i camera.HEIC');
+		expect(cwebpCalls.join('\n')).toContain('-i already.avif');
 		const outputDirectory = join(cwebpFixture, `${basename(cwebpFixture)}_webp`);
 		expect(existsSync(join(outputDirectory, 'photo.webp'))).toBe(true);
 		expect(existsSync(join(outputDirectory, 'photo_png.webp'))).toBe(true);
 		expect(existsSync(join(outputDirectory, 'my holiday.webp'))).toBe(true);
 		expect(existsSync(join(outputDirectory, 'my holiday_png.webp'))).toBe(true);
 		expect(existsSync(join(outputDirectory, 'upper.webp'))).toBe(true);
+		expect(existsSync(join(outputDirectory, 'camera.webp'))).toBe(true);
+		expect(existsSync(join(outputDirectory, 'already.webp'))).toBe(true);
+		// 一時ファイル (.tmp.png) が削除されていること（C5）
+		expect(existsSync(join(outputDirectory, 'camera.tmp.png'))).toBe(false);
+		expect(existsSync(join(outputDirectory, 'already.tmp.png'))).toBe(false);
 	});
 
 	it('CC4-06 keeps generated outputs identical when the same bash script runs twice', () => {
@@ -367,6 +393,7 @@ Add-Type -TypeDefinition $source -OutputAssembly $OutputPath -OutputType Console
 			expect(compileResult.status, compileResult.stderr).toBe(0);
 			copyFileSync(fakeExecutablePath, join(binDirectory, 'ffmpeg.exe'));
 			copyFileSync(fakeExecutablePath, join(binDirectory, 'cwebp.exe'));
+			copyFileSync(fakeExecutablePath, join(binDirectory, 'gif2webp.exe'));
 		}, windowsTestTimeout);
 
 		afterAll(() => {
@@ -415,7 +442,9 @@ Add-Type -TypeDefinition $source -OutputAssembly $OutputPath -OutputType Console
 
 				expect(result.status, diagnostics).toBe(0);
 				expect(existsSync(fakeLog), diagnostics).toBe(true);
-				expect(readFileSync(fakeLog, 'utf8').trim().split(/\r?\n/), diagnostics).toHaveLength(4);
+				expect(readFileSync(fakeLog, 'utf8').trim().split(/\r?\n/), diagnostics).toHaveLength(
+					expectedInvocationCount(tool, fixtureCategory)
+				);
 				expectCategoryOutputs(fixture, outputExtension, fixtureCategory);
 			},
 			windowsTestTimeout

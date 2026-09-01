@@ -21,6 +21,11 @@ import {
 	buildCwebpBatchCommand,
 	isOptionEmpty
 } from '../../src/lib/ffmpeg/builder';
+import {
+	CWEBP_DIRECT_EXTENSIONS,
+	CWEBP_PREPROCESS_EXTENSIONS,
+	CWEBP_GIF_EXTENSIONS
+} from '../../src/lib/ffmpeg/presets';
 import type { FFmpegOptions, BatchOptions, BatchScript, FilterOptions } from '../../src/lib/ffmpeg/types';
 
 // ─── ヘルパー: デフォルトオプション生成 ──────────────────────────────────────
@@ -334,8 +339,8 @@ describe('buildCommand', () => {
 				filter: { fps: 10, scale: { width: 320, height: -1 } }
 			});
 			const lines = buildCommand(opts).split('\n');
-			expect(lines[0]).toMatch(/^ffmpeg -y /);
-			expect(lines[1]).toMatch(/^ffmpeg -y /);
+			expect(lines[0]).toMatch(/^ffmpeg -nostdin -y /);
+			expect(lines[1]).toMatch(/^ffmpeg -nostdin -y /);
 		});
 
 		it('GIF で -ss と -t が反映される', () => {
@@ -705,6 +710,188 @@ describe('buildCwebpBatchCommand', () => {
 		});
 		const result = requireBatchScript(buildCwebpBatchCommand(opts, batch));
 		expect(result.bash).toContain('-resize 800 600');
+	});
+});
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// WebP 入力形式の3経路振り分け（① 直接 cwebp / ② ffmpeg→PNG→cwebp / ③ gif2webp）
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+describe('buildCwebpCommand の3経路振り分け', () => {
+	it('heic/heif/avif/bmp は ffmpeg → PNG → cwebp を && で連鎖する（② 経路）', () => {
+		for (const ext of CWEBP_PREPROCESS_EXTENSIONS) {
+			const opts = createDefaultOptions({
+				input: { filename: `input.${ext}` },
+				output: { filename: 'output.webp', overwrite: true },
+				video: { quality: 75, noVideo: false }
+			});
+			const cmd = buildCwebpCommand(opts);
+			expect(cmd).toBe(
+				'ffmpeg -nostdin -y -i input.' +
+					ext +
+					' output.tmp.png && cwebp -q 75 output.tmp.png -o output.webp'
+			);
+		}
+	});
+
+	it('gif はリサイズ未指定時 gif2webp 単独（③ 経路）で -q を含まない', () => {
+		const opts = createDefaultOptions({
+			input: { filename: 'input.gif' },
+			output: { filename: 'output.webp', overwrite: true },
+			video: { quality: 75, noVideo: false }
+		});
+		const cmd = buildCwebpCommand(opts);
+		expect(cmd).toBe('gif2webp input.gif -o output.webp');
+		expect(cmd).not.toContain('-q');
+		expect(cmd).not.toContain('ffmpeg');
+	});
+
+	it('gif はリサイズ指定時のみ ffmpeg で scale してから gif2webp に渡し、-q は含まない', () => {
+		const opts = createDefaultOptions({
+			input: { filename: 'input.gif' },
+			output: { filename: 'output.webp', overwrite: true },
+			video: { quality: 75, noVideo: false },
+			filter: { scale: { width: 480, height: -1 } }
+		});
+		const cmd = buildCwebpCommand(opts);
+		expect(cmd).toBe(
+			'ffmpeg -nostdin -y -i input.gif -vf "scale=480:-1" output.tmp.gif && gif2webp output.tmp.gif -o output.webp'
+		);
+		expect(cmd).not.toContain('-q');
+	});
+
+	it('直接 cwebp 経路（① 経路）には -nostdin も && も含まれない', () => {
+		for (const ext of CWEBP_DIRECT_EXTENSIONS) {
+			const opts = createDefaultOptions({
+				input: { filename: `input.${ext}` },
+				output: { filename: 'output.webp', overwrite: true },
+				video: { quality: 75, noVideo: false }
+			});
+			const cmd = buildCwebpCommand(opts);
+			expect(cmd).not.toContain('-nostdin');
+			expect(cmd).not.toContain('&&');
+			expect(cmd).not.toContain('ffmpeg');
+		}
+	});
+
+	it('cwebp / ffmpeg 前処理のいずれのコマンドにも -map が含まれない', () => {
+		const extensions = [...CWEBP_DIRECT_EXTENSIONS, ...CWEBP_PREPROCESS_EXTENSIONS, ...CWEBP_GIF_EXTENSIONS];
+		for (const ext of extensions) {
+			const opts = createDefaultOptions({
+				input: { filename: `input.${ext}` },
+				output: { filename: 'output.webp', overwrite: true },
+				video: { quality: 75, noVideo: false }
+			});
+			expect(buildCwebpCommand(opts)).not.toContain('-map');
+		}
+	});
+});
+
+describe('buildCwebpBatchCommand の3経路振り分け', () => {
+	const fullBatch: BatchOptions = {
+		inputExtensions: [...CWEBP_DIRECT_EXTENSIONS, ...CWEBP_PREPROCESS_EXTENSIONS, ...CWEBP_GIF_EXTENSIONS],
+		allowSameFormatInput: false
+	};
+
+	function buildFullScript(overrides: Partial<{ filter: FFmpegOptions['filter'] }> = {}): BatchScript {
+		const opts = createDefaultOptions({
+			output: { filename: 'output.webp' },
+			video: { quality: 75, noVideo: false },
+			...overrides
+		});
+		return requireBatchScript(buildCwebpBatchCommand(opts, fullBatch));
+	}
+
+	it('bash は入れ子 case で3経路すべてを含む', () => {
+		const script = buildFullScript();
+		expect(script.bash).toContain(`${CWEBP_PREPROCESS_EXTENSIONS.join('|')})`);
+		expect(script.bash).toContain('ffmpeg -nostdin -y -loglevel error');
+		expect(script.bash).toContain(' && cwebp -q 75 ');
+		expect(script.bash).toContain(`${CWEBP_GIF_EXTENSIONS.join('|')})`);
+		expect(script.bash).toContain('gif2webp "$f" -o "$out"');
+		expect(script.bash).toContain('cwebp -q 75 "$f" -o "$out"');
+	});
+
+	it('cmd は拡張子ごとに1ループを維持しつつ経路別コマンドを分岐内に置く', () => {
+		const script = buildFullScript();
+		const loopCount = script.cmd.match(/^for %%f in /gm)?.length ?? 0;
+		expect(loopCount).toBe(fullBatch.inputExtensions.length);
+		for (const ext of CWEBP_PREPROCESS_EXTENSIONS) {
+			expect(script.cmd).toContain(`for %%f in (*.${ext}) do (`);
+		}
+		expect(script.cmd).toContain('for %%f in (*.gif) do (');
+		expect(script.cmd).toContain('gif2webp "%%f"');
+		// ffmpeg/gif2webp が if not errorlevel 1 の直後（findstr の間）に置かれていない
+		expect(script.cmd).not.toMatch(/findstr[^\n]*\n\s*ffmpeg/);
+		expect(script.cmd).not.toMatch(/findstr[^\n]*\n\s*gif2webp/);
+	});
+
+	it('PowerShell は switch ($inputExt) で3経路を分岐し、$file を使い $_. を含まない', () => {
+		const script = buildFullScript();
+		expect(script.powershell).toContain('$file = $_');
+		expect(script.powershell).toContain('switch ($inputExt) {');
+
+		const switchStart = script.powershell.indexOf('switch ($inputExt) {');
+		const switchBody = script.powershell.slice(switchStart);
+		expect(switchBody).not.toContain('$_.');
+		expect(switchBody).toContain('$file.FullName');
+	});
+
+	it('空アーム非出力: 直接系拡張子のみのバッチには ffmpeg も gif2webp も出力しない', () => {
+		const directOnly: BatchOptions = {
+			inputExtensions: [...CWEBP_DIRECT_EXTENSIONS],
+			allowSameFormatInput: false
+		};
+		const opts = createDefaultOptions({
+			output: { filename: 'output.webp' },
+			video: { quality: 75, noVideo: false }
+		});
+		const script = requireBatchScript(buildCwebpBatchCommand(opts, directOnly));
+		for (const target of [script.bash, script.powershell, script.cmd]) {
+			expect(target).not.toContain('ffmpeg');
+			expect(target).not.toContain('gif2webp');
+		}
+	});
+
+	it('空アーム非出力: gif 拡張子のみのバッチ（リサイズ無し）には ffmpeg を出力しない', () => {
+		const gifOnly: BatchOptions = {
+			inputExtensions: [...CWEBP_GIF_EXTENSIONS],
+			allowSameFormatInput: false
+		};
+		const opts = createDefaultOptions({
+			output: { filename: 'output.webp' },
+			video: { quality: 75, noVideo: false }
+		});
+		const script = requireBatchScript(buildCwebpBatchCommand(opts, gifOnly));
+		for (const target of [script.bash, script.powershell, script.cmd]) {
+			expect(target).not.toContain('ffmpeg');
+			expect(target).toContain('gif2webp');
+		}
+	});
+
+	it('GIF の行に -q が含まれない（D1: gif2webp は可逆圧縮のため品質設定は無効）', () => {
+		const script = buildFullScript();
+		for (const line of script.bash.split('\n')) {
+			if (line.includes('gif2webp')) {
+				expect(line).not.toContain('-q');
+			}
+		}
+		for (const line of script.cmd.split('\r\n')) {
+			if (line.includes('gif2webp')) {
+				expect(line).not.toContain('-q');
+			}
+		}
+	});
+
+	it('GIF はリサイズ有無で生成される形が変わる', () => {
+		const withoutResize = buildFullScript();
+		expect(withoutResize.bash).toContain('gif2webp "$f" -o "$out"');
+		expect(withoutResize.bash).not.toContain('.tmp.gif');
+
+		const withResize = buildFullScript({ filter: { scale: { width: 480, height: -1 } } });
+		expect(withResize.bash).toContain('.tmp.gif');
+		expect(withResize.bash).toContain('scale=480:-1');
+		expect(withResize.bash).toContain('&& gif2webp "$tmp" -o "$out"');
 	});
 });
 
