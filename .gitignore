@@ -71,8 +71,8 @@ tasks/
 /.yomiyasu/
 /.direnv/
 /.orca-report.md
-/.envrc.local
-/.dev.vars
+.envrc.local
+.dev.vars
 /.mcp.json
 /.yomiyasu-words/allow.txt
 /.yomiyasu-words/flag.txt
