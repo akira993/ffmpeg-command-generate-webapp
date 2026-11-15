@@ -88,8 +88,6 @@ tasks/
 /scripts/check-map-equivalence.py
 /scripts/check-section-refs-test.py
 /scripts/check-section-refs.py
-/scripts/check-version-test.py
-/scripts/check-version.py
 /scripts/hooks/pre-push
 /scripts/pre-push-test.py
 /scripts/resolve-audit-scope-test.py
