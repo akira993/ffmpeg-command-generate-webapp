@@ -63,3 +63,39 @@ tasks/
 
 # Codex 設定（machine-local。ルート直下のみ対象）
 /config.toml
+
+# 非公開のまま手元だけに置く開発用の資料と検査の台本
+/bak/
+/scripts/__pycache__/
+/.codegraph/
+/.yomiyasu/
+/.direnv/
+/.orca-report.md
+/.envrc.local
+/.dev.vars
+/.mcp.json
+/.yomiyasu-words/allow.txt
+/.yomiyasu-words/flag.txt
+/AGENTS.md
+/CONTEXT.md
+/PHILOSOPHY.md
+/mdrg.toml
+/scripts/audit-due-test.py
+/scripts/audit-due.py
+/scripts/check-docs-test.py
+/scripts/check-docs.py
+/scripts/check-map-equivalence-test.py
+/scripts/check-map-equivalence.py
+/scripts/check-section-refs-test.py
+/scripts/check-section-refs.py
+/scripts/check-version-test.py
+/scripts/check-version.py
+/scripts/hooks/pre-push
+/scripts/pre-push-test.py
+/scripts/resolve-audit-scope-test.py
+/scripts/resolve-audit-scope.py
+/scripts/startup-probe-test.py
+/scripts/startup-probe.py
+/scripts/sync-docaudit-map-test.py
+/scripts/sync-docaudit-map.py
+/scripts/templates/CONTEXT.md.tmpl
