@@ -79,7 +79,6 @@ tasks/
 /AGENTS.md
 /CONTEXT.md
 /PHILOSOPHY.md
-/mdrg.toml
 /scripts/audit-due-test.py
 /scripts/audit-due.py
 /scripts/check-docs-test.py
@@ -96,4 +95,3 @@ tasks/
 /scripts/startup-probe.py
 /scripts/sync-docaudit-map-test.py
 /scripts/sync-docaudit-map.py
-/scripts/templates/CONTEXT.md.tmpl
