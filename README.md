@@ -30,9 +30,9 @@ GUIで簡単にFFmpegコマンドを生成するWebアプリ。
 |------|-----------|
 | SvelteKit | 2.x |
 | Svelte | 5.x (Runes) |
-| TypeScript | 5.x |
+| TypeScript | 6.x |
 | Tailwind CSS | 4.x |
-| Vite | 7.x |
+| Vite | 8.x |
 | UI コンポーネント | 独自実装（CVA + Svelte 5 Runes） |
 | @lucide/svelte | latest |
 | sveltekit-i18n | latest |
@@ -94,7 +94,7 @@ static/
 ├── manifest.webmanifest  # PWA マニフェスト
 ├── icons/                # PWA アイコン（192/512px 標準+マスカブル、180px apple-touch-icon）
 ├── fonts/                # セルフホスト woff2（Noto Sans JP / Inter）
-├── og/                   # OGP 画像（ホーム・About × JA/EN）
+├── og-*.png              # OGP 画像（ホーム・About × JA/EN）
 ├── sitemap.xml           # サイトマップ
 └── robots.txt            # クローラ設定
 tests/
