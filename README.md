@@ -102,8 +102,7 @@ tests/
 scripts/
 ├── lint-css.sh           # CSS oklch ルール CI スクリプト
 ├── subset-fonts.py       # Web フォントサブセット化
-├── generate-pwa-icons.mjs  # PWA アイコン生成（sharp）
-└── jp-chars.txt          # サブセット対象の日本語文字リスト
+└── generate-pwa-icons.mjs  # PWA アイコン生成（sharp）
 .storybook/               # Storybook 設定（main.ts, preview.ts）
 ```
 
