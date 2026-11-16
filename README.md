@@ -1,11 +1,3 @@
----
-title: "FFmpeg Command Generator"
-description: "GUIで簡単にFFmpegコマンドを生成するWebアプリ"
-category: "root"
-created: "2026-02-16"
-updated: "2026-03-18"
----
-
 # FFmpeg Command Generator
 
 GUIで簡単にFFmpegコマンドを生成するWebアプリ。
@@ -47,7 +39,7 @@ GUIで簡単にFFmpegコマンドを生成するWebアプリ。
 | Vitest | 4.x |
 | Storybook | 10.x |
 
-> UI コンポーネントは [RabeeUI パターン](docs/migration/rabeeui-migration-report.md)（CVA + Context API）で独自実装しています。bits-ui / shadcn-svelte は使用していません。
+> UI コンポーネントは RabeeUI パターン（CVA + Context API）で独自実装しています。bits-ui / shadcn-svelte は使用していません。
 
 ## Getting Started
 
@@ -114,27 +106,6 @@ scripts/
 └── jp-chars.txt          # サブセット対象の日本語文字リスト
 .storybook/               # Storybook 設定（main.ts, preview.ts）
 ```
-
-## Documentation
-
-| ドキュメント | 内容 |
-|-------------|------|
-| [docs/design/requirements.md](docs/design/requirements.md) | 要件定義 |
-| [docs/design/basic-design.md](docs/design/basic-design.md) | 基本設計 |
-| [docs/design/detailed-design.md](docs/design/detailed-design.md) | 詳細設計 |
-| [docs/design/css-design.md](docs/design/css-design.md) | CSS設計（oklchカラー・テーマ） |
-| [docs/design/compact-mode-design.md](docs/design/compact-mode-design.md) | PWA コンパクトモード設計 |
-| [docs/design/chrome-extension-design.md](docs/design/chrome-extension-design.md) | Chrome 拡張機能リサイザー設計 |
-| [docs/guides/onboarding-guide.md](docs/guides/onboarding-guide.md) | 初めて使う人向けガイドUX |
-| [docs/testing/test-design.md](docs/testing/test-design.md) | テスト設計 |
-| [docs/testing/test-manual.md](docs/testing/test-manual.md) | 手動テスト手順 |
-| [docs/deploy/deployment.md](docs/deploy/deployment.md) | デプロイ・CI/CD |
-| [docs/seo/seo-llmo-design.md](docs/seo/seo-llmo-design.md) | SEO / LLM 最適化設計 |
-| [docs/seo/seo-external-setup.md](docs/seo/seo-external-setup.md) | SEO 外部サービス設定 |
-| [docs/migration/rabeeui-migration-report.md](docs/migration/rabeeui-migration-report.md) | RabeeUI 移行レポート（bits-ui 排除） |
-| [docs/migration/typescript-6.0-migration-plan.md](docs/migration/typescript-6.0-migration-plan.md) | TypeScript 6.0 移行計画 |
-| [docs/migration/vite-8.0-migration-plan.md](docs/migration/vite-8.0-migration-plan.md) | Vite 8.0 移行計画 |
-| [CHANGELOG.md](CHANGELOG.md) | 変更履歴 |
 
 ## CSS Rules (Enforced by CI)
 
