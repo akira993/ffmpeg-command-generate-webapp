@@ -1,0 +1,25 @@
+{
+	"useTabs": true,
+	"singleQuote": true,
+	"ignorePatterns": [
+		"**/*.svelte",
+		"**/*.css",
+		"**/*.scss",
+		"**/*.less",
+		"**/*.json",
+		"**/*.jsonc",
+		"**/*.json5",
+		"**/*.md",
+		"**/*.markdown",
+		"**/*.mdx",
+		"**/*.yml",
+		"**/*.yaml",
+		"**/*.html",
+		"**/*.svg",
+		"**/*.toml",
+		"**/*.graphql",
+		"**/*.gql",
+		"package-lock.json",
+		"static/**"
+	]
+}

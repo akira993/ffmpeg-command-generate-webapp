@@ -13,12 +13,12 @@ const preview: Preview = {
 		controls: {
 			matchers: {
 				color: /(background|color)$/i,
-				date: /Date$/i
-			}
+				date: /Date$/i,
+			},
 		},
 		a11y: {
-			test: 'todo'
-		}
+			test: 'todo',
+		},
 	},
 	globalTypes: {
 		theme: {
@@ -27,8 +27,8 @@ const preview: Preview = {
 				title: 'Theme',
 				icon: 'paintbrush',
 				items: ['light', 'dark'],
-				dynamicTitle: true
-			}
+				dynamicTitle: true,
+			},
 		},
 		locale: {
 			description: 'Locale',
@@ -36,13 +36,13 @@ const preview: Preview = {
 				title: 'Locale',
 				icon: 'globe',
 				items: ['ja', 'en'],
-				dynamicTitle: true
-			}
-		}
+				dynamicTitle: true,
+			},
+		},
 	},
 	initialGlobals: {
 		theme: 'light',
-		locale: 'ja'
+		locale: 'ja',
 	},
 	decorators: [
 		(storyFn, context) => {
@@ -66,8 +66,8 @@ const preview: Preview = {
 			});
 
 			return storyFn();
-		}
-	]
+		},
+	],
 };
 
 export default preview;

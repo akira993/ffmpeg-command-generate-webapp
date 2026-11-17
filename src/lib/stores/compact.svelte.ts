@@ -30,7 +30,7 @@ class CompactStore {
 		} else {
 			this.previousSize = {
 				width: window.outerWidth,
-				height: window.outerHeight
+				height: window.outerHeight,
 			};
 			const { width, height } = this.calculateCompactSize();
 			window.resizeTo(width, height);

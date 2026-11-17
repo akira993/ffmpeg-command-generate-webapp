@@ -12,15 +12,20 @@ import type {
 	FileInfo,
 	BatchOptions,
 	BatchScript,
-	ScriptType
+	ScriptType,
 } from '#lib/ffmpeg/types.js';
-import { buildCommand, buildBatchCommand, buildCwebpCommand, buildCwebpBatchCommand } from '#lib/ffmpeg/builder.js';
+import {
+	buildCommand,
+	buildBatchCommand,
+	buildCwebpCommand,
+	buildCwebpBatchCommand,
+} from '#lib/ffmpeg/builder.js';
 import {
 	PRESETS,
 	getFileExtension,
 	getValidatedOutputExtension,
 	inferBatchOptions,
-	resolveBatchInputExtensions
+	resolveBatchInputExtensions,
 } from '#lib/ffmpeg/presets.js';
 
 // ============================================================
@@ -34,7 +39,7 @@ function createDefaultOptions(): FFmpegOptions {
 		video: { noVideo: false },
 		audio: { noAudio: false },
 		filter: {},
-		misc: { stripMetadata: false, copyStreams: false }
+		misc: { stripMetadata: false, copyStreams: false },
 	};
 }
 
@@ -81,7 +86,7 @@ class CommandStore {
 	commandString = $derived(
 		this.selectedPreset === 'image-webp'
 			? buildCwebpCommand(this.options)
-			: buildCommand(this.options)
+			: buildCommand(this.options),
 	);
 
 	/** 一括処理スクリプト（batchMode時、WebP プリセット時は cwebp を使用） */
@@ -115,15 +120,14 @@ class CommandStore {
 			return {
 				targetCount: 0,
 				excludedCount: this.droppedFiles.length,
-				excludedExtensions: [...new Set(this.droppedFiles.map((file) => getFileExtension(file.name)))]
+				excludedExtensions: [
+					...new Set(this.droppedFiles.map((file) => getFileExtension(file.name))),
+				],
 			};
 		}
 
 		const allowedExtensions = new Set(
-			resolveBatchInputExtensions(
-				inferBatchOptions(PRESETS[this.selectedPreset]),
-				outputExtension
-			)
+			resolveBatchInputExtensions(inferBatchOptions(PRESETS[this.selectedPreset]), outputExtension),
 		);
 		let targetCount = 0;
 		const excludedExtensions = new Set<string | null>();
@@ -140,7 +144,7 @@ class CommandStore {
 		return {
 			targetCount,
 			excludedCount: this.droppedFiles.length - targetCount,
-			excludedExtensions: [...excludedExtensions]
+			excludedExtensions: [...excludedExtensions],
 		};
 	});
 

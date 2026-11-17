@@ -7,7 +7,7 @@ import {
 	readFileSync,
 	readdirSync,
 	rmSync,
-	writeFileSync
+	writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { basename, delimiter, join } from 'node:path';
@@ -18,7 +18,7 @@ import {
 	CWEBP_PREPROCESS_EXTENSIONS,
 	PRESETS,
 	getValidatedOutputExtension,
-	inferBatchOptions
+	inferBatchOptions,
 } from '../../src/lib/ffmpeg/presets';
 import type { BatchScript, FFmpegOptions, PresetId } from '../../src/lib/ffmpeg/types';
 
@@ -37,7 +37,7 @@ function createOptions(outputFilename: string): FFmpegOptions {
 		video: { codec: 'libsvtav1', crf: 30, noVideo: false },
 		audio: { noAudio: true },
 		filter: {},
-		misc: { stripMetadata: false, copyStreams: false }
+		misc: { stripMetadata: false, copyStreams: false },
 	};
 }
 
@@ -66,7 +66,7 @@ function createFixture(): string {
 		'already.avif',
 		'notes.txt',
 		'README',
-		'bad.jp$'
+		'bad.jp$',
 	]) {
 		writeFileSync(join(fixture, filename), '');
 	}
@@ -106,8 +106,8 @@ function runBashScript(fixture: string, script: string, filename: string): strin
 		env: {
 			...process.env,
 			PATH: `${binDirectory}${delimiter}${process.env.PATH ?? ''}`,
-			FAKE_LOG: logPath
-		}
+			FAKE_LOG: logPath,
+		},
 	});
 	expect(result.status, result.stderr).toBe(0);
 	return readFileSync(logPath, 'utf8').trim().split('\n');
@@ -131,7 +131,7 @@ type FixtureCategory = 'audio' | 'image' | 'video';
 const fixtureExtensions: Record<FixtureCategory, readonly string[]> = {
 	image: ['jpg', 'png', 'heic', 'gif', 'bmp'],
 	video: ['mp4', 'mov'],
-	audio: ['flac', 'wav']
+	audio: ['flac', 'wav'],
 };
 
 function createCategoryFixture(root: string, name: string, category: FixtureCategory): string {
@@ -153,7 +153,7 @@ function createCategoryFixture(root: string, name: string, category: FixtureCate
 function expectCategoryOutputs(
 	fixture: string,
 	outputExtension: string,
-	category: FixtureCategory
+	category: FixtureCategory,
 ): void {
 	const outputDirectory = join(fixture, `${basename(fixture)}_${outputExtension}`);
 	const outputs = readdirSync(outputDirectory).sort();
@@ -165,7 +165,7 @@ function expectCategoryOutputs(
 		// 拡張子ごとの走査順は shell によって異なるため、どれが無印になるかは決め打ちしない。
 		// 無印1つ + 残り全てが _ext サフィックス付きであることだけを検証する。
 		const suffixedCount = inputExtensions.filter((extension) =>
-			outputs.includes(`${baseName}_${extension}.${outputExtension}`)
+			outputs.includes(`${baseName}_${extension}.${outputExtension}`),
 		).length;
 		expect(suffixedCount).toBe(inputExtensions.length - 1);
 	}
@@ -185,16 +185,13 @@ function expectedInvocationCount(tool: 'cwebp' | 'ffmpeg', category: FixtureCate
 describe('generated bash scripts', () => {
 	it('CC4-02 passes bash -n syntax validation', () => {
 		const ffmpegScript = requireScript(
-			buildBatchCommand(
-				createOptions('output.avif'),
-				inferBatchOptions(PRESETS['image-convert'])
-			)
+			buildBatchCommand(createOptions('output.avif'), inferBatchOptions(PRESETS['image-convert'])),
 		);
 		const cwebpScript = requireScript(
 			buildCwebpBatchCommand(
 				createOptions('output.webp'),
-				inferBatchOptions(PRESETS['image-webp'])
-			)
+				inferBatchOptions(PRESETS['image-webp']),
+			),
 		);
 
 		for (const script of [ffmpegScript.bash, cwebpScript.bash]) {
@@ -209,10 +206,7 @@ describe('generated bash scripts', () => {
 	it('CC4-03 executes fixtures with fake ffmpeg and cwebp binaries without skips', () => {
 		const ffmpegFixture = createFixture();
 		const ffmpegScript = requireScript(
-			buildBatchCommand(
-				createOptions('output.avif'),
-				inferBatchOptions(PRESETS['image-convert'])
-			)
+			buildBatchCommand(createOptions('output.avif'), inferBatchOptions(PRESETS['image-convert'])),
 		);
 		const ffmpegCalls = runBashScript(ffmpegFixture, ffmpegScript.bash, 'ffmpeg-batch.sh');
 
@@ -226,8 +220,8 @@ describe('generated bash scripts', () => {
 		const cwebpScript = requireScript(
 			buildCwebpBatchCommand(
 				createOptions('output.webp'),
-				inferBatchOptions(PRESETS['image-webp'])
-			)
+				inferBatchOptions(PRESETS['image-webp']),
+			),
 		);
 		const cwebpCalls = runBashScript(cwebpFixture, cwebpScript.bash, 'cwebp-batch.sh');
 
@@ -256,22 +250,22 @@ describe('generated bash scripts', () => {
 				script: requireScript(
 					buildBatchCommand(
 						createOptions('output.avif'),
-						inferBatchOptions(PRESETS['image-convert'])
-					)
+						inferBatchOptions(PRESETS['image-convert']),
+					),
 				).bash,
 				outputExtension: 'avif',
-				filename: 'ffmpeg-idempotent.sh'
+				filename: 'ffmpeg-idempotent.sh',
 			},
 			{
 				script: requireScript(
 					buildCwebpBatchCommand(
 						createOptions('output.webp'),
-						inferBatchOptions(PRESETS['image-webp'])
-					)
+						inferBatchOptions(PRESETS['image-webp']),
+					),
 				).bash,
 				outputExtension: 'webp',
-				filename: 'cwebp-idempotent.sh'
-			}
+				filename: 'cwebp-idempotent.sh',
+			},
 		];
 
 		for (const { script, outputExtension, filename } of scripts) {
@@ -283,7 +277,7 @@ describe('generated bash scripts', () => {
 				'cash$money.jpg',
 				'cash$money.png',
 				'bracket[1].jpg',
-				'bracket[1].png'
+				'bracket[1].png',
 			]) {
 				writeFileSync(join(fixture, specialName), '');
 			}
@@ -304,8 +298,8 @@ describe('generated bash scripts', () => {
 					`cash$money.${outputExtension}`,
 					`cash$money_png.${outputExtension}`,
 					`bracket[1].${outputExtension}`,
-					`bracket[1]_png.${outputExtension}`
-				])
+					`bracket[1]_png.${outputExtension}`,
+				]),
 			);
 		}
 	});
@@ -325,10 +319,10 @@ if (process.platform === 'win32') {
 		{ id: 'gif-generate', fixtureCategory: 'video', tool: 'ffmpeg' },
 		{ id: 'audio-extract', fixtureCategory: 'video', tool: 'ffmpeg' },
 		{ id: 'audio-convert', fixtureCategory: 'audio', tool: 'ffmpeg' },
-		{ id: 'image-webp', fixtureCategory: 'image', tool: 'cwebp' }
+		{ id: 'image-webp', fixtureCategory: 'image', tool: 'cwebp' },
 	];
 	const testCases = presetCases.flatMap((presetCase) =>
-		(['powershell', 'cmd'] as const).map((shell) => ({ ...presetCase, shell }))
+		(['powershell', 'cmd'] as const).map((shell) => ({ ...presetCase, shell })),
 	);
 
 	describe('CC4-04 executes generated Windows scripts', () => {
@@ -368,14 +362,14 @@ public static class FakeMediaTool
         return 0;
     }
 }
-`
+`,
 			);
 			writeFileSync(
 				compileScriptPath,
 				`param([string]$SourcePath, [string]$OutputPath)
 $source = Get-Content -LiteralPath $SourcePath -Raw
 Add-Type -TypeDefinition $source -OutputAssembly $OutputPath -OutputType ConsoleApplication
-`
+`,
 			);
 			const compileResult = spawnSync(
 				'powershell.exe',
@@ -386,9 +380,9 @@ Add-Type -TypeDefinition $source -OutputAssembly $OutputPath -OutputType Console
 					'-File',
 					compileScriptPath,
 					fakeSourcePath,
-					fakeExecutablePath
+					fakeExecutablePath,
 				],
-				{ encoding: 'utf8' }
+				{ encoding: 'utf8' },
 			);
 			expect(compileResult.status, compileResult.stderr).toBe(0);
 			copyFileSync(fakeExecutablePath, join(binDirectory, 'ffmpeg.exe'));
@@ -409,14 +403,11 @@ Add-Type -TypeDefinition $source -OutputAssembly $OutputPath -OutputType Console
 				const script = requireScript(
 					tool === 'cwebp'
 						? buildCwebpBatchCommand(options, inferBatchOptions(preset))
-						: buildBatchCommand(options, inferBatchOptions(preset))
+						: buildBatchCommand(options, inferBatchOptions(preset)),
 				);
 				const fixture = createCategoryFixture(root, `${id}-${shell}`, fixtureCategory);
 				const fakeLog = join(root, `${id}-${shell}.log`);
-				const scriptPath = join(
-					root,
-					`${id}-${shell}.${shell === 'powershell' ? 'ps1' : 'cmd'}`
-				);
+				const scriptPath = join(root, `${id}-${shell}.${shell === 'powershell' ? 'ps1' : 'cmd'}`);
 				writeFileSync(scriptPath, script[shell]);
 				const command = shell === 'powershell' ? 'powershell.exe' : 'cmd.exe';
 				const args =
@@ -429,25 +420,25 @@ Add-Type -TypeDefinition $source -OutputAssembly $OutputPath -OutputType Console
 					env: {
 						...process.env,
 						PATH: `${binDirectory}${delimiter}${process.env.PATH ?? ''}`,
-						FAKE_LOG: fakeLog
-					}
+						FAKE_LOG: fakeLog,
+					},
 				});
 				const diagnostics = JSON.stringify({
 					preset: id,
 					shell,
 					status: result.status,
 					stdout: result.stdout,
-					stderr: result.stderr
+					stderr: result.stderr,
 				});
 
 				expect(result.status, diagnostics).toBe(0);
 				expect(existsSync(fakeLog), diagnostics).toBe(true);
 				expect(readFileSync(fakeLog, 'utf8').trim().split(/\r?\n/), diagnostics).toHaveLength(
-					expectedInvocationCount(tool, fixtureCategory)
+					expectedInvocationCount(tool, fixtureCategory),
 				);
 				expectCategoryOutputs(fixture, outputExtension, fixtureCategory);
 			},
-			windowsTestTimeout
+			windowsTestTimeout,
 		);
 	});
 }

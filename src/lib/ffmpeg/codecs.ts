@@ -19,7 +19,7 @@ export const VIDEO_CODEC_LABELS: Record<VideoCodec, string> = {
 	'libvpx-vp9': 'VP9 (libvpx-vp9)',
 	libsvtav1: 'AV1 (SVT-AV1)',
 	libwebp: 'WebP (libwebp)',
-	copy: 'コピー（再エンコードなし）'
+	copy: 'コピー（再エンコードなし）',
 };
 
 /** 音声コーデック表示名 */
@@ -30,7 +30,7 @@ export const AUDIO_CODEC_LABELS: Record<AudioCodec, string> = {
 	libvorbis: 'Vorbis (libvorbis)',
 	flac: 'FLAC',
 	pcm_s16le: 'PCM (非圧縮)',
-	copy: 'コピー（再エンコードなし）'
+	copy: 'コピー（再エンコードなし）',
 };
 
 // ============================================================
@@ -66,7 +66,7 @@ export const CODEC_FORMAT_COMPAT: Record<string, string[]> = {
 	libopus: ['ogg', 'webm', 'mkv', 'opus'],
 	libvorbis: ['ogg', 'webm', 'mkv'],
 	flac: ['flac', 'mkv'],
-	pcm_s16le: ['wav', 'mkv']
+	pcm_s16le: ['wav', 'mkv'],
 };
 
 /** 音声コーデックと映像コーデックの推奨ペア */
@@ -75,7 +75,7 @@ export const RECOMMENDED_AUDIO_CODEC: Partial<Record<VideoCodec, AudioCodec>> = 
 	libx265: 'aac',
 	libvpx: 'libvorbis',
 	'libvpx-vp9': 'libopus',
-	libsvtav1: 'libopus'
+	libsvtav1: 'libopus',
 };
 
 // ============================================================
@@ -95,7 +95,7 @@ export const AVIF_DEFAULTS = {
 	crf: 30,
 	pixFmt: 'yuv420p10le' as PixelFormat,
 	/** CRF範囲: 1(最高品質) ~ 63(最低品質) */
-	crfRange: { min: 1, max: 63 }
+	crfRange: { min: 1, max: 63 },
 } as const;
 
 // ============================================================
@@ -124,7 +124,7 @@ export const SVT_AV1_DEFAULTS = {
 	/** CRF範囲: 1(最高品質) ~ 63(最低品質) */
 	crfRange: { min: 1, max: 63 },
 	/** preset範囲: 0(最遅/高品質) ~ 13(最速) — 推奨は4-8 */
-	presetRange: { min: 0, max: 13 }
+	presetRange: { min: 0, max: 13 },
 } as const;
 
 // ============================================================
@@ -144,7 +144,7 @@ export const WEBP_DEFAULTS = {
 	codec: 'libwebp' as VideoCodec,
 	quality: 75,
 	/** quality範囲: 0(最低品質) ~ 100(最高品質) */
-	qualityRange: { min: 0, max: 100 }
+	qualityRange: { min: 0, max: 100 },
 } as const;
 
 // ============================================================
@@ -156,7 +156,7 @@ export const H264_DEFAULTS = {
 	crf: 23,
 	preset: 'medium' as EncoderPreset,
 	pixFmt: 'yuv420p' as PixelFormat,
-	crfRange: { min: 0, max: 51 }
+	crfRange: { min: 0, max: 51 },
 } as const;
 
 export const H265_DEFAULTS = {
@@ -164,7 +164,7 @@ export const H265_DEFAULTS = {
 	crf: 28,
 	preset: 'medium' as EncoderPreset,
 	pixFmt: 'yuv420p10le' as PixelFormat,
-	crfRange: { min: 0, max: 51 }
+	crfRange: { min: 0, max: 51 },
 } as const;
 
 // ============================================================
@@ -181,7 +181,7 @@ export const H265_DEFAULTS = {
  *   libwebp — ❌ Homebrew ffmpeg に未同梱（cwebp を代替使用）
  */
 export const NON_DEFAULT_VIDEO_CODECS: Set<string> = new Set([
-	'libwebp' // Homebrew ffmpeg に未同梱。WebP変換は cwebp を推奨
+	'libwebp', // Homebrew ffmpeg に未同梱。WebP変換は cwebp を推奨
 ]);
 
 /**
@@ -194,7 +194,7 @@ export const NON_DEFAULT_VIDEO_CODECS: Set<string> = new Set([
  *   libvorbis — ❌ Homebrew ffmpeg に未同梱
  */
 export const NON_DEFAULT_AUDIO_CODECS: Set<string> = new Set([
-	'libvorbis' // Homebrew ffmpeg に未同梱
+	'libvorbis', // Homebrew ffmpeg に未同梱
 ]);
 
 // ============================================================
@@ -230,5 +230,5 @@ export const EXTENSION_TO_TYPE: Record<string, 'video' | 'audio' | 'image'> = {
 	avif: 'image',
 	tiff: 'image',
 	bmp: 'image',
-	gif: 'image'
+	gif: 'image',
 };

@@ -6,7 +6,7 @@ const CACHE = `cache-${version}`;
 
 // immutable は旧 build、assets は旧 files。パスは base 相対なので、pathname と比較できるよう先頭の / を足す。
 const ASSETS = [...immutable, ...assets].map((file) =>
-	file.path.startsWith('/') ? file.path : `/${file.path}`
+	file.path.startsWith('/') ? file.path : `/${file.path}`,
 );
 
 self.addEventListener('install', (event) => {

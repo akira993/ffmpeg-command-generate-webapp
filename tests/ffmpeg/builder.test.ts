@@ -19,32 +19,39 @@ import {
 	buildCwebpCommand,
 	buildBatchCommand,
 	buildCwebpBatchCommand,
-	isOptionEmpty
+	isOptionEmpty,
 } from '../../src/lib/ffmpeg/builder';
 import {
 	CWEBP_DIRECT_EXTENSIONS,
 	CWEBP_PREPROCESS_EXTENSIONS,
-	CWEBP_GIF_EXTENSIONS
+	CWEBP_GIF_EXTENSIONS,
 } from '../../src/lib/ffmpeg/presets';
-import type { FFmpegOptions, BatchOptions, BatchScript, FilterOptions } from '../../src/lib/ffmpeg/types';
+import type {
+	FFmpegOptions,
+	BatchOptions,
+	BatchScript,
+	FilterOptions,
+} from '../../src/lib/ffmpeg/types';
 
 // ─── ヘルパー: デフォルトオプション生成 ──────────────────────────────────────
 
-function createDefaultOptions(overrides: Partial<{
-	input: Partial<FFmpegOptions['input']>;
-	output: Partial<FFmpegOptions['output']>;
-	video: Partial<FFmpegOptions['video']>;
-	audio: Partial<FFmpegOptions['audio']>;
-	filter: Partial<FFmpegOptions['filter']>;
-	misc: Partial<FFmpegOptions['misc']>;
-}> = {}): FFmpegOptions {
+function createDefaultOptions(
+	overrides: Partial<{
+		input: Partial<FFmpegOptions['input']>;
+		output: Partial<FFmpegOptions['output']>;
+		video: Partial<FFmpegOptions['video']>;
+		audio: Partial<FFmpegOptions['audio']>;
+		filter: Partial<FFmpegOptions['filter']>;
+		misc: Partial<FFmpegOptions['misc']>;
+	}> = {},
+): FFmpegOptions {
 	return {
 		input: { filename: 'input.mp4', ...overrides.input },
 		output: { filename: 'output.mp4', overwrite: true, ...overrides.output },
 		video: { noVideo: false, ...overrides.video },
 		audio: { noAudio: false, ...overrides.audio },
 		filter: { ...overrides.filter },
-		misc: { stripMetadata: false, copyStreams: false, ...overrides.misc }
+		misc: { stripMetadata: false, copyStreams: false, ...overrides.misc },
 	};
 }
 
@@ -78,7 +85,7 @@ describe('buildCommand', () => {
 				video: { codec: 'libx264', crf: 23, noVideo: false },
 				audio: { codec: 'aac', bitrate: '128k', noAudio: false },
 				filter: { scale: { width: 1920, height: 1080 } },
-				misc: { stripMetadata: true, copyStreams: false }
+				misc: { stripMetadata: true, copyStreams: false },
 			});
 			const cmd = buildCommand(opts);
 
@@ -103,7 +110,7 @@ describe('buildCommand', () => {
 	describe('入力オプション', () => {
 		it('-ss を入力前に配置する（高速シーク）', () => {
 			const opts = createDefaultOptions({
-				input: { filename: 'input.mp4', startTime: '00:01:30' }
+				input: { filename: 'input.mp4', startTime: '00:01:30' },
 			});
 			const cmd = buildCommand(opts);
 			expect(cmd).toContain('-ss 00:01:30 -i input.mp4');
@@ -155,7 +162,7 @@ describe('buildCommand', () => {
 
 		it('SVT-AV1 プリセットを指定する', () => {
 			const opts = createDefaultOptions({
-				video: { codec: 'libsvtav1', svtav1Preset: 6, noVideo: false }
+				video: { codec: 'libsvtav1', svtav1Preset: 6, noVideo: false },
 			});
 			const cmd = buildCommand(opts);
 			expect(cmd).toContain('-preset 6');
@@ -163,7 +170,11 @@ describe('buildCommand', () => {
 
 		it('SVT-AV1 追加パラメータを指定する', () => {
 			const opts = createDefaultOptions({
-				video: { codec: 'libsvtav1', svtav1Params: 'tune=0:enable-overlays=1:scd=1', noVideo: false }
+				video: {
+					codec: 'libsvtav1',
+					svtav1Params: 'tune=0:enable-overlays=1:scd=1',
+					noVideo: false,
+				},
 			});
 			const cmd = buildCommand(opts);
 			expect(cmd).toContain('-svtav1-params tune=0:enable-overlays=1:scd=1');
@@ -222,13 +233,17 @@ describe('buildCommand', () => {
 		});
 
 		it('duration を指定する', () => {
-			const opts = createDefaultOptions({ misc: { duration: '10', copyStreams: false, stripMetadata: false } });
+			const opts = createDefaultOptions({
+				misc: { duration: '10', copyStreams: false, stripMetadata: false },
+			});
 			const cmd = buildCommand(opts);
 			expect(cmd).toContain('-t 10');
 		});
 
 		it('endTime を指定する', () => {
-			const opts = createDefaultOptions({ misc: { endTime: '00:00:30', copyStreams: false, stripMetadata: false } });
+			const opts = createDefaultOptions({
+				misc: { endTime: '00:00:30', copyStreams: false, stripMetadata: false },
+			});
 			const cmd = buildCommand(opts);
 			expect(cmd).toContain('-to 00:00:30');
 		});
@@ -243,7 +258,7 @@ describe('buildCommand', () => {
 			const opts = createDefaultOptions({
 				video: { codec: 'libx264', crf: 23, noVideo: false },
 				audio: { codec: 'aac', bitrate: '128k', noAudio: false },
-				misc: { copyStreams: true, stripMetadata: false }
+				misc: { copyStreams: true, stripMetadata: false },
 			});
 			const cmd = buildCommand(opts);
 			expect(cmd).toContain('-c copy');
@@ -255,7 +270,7 @@ describe('buildCommand', () => {
 
 		it('noVideo=true で -vn のみ出力し、映像コーデック設定を含まない', () => {
 			const opts = createDefaultOptions({
-				video: { codec: 'libx264', crf: 23, noVideo: true }
+				video: { codec: 'libx264', crf: 23, noVideo: true },
 			});
 			const cmd = buildCommand(opts);
 			expect(cmd).toContain('-vn');
@@ -265,7 +280,7 @@ describe('buildCommand', () => {
 
 		it('noAudio=true で -an のみ出力し、音声コーデック設定を含まない', () => {
 			const opts = createDefaultOptions({
-				audio: { codec: 'aac', bitrate: '128k', noAudio: true }
+				audio: { codec: 'aac', bitrate: '128k', noAudio: true },
 			});
 			const cmd = buildCommand(opts);
 			expect(cmd).toContain('-an');
@@ -276,7 +291,7 @@ describe('buildCommand', () => {
 		it('copyStreams=true でフィルタが出力されない', () => {
 			const opts = createDefaultOptions({
 				misc: { copyStreams: true, stripMetadata: false },
-				filter: { scale: { width: 1920, height: 1080 }, fps: 30 }
+				filter: { scale: { width: 1920, height: 1080 }, fps: 30 },
 			});
 			const cmd = buildCommand(opts);
 			expect(cmd).toContain('-c copy');
@@ -287,7 +302,7 @@ describe('buildCommand', () => {
 		it('noVideo + noAudio で -vn -an 両方出力', () => {
 			const opts = createDefaultOptions({
 				video: { noVideo: true },
-				audio: { noAudio: true }
+				audio: { noAudio: true },
 			});
 			const cmd = buildCommand(opts);
 			expect(cmd).toContain('-vn');
@@ -303,7 +318,7 @@ describe('buildCommand', () => {
 		it('.gif 出力で2パスコマンドを改行区切りで返す', () => {
 			const opts = createDefaultOptions({
 				output: { filename: 'output.gif', overwrite: true },
-				filter: { fps: 10, scale: { width: 320, height: -1 } }
+				filter: { fps: 10, scale: { width: 320, height: -1 } },
 			});
 			const cmd = buildCommand(opts);
 			const lines = cmd.split('\n');
@@ -313,7 +328,7 @@ describe('buildCommand', () => {
 		it('パス1でパレット生成コマンドを出力する', () => {
 			const opts = createDefaultOptions({
 				output: { filename: 'output.gif', overwrite: true },
-				filter: { fps: 10, scale: { width: 320, height: -1 } }
+				filter: { fps: 10, scale: { width: 320, height: -1 } },
 			});
 			const lines = buildCommand(opts).split('\n');
 			expect(lines[0]).toContain('palettegen');
@@ -324,7 +339,7 @@ describe('buildCommand', () => {
 		it('パス2で paletteuse コマンドを出力する', () => {
 			const opts = createDefaultOptions({
 				output: { filename: 'output.gif', overwrite: true },
-				filter: { fps: 10, scale: { width: 320, height: -1 } }
+				filter: { fps: 10, scale: { width: 320, height: -1 } },
 			});
 			const lines = buildCommand(opts).split('\n');
 			expect(lines[1]).toContain('paletteuse');
@@ -336,7 +351,7 @@ describe('buildCommand', () => {
 		it('GIF で -y オプションが両パスに含まれる', () => {
 			const opts = createDefaultOptions({
 				output: { filename: 'output.gif', overwrite: true },
-				filter: { fps: 10, scale: { width: 320, height: -1 } }
+				filter: { fps: 10, scale: { width: 320, height: -1 } },
 			});
 			const lines = buildCommand(opts).split('\n');
 			expect(lines[0]).toMatch(/^ffmpeg -nostdin -y /);
@@ -348,7 +363,7 @@ describe('buildCommand', () => {
 				input: { filename: 'input.mp4', startTime: '00:00:05' },
 				output: { filename: 'output.gif', overwrite: true },
 				filter: { fps: 10, scale: { width: 320, height: -1 } },
-				misc: { duration: '3', copyStreams: false, stripMetadata: false }
+				misc: { duration: '3', copyStreams: false, stripMetadata: false },
 			});
 			const lines = buildCommand(opts).split('\n');
 			expect(lines[0]).toContain('-ss 00:00:05');
@@ -360,7 +375,7 @@ describe('buildCommand', () => {
 		it('.GIF (大文字) でも GIF モードが適用される', () => {
 			const opts = createDefaultOptions({
 				output: { filename: 'output.GIF', overwrite: true },
-				filter: { fps: 10, scale: { width: 320 } }
+				filter: { fps: 10, scale: { width: 320 } },
 			});
 			const cmd = buildCommand(opts);
 			expect(cmd.split('\n')).toHaveLength(2);
@@ -369,7 +384,7 @@ describe('buildCommand', () => {
 		it('GIF でデフォルト fps=10, scale=320:-1 が適用される', () => {
 			const opts = createDefaultOptions({
 				output: { filename: 'output.gif', overwrite: true },
-				filter: {}
+				filter: {},
 			});
 			const lines = buildCommand(opts).split('\n');
 			expect(lines[0]).toContain('fps=10,scale=320:-1:flags=lanczos');
@@ -387,7 +402,7 @@ describe('buildCommand', () => {
 				output: { filename: 'output.avif', overwrite: true },
 				video: { codec: 'libsvtav1', crf: 30, bitrate: '0', pixFmt: 'yuv420p10le', noVideo: false },
 				audio: { noAudio: true },
-				misc: { stripMetadata: false, copyStreams: false }
+				misc: { stripMetadata: false, copyStreams: false },
 			});
 			const cmd = buildCommand(opts);
 			expect(cmd).toContain('ffmpeg -y -i input.png');
@@ -402,11 +417,14 @@ describe('buildCommand', () => {
 		it('動画圧縮 SVT-AV1 (video-compress)', () => {
 			const opts = createDefaultOptions({
 				video: {
-					codec: 'libsvtav1', crf: 30, svtav1Preset: 6,
-					pixFmt: 'yuv420p10le', svtav1Params: 'tune=0:enable-overlays=1:scd=1',
-					noVideo: false
+					codec: 'libsvtav1',
+					crf: 30,
+					svtav1Preset: 6,
+					pixFmt: 'yuv420p10le',
+					svtav1Params: 'tune=0:enable-overlays=1:scd=1',
+					noVideo: false,
 				},
-				audio: { codec: 'libopus', bitrate: '128k', noAudio: false }
+				audio: { codec: 'libopus', bitrate: '128k', noAudio: false },
 			});
 			const cmd = buildCommand(opts);
 			expect(cmd).toContain('-c:v libsvtav1');
@@ -421,7 +439,7 @@ describe('buildCommand', () => {
 			const opts = createDefaultOptions({
 				video: { noVideo: true },
 				audio: { codec: 'libmp3lame', bitrate: '192k', noAudio: false },
-				output: { filename: 'output.mp3', overwrite: true }
+				output: { filename: 'output.mp3', overwrite: true },
 			});
 			const cmd = buildCommand(opts);
 			expect(cmd).toContain('-vn');
@@ -434,7 +452,7 @@ describe('buildCommand', () => {
 		it('動画トリム (video-trim) — copyStreams で高速処理', () => {
 			const opts = createDefaultOptions({
 				input: { filename: 'input.mp4', startTime: '00:00:00' },
-				misc: { copyStreams: true, endTime: '00:00:30', stripMetadata: false }
+				misc: { copyStreams: true, endTime: '00:00:30', stripMetadata: false },
 			});
 			const cmd = buildCommand(opts);
 			expect(cmd).toContain('-ss 00:00:00');
@@ -453,7 +471,7 @@ describe('buildCommand', () => {
 		it('スペースを含むファイル名をクォートする', () => {
 			const opts = createDefaultOptions({
 				input: { filename: 'my video.mp4' },
-				output: { filename: 'my output.mp4', overwrite: true }
+				output: { filename: 'my output.mp4', overwrite: true },
 			});
 			const cmd = buildCommand(opts);
 			expect(cmd).toContain('"my video.mp4"');
@@ -474,7 +492,7 @@ describe('buildCommand', () => {
 				video: { noVideo: false },
 				audio: { noAudio: false },
 				filter: {},
-				misc: { stripMetadata: false, copyStreams: false }
+				misc: { stripMetadata: false, copyStreams: false },
 			};
 			const cmd = buildCommand(opts);
 			expect(cmd).toBe('ffmpeg -i in.mp4 out.mp4');
@@ -504,8 +522,9 @@ describe('buildVideoFilter', () => {
 	});
 
 	it('crop フィルタを生成する', () => {
-		expect(buildVideoFilter({ crop: { width: 640, height: 480, x: 10, y: 20 } }))
-			.toBe('crop=640:480:10:20');
+		expect(buildVideoFilter({ crop: { width: 640, height: 480, x: 10, y: 20 } })).toBe(
+			'crop=640:480:10:20',
+		);
 	});
 
 	it('fps フィルタを生成する', () => {
@@ -520,7 +539,7 @@ describe('buildVideoFilter', () => {
 		const filter: FilterOptions = {
 			scale: { width: 1920, height: 1080 },
 			fps: 30,
-			customFilter: 'eq=brightness=0.1'
+			customFilter: 'eq=brightness=0.1',
 		};
 		expect(buildVideoFilter(filter)).toBe('scale=1920:1080,fps=30,eq=brightness=0.1');
 	});
@@ -539,7 +558,7 @@ describe('buildCwebpCommand', () => {
 		const opts = createDefaultOptions({
 			input: { filename: 'input.png' },
 			output: { filename: 'output.webp', overwrite: true },
-			video: { quality: 75, noVideo: false }
+			video: { quality: 75, noVideo: false },
 		});
 		const cmd = buildCwebpCommand(opts);
 		expect(cmd).toBe('cwebp -q 75 input.png -o output.webp');
@@ -548,7 +567,7 @@ describe('buildCwebpCommand', () => {
 	it('quality 未設定でデフォルト 75 を使用する', () => {
 		const opts = createDefaultOptions({
 			input: { filename: 'input.png' },
-			output: { filename: 'output.webp', overwrite: true }
+			output: { filename: 'output.webp', overwrite: true },
 		});
 		const cmd = buildCwebpCommand(opts);
 		expect(cmd).toContain('-q 75');
@@ -559,7 +578,7 @@ describe('buildCwebpCommand', () => {
 			input: { filename: 'input.png' },
 			output: { filename: 'output.webp', overwrite: true },
 			video: { quality: 80, noVideo: false },
-			filter: { scale: { width: 800, height: 600 } }
+			filter: { scale: { width: 800, height: 600 } },
 		});
 		const cmd = buildCwebpCommand(opts);
 		expect(cmd).toContain('-resize 800 600');
@@ -569,7 +588,7 @@ describe('buildCwebpCommand', () => {
 		const opts = createDefaultOptions({
 			input: { filename: 'input.png' },
 			output: { filename: 'output.webp', overwrite: true },
-			filter: { scale: { width: 800, height: -1 } }
+			filter: { scale: { width: 800, height: -1 } },
 		});
 		const cmd = buildCwebpCommand(opts);
 		expect(cmd).toContain('-resize 800 0');
@@ -578,7 +597,7 @@ describe('buildCwebpCommand', () => {
 	it('スペース付きファイル名をクォートする', () => {
 		const opts = createDefaultOptions({
 			input: { filename: 'my image.png' },
-			output: { filename: 'my output.webp', overwrite: true }
+			output: { filename: 'my output.webp', overwrite: true },
 		});
 		const cmd = buildCwebpCommand(opts);
 		expect(cmd).toContain('"my image.png"');
@@ -593,13 +612,13 @@ describe('buildCwebpCommand', () => {
 describe('buildBatchCommand', () => {
 	const batch: BatchOptions = {
 		inputExtensions: ['mp4', 'mov', 'avi'],
-		allowSameFormatInput: true
+		allowSameFormatInput: true,
 	};
 
 	it('Bash / PowerShell / cmd の3形式を返す', () => {
 		const opts = createDefaultOptions({
 			video: { codec: 'libx264', crf: 23, noVideo: false },
-			audio: { codec: 'aac', noAudio: false }
+			audio: { codec: 'aac', noAudio: false },
 		});
 		const result = requireBatchScript(buildBatchCommand(opts, batch));
 		expect(result).toHaveProperty('bash');
@@ -636,13 +655,13 @@ describe('buildBatchCommand', () => {
 	it('cmd スクリプトで出力拡張子と同一の入力拡張子をスキップする', () => {
 		const batchSameExt: BatchOptions = {
 			inputExtensions: ['mp4', 'mov', 'mkv'],
-			allowSameFormatInput: false
+			allowSameFormatInput: false,
 		};
 		const opts = createDefaultOptions({ output: { filename: 'output.mkv' } });
 		const result = requireBatchScript(buildBatchCommand(opts, batchSameExt));
 		// mkv → mkv の for ループは生成されない
-		const forLines = result.cmd.split('\n').filter(l => l.startsWith('for'));
-		expect(forLines.every(l => !l.includes('*.mkv'))).toBe(true);
+		const forLines = result.cmd.split('\n').filter((l) => l.startsWith('for'));
+		expect(forLines.every((l) => !l.includes('*.mkv'))).toBe(true);
 	});
 
 	it('copyStreams=true でバッチスクリプトに -c copy が含まれる', () => {
@@ -655,7 +674,7 @@ describe('buildBatchCommand', () => {
 
 	it('-ss オプションがバッチスクリプトに含まれる', () => {
 		const opts = createDefaultOptions({
-			input: { filename: 'input.mp4', startTime: '00:01:00' }
+			input: { filename: 'input.mp4', startTime: '00:01:00' },
 		});
 		const result = requireBatchScript(buildBatchCommand(opts, batch));
 		expect(result.bash).toContain('-ss 00:01:00');
@@ -667,13 +686,13 @@ describe('buildBatchCommand', () => {
 describe('buildCwebpBatchCommand', () => {
 	const batch: BatchOptions = {
 		inputExtensions: ['jpg', 'jpeg', 'png'],
-		allowSameFormatInput: false
+		allowSameFormatInput: false,
 	};
 
 	it('3形式のスクリプトを返す', () => {
 		const opts = createDefaultOptions({
 			output: { filename: 'output.webp' },
-			video: { quality: 80, noVideo: false }
+			video: { quality: 80, noVideo: false },
 		});
 		const result = requireBatchScript(buildCwebpBatchCommand(opts, batch));
 		expect(result).toHaveProperty('bash');
@@ -684,7 +703,7 @@ describe('buildCwebpBatchCommand', () => {
 	it('cwebp コマンドを使用する（ffmpeg ではない）', () => {
 		const opts = createDefaultOptions({
 			output: { filename: 'output.webp' },
-			video: { quality: 80, noVideo: false }
+			video: { quality: 80, noVideo: false },
 		});
 		const result = requireBatchScript(buildCwebpBatchCommand(opts, batch));
 		expect(result.bash).toContain('cwebp');
@@ -696,7 +715,7 @@ describe('buildCwebpBatchCommand', () => {
 	it('品質オプションが含まれる', () => {
 		const opts = createDefaultOptions({
 			output: { filename: 'output.webp' },
-			video: { quality: 90, noVideo: false }
+			video: { quality: 90, noVideo: false },
 		});
 		const result = requireBatchScript(buildCwebpBatchCommand(opts, batch));
 		expect(result.bash).toContain('-q 90');
@@ -706,7 +725,7 @@ describe('buildCwebpBatchCommand', () => {
 		const opts = createDefaultOptions({
 			output: { filename: 'output.webp' },
 			video: { quality: 75, noVideo: false },
-			filter: { scale: { width: 800, height: 600 } }
+			filter: { scale: { width: 800, height: 600 } },
 		});
 		const result = requireBatchScript(buildCwebpBatchCommand(opts, batch));
 		expect(result.bash).toContain('-resize 800 600');
@@ -723,13 +742,13 @@ describe('buildCwebpCommand の3経路振り分け', () => {
 			const opts = createDefaultOptions({
 				input: { filename: `input.${ext}` },
 				output: { filename: 'output.webp', overwrite: true },
-				video: { quality: 75, noVideo: false }
+				video: { quality: 75, noVideo: false },
 			});
 			const cmd = buildCwebpCommand(opts);
 			expect(cmd).toBe(
 				'ffmpeg -nostdin -y -i input.' +
 					ext +
-					' output.tmp.png && cwebp -q 75 output.tmp.png -o output.webp'
+					' output.tmp.png && cwebp -q 75 output.tmp.png -o output.webp',
 			);
 		}
 	});
@@ -738,7 +757,7 @@ describe('buildCwebpCommand の3経路振り分け', () => {
 		const opts = createDefaultOptions({
 			input: { filename: 'input.gif' },
 			output: { filename: 'output.webp', overwrite: true },
-			video: { quality: 75, noVideo: false }
+			video: { quality: 75, noVideo: false },
 		});
 		const cmd = buildCwebpCommand(opts);
 		expect(cmd).toBe('gif2webp input.gif -o output.webp');
@@ -751,11 +770,11 @@ describe('buildCwebpCommand の3経路振り分け', () => {
 			input: { filename: 'input.gif' },
 			output: { filename: 'output.webp', overwrite: true },
 			video: { quality: 75, noVideo: false },
-			filter: { scale: { width: 480, height: -1 } }
+			filter: { scale: { width: 480, height: -1 } },
 		});
 		const cmd = buildCwebpCommand(opts);
 		expect(cmd).toBe(
-			'ffmpeg -nostdin -y -i input.gif -vf "scale=480:-1" output.tmp.gif && gif2webp output.tmp.gif -o output.webp'
+			'ffmpeg -nostdin -y -i input.gif -vf "scale=480:-1" output.tmp.gif && gif2webp output.tmp.gif -o output.webp',
 		);
 		expect(cmd).not.toContain('-q');
 	});
@@ -765,7 +784,7 @@ describe('buildCwebpCommand の3経路振り分け', () => {
 			const opts = createDefaultOptions({
 				input: { filename: `input.${ext}` },
 				output: { filename: 'output.webp', overwrite: true },
-				video: { quality: 75, noVideo: false }
+				video: { quality: 75, noVideo: false },
 			});
 			const cmd = buildCwebpCommand(opts);
 			expect(cmd).not.toContain('-nostdin');
@@ -775,12 +794,16 @@ describe('buildCwebpCommand の3経路振り分け', () => {
 	});
 
 	it('cwebp / ffmpeg 前処理のいずれのコマンドにも -map が含まれない', () => {
-		const extensions = [...CWEBP_DIRECT_EXTENSIONS, ...CWEBP_PREPROCESS_EXTENSIONS, ...CWEBP_GIF_EXTENSIONS];
+		const extensions = [
+			...CWEBP_DIRECT_EXTENSIONS,
+			...CWEBP_PREPROCESS_EXTENSIONS,
+			...CWEBP_GIF_EXTENSIONS,
+		];
 		for (const ext of extensions) {
 			const opts = createDefaultOptions({
 				input: { filename: `input.${ext}` },
 				output: { filename: 'output.webp', overwrite: true },
-				video: { quality: 75, noVideo: false }
+				video: { quality: 75, noVideo: false },
 			});
 			expect(buildCwebpCommand(opts)).not.toContain('-map');
 		}
@@ -789,15 +812,21 @@ describe('buildCwebpCommand の3経路振り分け', () => {
 
 describe('buildCwebpBatchCommand の3経路振り分け', () => {
 	const fullBatch: BatchOptions = {
-		inputExtensions: [...CWEBP_DIRECT_EXTENSIONS, ...CWEBP_PREPROCESS_EXTENSIONS, ...CWEBP_GIF_EXTENSIONS],
-		allowSameFormatInput: false
+		inputExtensions: [
+			...CWEBP_DIRECT_EXTENSIONS,
+			...CWEBP_PREPROCESS_EXTENSIONS,
+			...CWEBP_GIF_EXTENSIONS,
+		],
+		allowSameFormatInput: false,
 	};
 
-	function buildFullScript(overrides: Partial<{ filter: FFmpegOptions['filter'] }> = {}): BatchScript {
+	function buildFullScript(
+		overrides: Partial<{ filter: FFmpegOptions['filter'] }> = {},
+	): BatchScript {
 		const opts = createDefaultOptions({
 			output: { filename: 'output.webp' },
 			video: { quality: 75, noVideo: false },
-			...overrides
+			...overrides,
 		});
 		return requireBatchScript(buildCwebpBatchCommand(opts, fullBatch));
 	}
@@ -840,11 +869,11 @@ describe('buildCwebpBatchCommand の3経路振り分け', () => {
 	it('空アーム非出力: 直接系拡張子のみのバッチには ffmpeg も gif2webp も出力しない', () => {
 		const directOnly: BatchOptions = {
 			inputExtensions: [...CWEBP_DIRECT_EXTENSIONS],
-			allowSameFormatInput: false
+			allowSameFormatInput: false,
 		};
 		const opts = createDefaultOptions({
 			output: { filename: 'output.webp' },
-			video: { quality: 75, noVideo: false }
+			video: { quality: 75, noVideo: false },
 		});
 		const script = requireBatchScript(buildCwebpBatchCommand(opts, directOnly));
 		for (const target of [script.bash, script.powershell, script.cmd]) {
@@ -856,11 +885,11 @@ describe('buildCwebpBatchCommand の3経路振り分け', () => {
 	it('空アーム非出力: gif 拡張子のみのバッチ（リサイズ無し）には ffmpeg を出力しない', () => {
 		const gifOnly: BatchOptions = {
 			inputExtensions: [...CWEBP_GIF_EXTENSIONS],
-			allowSameFormatInput: false
+			allowSameFormatInput: false,
 		};
 		const opts = createDefaultOptions({
 			output: { filename: 'output.webp' },
-			video: { quality: 75, noVideo: false }
+			video: { quality: 75, noVideo: false },
 		});
 		const script = requireBatchScript(buildCwebpBatchCommand(opts, gifOnly));
 		for (const target of [script.bash, script.powershell, script.cmd]) {

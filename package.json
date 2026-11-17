@@ -20,6 +20,8 @@
 		"test": "vitest run",
 		"test:watch": "vitest",
 		"lint": "oxlint src",
+		"format": "oxfmt src tests .storybook",
+		"format:check": "oxfmt --check src tests .storybook",
 		"storybook": "storybook dev -p 6006",
 		"build-storybook": "storybook build"
 	},
@@ -35,6 +37,7 @@
 		"@tailwindcss/vite": "^4.3.5",
 		"@types/node": "^26.6.6",
 		"clsx": "^2.1.1",
+		"oxfmt": "^0.79.0",
 		"oxlint": "^1.94.0",
 		"sharp": "^0.35.5",
 		"storybook": "^10.6.7",

@@ -49,7 +49,7 @@ class ConsentStore {
 	private grantAnalytics(): void {
 		if (typeof window.gtag === 'function') {
 			window.gtag('consent', 'update', {
-				analytics_storage: 'granted'
+				analytics_storage: 'granted',
 			});
 		}
 	}

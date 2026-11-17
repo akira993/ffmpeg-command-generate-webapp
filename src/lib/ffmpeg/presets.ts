@@ -35,19 +35,19 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 				crf: AVIF_DEFAULTS.crf,
 				bitrate: '0',
 				pixFmt: AVIF_DEFAULTS.pixFmt,
-				noVideo: false
+				noVideo: false,
 			},
 			audio: { noAudio: true },
 			filter: {},
-			misc: { stripMetadata: false, copyStreams: false }
+			misc: { stripMetadata: false, copyStreams: false },
 		},
 		editableFields: [
 			'input.filename',
 			'output.filename',
 			'video.crf',
 			'filter.scale.width',
-			'filter.scale.height'
-		]
+			'filter.scale.height',
+		],
 	},
 
 	// ----------------------------------------------------------------
@@ -66,19 +66,19 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 			video: {
 				codec: WEBP_DEFAULTS.codec,
 				quality: WEBP_DEFAULTS.quality,
-				noVideo: false
+				noVideo: false,
 			},
 			audio: { noAudio: true },
 			filter: {},
-			misc: { stripMetadata: false, copyStreams: false }
+			misc: { stripMetadata: false, copyStreams: false },
 		},
 		editableFields: [
 			'input.filename',
 			'output.filename',
 			'video.quality',
 			'filter.scale.width',
-			'filter.scale.height'
-		]
+			'filter.scale.height',
+		],
 	},
 
 	// ----------------------------------------------------------------
@@ -100,15 +100,15 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 				svtav1Preset: SVT_AV1_DEFAULTS.svtav1Preset,
 				pixFmt: SVT_AV1_DEFAULTS.pixFmt,
 				svtav1Params: SVT_AV1_DEFAULTS.svtav1Params,
-				noVideo: false
+				noVideo: false,
 			},
 			audio: {
 				codec: SVT_AV1_DEFAULTS.audioCodec,
 				bitrate: SVT_AV1_DEFAULTS.audioBitrate,
-				noAudio: false
+				noAudio: false,
 			},
 			filter: {},
-			misc: { stripMetadata: false, copyStreams: false }
+			misc: { stripMetadata: false, copyStreams: false },
 		},
 		editableFields: [
 			'input.filename',
@@ -118,8 +118,8 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 			'output.format',
 			'video.crf',
 			'video.svtav1Preset',
-			'audio.bitrate'
-		]
+			'audio.bitrate',
+		],
 	},
 
 	// ----------------------------------------------------------------
@@ -138,7 +138,7 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 			video: { codec: 'libvpx-vp9', crf: 30, bitrate: '0', noVideo: false },
 			audio: { codec: 'libopus', bitrate: '128k', noAudio: false },
 			filter: {},
-			misc: { stripMetadata: false, copyStreams: false }
+			misc: { stripMetadata: false, copyStreams: false },
 		},
 		editableFields: [
 			'input.filename',
@@ -147,8 +147,8 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 			'audio.codec',
 			'output.format',
 			'video.crf',
-			'audio.bitrate'
-		]
+			'audio.bitrate',
+		],
 	},
 
 	// ----------------------------------------------------------------
@@ -167,15 +167,15 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 			video: { noVideo: true },
 			audio: { codec: 'libmp3lame', bitrate: '192k', noAudio: false },
 			filter: {},
-			misc: { stripMetadata: false, copyStreams: false }
+			misc: { stripMetadata: false, copyStreams: false },
 		},
 		editableFields: [
 			'input.filename',
 			'output.filename',
 			'audio.codec',
 			'output.format',
-			'audio.bitrate'
-		]
+			'audio.bitrate',
+		],
 	},
 
 	// ----------------------------------------------------------------
@@ -194,7 +194,7 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 			video: { noVideo: true },
 			audio: { codec: 'libmp3lame', bitrate: '192k', noAudio: false },
 			filter: {},
-			misc: { stripMetadata: false, copyStreams: false }
+			misc: { stripMetadata: false, copyStreams: false },
 		},
 		editableFields: [
 			'input.filename',
@@ -202,8 +202,8 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 			'audio.codec',
 			'output.format',
 			'audio.bitrate',
-			'audio.sampleRate'
-		]
+			'audio.sampleRate',
+		],
 	},
 
 	// ----------------------------------------------------------------
@@ -222,7 +222,7 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 			video: { noVideo: false },
 			audio: { noAudio: false },
 			filter: {},
-			misc: { stripMetadata: false, copyStreams: true, endTime: '00:00:30' }
+			misc: { stripMetadata: false, copyStreams: true, endTime: '00:00:30' },
 		},
 		editableFields: [
 			'input.filename',
@@ -230,8 +230,8 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 			'output.filename',
 			'misc.endTime',
 			'misc.duration',
-			'misc.copyStreams'
-		]
+			'misc.copyStreams',
+		],
 	},
 
 	// ----------------------------------------------------------------
@@ -250,7 +250,7 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 			video: { noVideo: false },
 			audio: { noAudio: true },
 			filter: { fps: 10, scale: { width: 320, height: -1 } },
-			misc: { stripMetadata: false, copyStreams: false }
+			misc: { stripMetadata: false, copyStreams: false },
 		},
 		editableFields: [
 			'input.filename',
@@ -258,9 +258,9 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 			'filter.fps',
 			'filter.scale.width',
 			'input.startTime',
-			'misc.duration'
-		]
-	}
+			'misc.duration',
+		],
+	},
 };
 
 // ============================================================
@@ -268,23 +268,65 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
 // ============================================================
 
 export const VIDEO_INPUT_EXTENSIONS = [
-	'mp4', 'mov', 'avi', 'mkv', 'webm', 'flv', 'wmv', 'm4v',
-	'mpg', 'mpeg', 'ts', 'm2ts', 'mts', '3gp', 'ogv'
+	'mp4',
+	'mov',
+	'avi',
+	'mkv',
+	'webm',
+	'flv',
+	'wmv',
+	'm4v',
+	'mpg',
+	'mpeg',
+	'ts',
+	'm2ts',
+	'mts',
+	'3gp',
+	'ogv',
 ];
 
 export const AUDIO_INPUT_EXTENSIONS = [
-	'mp3', 'm4a', 'aac', 'flac', 'wav', 'aiff', 'aif',
-	'ogg', 'oga', 'opus', 'wma', 'mka'
+	'mp3',
+	'm4a',
+	'aac',
+	'flac',
+	'wav',
+	'aiff',
+	'aif',
+	'ogg',
+	'oga',
+	'opus',
+	'wma',
+	'mka',
 ];
 
 export const FFMPEG_IMAGE_INPUT_EXTENSIONS = [
-	'jpg', 'jpeg', 'jfif', 'png', 'gif', 'webp', 'bmp',
-	'tif', 'tiff', 'heic', 'heif', 'avif'
+	'jpg',
+	'jpeg',
+	'jfif',
+	'png',
+	'gif',
+	'webp',
+	'bmp',
+	'tif',
+	'tiff',
+	'heic',
+	'heif',
+	'avif',
 ];
 
 /** ① 直接 cwebp で読める入力形式 */
 export const CWEBP_DIRECT_EXTENSIONS = [
-	'png', 'jpg', 'jpeg', 'jfif', 'tif', 'tiff', 'pnm', 'pgm', 'ppm', 'pam'
+	'png',
+	'jpg',
+	'jpeg',
+	'jfif',
+	'tif',
+	'tiff',
+	'pnm',
+	'pgm',
+	'ppm',
+	'pam',
 ];
 
 /** ② ffmpeg で PNG に変換してから cwebp に渡す入力形式（cwebp が直接読めない） */
@@ -296,7 +338,7 @@ export const CWEBP_GIF_EXTENSIONS = ['gif'];
 export const CWEBP_IMAGE_INPUT_EXTENSIONS = [
 	...CWEBP_DIRECT_EXTENSIONS,
 	...CWEBP_PREPROCESS_EXTENSIONS,
-	...CWEBP_GIF_EXTENSIONS
+	...CWEBP_GIF_EXTENSIONS,
 ];
 
 const FORMAT_FAMILIES: Record<string, string> = {
@@ -310,7 +352,7 @@ const FORMAT_FAMILIES: Record<string, string> = {
 	mpg: 'mpg',
 	mpeg: 'mpg',
 	ogg: 'ogg',
-	oga: 'ogg'
+	oga: 'ogg',
 };
 
 /** 全プリセットを配列で取得 */
@@ -334,30 +376,30 @@ export function inferBatchOptions(preset: PresetDefinition): BatchOptions {
 		case 'image-convert':
 			return {
 				inputExtensions: [...FFMPEG_IMAGE_INPUT_EXTENSIONS],
-				allowSameFormatInput: false
+				allowSameFormatInput: false,
 			};
 		case 'image-webp':
 			return {
 				inputExtensions: [...CWEBP_IMAGE_INPUT_EXTENSIONS],
-				allowSameFormatInput: false
+				allowSameFormatInput: false,
 			};
 		case 'video-compress':
 		case 'video-trim':
 			return {
 				inputExtensions: [...VIDEO_INPUT_EXTENSIONS],
-				allowSameFormatInput: true
+				allowSameFormatInput: true,
 			};
 		case 'video-convert':
 		case 'audio-extract':
 		case 'gif-generate':
 			return {
 				inputExtensions: [...VIDEO_INPUT_EXTENSIONS],
-				allowSameFormatInput: false
+				allowSameFormatInput: false,
 			};
 		case 'audio-convert':
 			return {
 				inputExtensions: [...AUDIO_INPUT_EXTENSIONS],
-				allowSameFormatInput: false
+				allowSameFormatInput: false,
 			};
 	}
 }
@@ -378,7 +420,7 @@ export function getFileExtension(filename: string): string | null {
 /** 同一形式入力を許可しないプリセットでは出力形式ファミリーを除外する */
 export function resolveBatchInputExtensions(
 	batch: BatchOptions,
-	outputExtension: string
+	outputExtension: string,
 ): string[] {
 	if (batch.allowSameFormatInput) return [...batch.inputExtensions];
 

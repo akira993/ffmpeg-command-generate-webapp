@@ -47,7 +47,7 @@ function extractBlock(source: string, startPattern: RegExp): string {
 }
 
 const themeBlock = extractBlock(cssSource, /@theme\s*\{/);
-const darkBlock  = extractBlock(cssSource, /^\.dark\s*\{/m);
+const darkBlock = extractBlock(cssSource, /^\.dark\s*\{/m);
 
 // ─── ヘルパー: ブロック内からトークン値を抽出 ─────────────────────────────────
 
@@ -61,7 +61,10 @@ function extractToken(tokenName: string): string | null {
 	return extractTokenFrom(cssSource, tokenName);
 }
 
-function extractOklchFrom(block: string, tokenName: string): { l: number; c: number; h: number } | null {
+function extractOklchFrom(
+	block: string,
+	tokenName: string,
+): { l: number; c: number; h: number } | null {
 	const raw = extractTokenFrom(block, tokenName);
 	if (!raw) return null;
 	const m = raw.match(/oklch\(\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)\s*\)/);
@@ -82,7 +85,7 @@ describe('CSSデザインルール (docs/css-design.md §1)', () => {
 		try {
 			output = execSync('bash scripts/lint-css.sh', {
 				cwd: ROOT,
-				encoding: 'utf-8'
+				encoding: 'utf-8',
 			});
 		} catch (e: any) {
 			output = e.stdout ?? '';
@@ -95,7 +98,9 @@ describe('CSSデザインルール (docs/css-design.md §1)', () => {
 	it('app.css に hex カラー (#xxx) が含まれない', () => {
 		const hexMatches = cssSource
 			.split('\n')
-			.filter((line: string) => !line.trimStart().startsWith('*') && !line.trimStart().startsWith('/*'))
+			.filter(
+				(line: string) => !line.trimStart().startsWith('*') && !line.trimStart().startsWith('/*'),
+			)
 			.filter((line: string) => /#[0-9a-fA-F]{3,8}\b/.test(line));
 		expect(hexMatches, `hex カラーが検出されました:\n${hexMatches.join('\n')}`).toHaveLength(0);
 	});
@@ -103,7 +108,9 @@ describe('CSSデザインルール (docs/css-design.md §1)', () => {
 	it('app.css に rgb()/rgba()/hsl()/hsla() が含まれない', () => {
 		const rgbMatches = cssSource
 			.split('\n')
-			.filter((line: string) => !line.trimStart().startsWith('*') && !line.trimStart().startsWith('/*'))
+			.filter(
+				(line: string) => !line.trimStart().startsWith('*') && !line.trimStart().startsWith('/*'),
+			)
 			.filter((line: string) => /\b(rgb|rgba|hsl|hsla)\s*\(/i.test(line));
 		expect(rgbMatches, `rgb/hsl カラーが検出されました:\n${rgbMatches.join('\n')}`).toHaveLength(0);
 	});
@@ -119,7 +126,9 @@ describe('CSSデザインルール (docs/css-design.md §1)', () => {
 				}
 			}
 		});
-		expect(violations, `"in oklab" なしのグラデーション:\n${violations.join('\n')}`).toHaveLength(0);
+		expect(violations, `"in oklab" なしのグラデーション:\n${violations.join('\n')}`).toHaveLength(
+			0,
+		);
 	});
 });
 
@@ -130,12 +139,12 @@ describe('CSSデザインルール (docs/css-design.md §1)', () => {
 
 describe('ライトテーマ トークン値 (docs §2.2)', () => {
 	const LIGHT_TOKENS: Record<string, string> = {
-		'--color-background':  'oklch(0.985 0.006 290)',
-		'--color-foreground':  'oklch(0.22 0.01 280)',
-		'--color-primary':     'oklch(0.55 0.14 290)',
-		'--color-secondary':   'oklch(0.94 0.025 350)',
-		'--color-accent':      'oklch(0.94 0.03 170)',
-		'--color-destructive': 'oklch(0.62 0.20 25)'
+		'--color-background': 'oklch(0.985 0.006 290)',
+		'--color-foreground': 'oklch(0.22 0.01 280)',
+		'--color-primary': 'oklch(0.55 0.14 290)',
+		'--color-secondary': 'oklch(0.94 0.025 350)',
+		'--color-accent': 'oklch(0.94 0.03 170)',
+		'--color-destructive': 'oklch(0.62 0.20 25)',
 	};
 
 	for (const [token, expected] of Object.entries(LIGHT_TOKENS)) {
@@ -149,10 +158,10 @@ describe('ライトテーマ トークン値 (docs §2.2)', () => {
 
 describe('ダークテーマ トークン値 (docs §2.3)', () => {
 	const DARK_TOKENS: Record<string, string> = {
-		'--color-background':  'oklch(0.13 0.02 280)',
-		'--color-foreground':  'oklch(0.92 0.01 260)',
-		'--color-accent':      'oklch(0.78 0.15 195)',
-		'--color-destructive': 'oklch(0.58 0.24 20)'
+		'--color-background': 'oklch(0.13 0.02 280)',
+		'--color-foreground': 'oklch(0.92 0.01 260)',
+		'--color-accent': 'oklch(0.78 0.15 195)',
+		'--color-destructive': 'oklch(0.58 0.24 20)',
 	};
 
 	for (const [token, expected] of Object.entries(DARK_TOKENS)) {
@@ -168,13 +177,13 @@ describe('ダークテーマ トークン値 (docs §2.3)', () => {
 
 describe('タイポグラフィ clamp() トークン (docs §3)', () => {
 	const TYPO_TOKENS: Record<string, string> = {
-		'--text-xs':   'clamp(0.75rem, 0.7rem + 0.15vw, 0.8125rem)',
-		'--text-sm':   'clamp(0.875rem, 0.82rem + 0.2vw, 0.9375rem)',
+		'--text-xs': 'clamp(0.75rem, 0.7rem + 0.15vw, 0.8125rem)',
+		'--text-sm': 'clamp(0.875rem, 0.82rem + 0.2vw, 0.9375rem)',
 		'--text-base': 'clamp(1rem, 0.94rem + 0.25vw, 1.0625rem)',
-		'--text-lg':   'clamp(1.125rem, 1.05rem + 0.3vw, 1.1875rem)',
-		'--text-xl':   'clamp(1.25rem, 1.15rem + 0.4vw, 1.375rem)',
-		'--text-2xl':  'clamp(1.5rem, 1.35rem + 0.55vw, 1.625rem)',
-		'--text-3xl':  'clamp(1.875rem, 1.7rem + 0.7vw, 2.0625rem)'
+		'--text-lg': 'clamp(1.125rem, 1.05rem + 0.3vw, 1.1875rem)',
+		'--text-xl': 'clamp(1.25rem, 1.15rem + 0.4vw, 1.375rem)',
+		'--text-2xl': 'clamp(1.5rem, 1.35rem + 0.55vw, 1.625rem)',
+		'--text-3xl': 'clamp(1.875rem, 1.7rem + 0.7vw, 2.0625rem)',
 	};
 
 	for (const [token, expected] of Object.entries(TYPO_TOKENS)) {
@@ -195,7 +204,10 @@ describe('ライトモード: プライマリボタン (WCAG)', () => {
 		expect(bg, '--color-primary が @theme に見つからない').not.toBeNull();
 		expect(fg, '--color-primary-foreground が @theme に見つからない').not.toBeNull();
 		const ratio = contrastRatio(lum(bg!), lum(fg!));
-		expect(ratio, `コントラスト比 ${ratio.toFixed(2)}:1 — AA基準 4.5:1 未達`).toBeGreaterThanOrEqual(WCAG.AA_NORMAL);
+		expect(
+			ratio,
+			`コントラスト比 ${ratio.toFixed(2)}:1 — AA基準 4.5:1 未達`,
+		).toBeGreaterThanOrEqual(WCAG.AA_NORMAL);
 	});
 });
 
@@ -206,14 +218,20 @@ describe('ダークモード: プライマリボタン (WCAG)', () => {
 		expect(bg, '.dark の --color-primary が見つからない').not.toBeNull();
 		expect(fg, '.dark の --color-primary-foreground が見つからない').not.toBeNull();
 		const ratio = contrastRatio(lum(bg!), lum(fg!));
-		expect(ratio, `コントラスト比 ${ratio.toFixed(2)}:1 — AA基準 4.5:1 未達`).toBeGreaterThanOrEqual(WCAG.AA_NORMAL);
+		expect(
+			ratio,
+			`コントラスト比 ${ratio.toFixed(2)}:1 — AA基準 4.5:1 未達`,
+		).toBeGreaterThanOrEqual(WCAG.AA_NORMAL);
 	});
 
 	it('primaryForeground on primary が WCAG AAA (7.0:1) を満たす', () => {
 		const bg = extractOklchFrom(darkBlock, '--color-primary');
 		const fg = extractOklchFrom(darkBlock, '--color-primary-foreground');
 		const ratio = contrastRatio(lum(bg!), lum(fg!));
-		expect(ratio, `コントラスト比 ${ratio.toFixed(2)}:1 — AAA基準 7.0:1 未達`).toBeGreaterThanOrEqual(WCAG.AAA_NORMAL);
+		expect(
+			ratio,
+			`コントラスト比 ${ratio.toFixed(2)}:1 — AAA基準 7.0:1 未達`,
+		).toBeGreaterThanOrEqual(WCAG.AAA_NORMAL);
 	});
 });
 

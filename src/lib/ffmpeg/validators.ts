@@ -207,4 +207,3 @@ export function validateSvtav1Preset(preset: number): ValidationResult {
 	}
 	return { valid: true };
 }
-

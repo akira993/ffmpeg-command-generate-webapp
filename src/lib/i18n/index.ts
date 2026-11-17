@@ -12,13 +12,13 @@ export const { t, locale, locales, loading, loadTranslations } = new I18n({
 		{
 			locale: 'ja',
 			namespace: '',
-			loader: async () => ja
+			loader: async () => ja,
 		},
 		{
 			locale: 'en',
 			namespace: '',
-			loader: async () => en
-		}
+			loader: async () => en,
+		},
 	],
-	extensions: [stores]
+	extensions: [stores],
 });

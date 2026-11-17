@@ -54,5 +54,5 @@ export const WCAG = {
 	/** 通常テキスト (AA) */
 	AA_NORMAL: 4.5,
 	/** 通常テキスト (AAA) */
-	AAA_NORMAL: 7.0
+	AAA_NORMAL: 7.0,
 } as const;

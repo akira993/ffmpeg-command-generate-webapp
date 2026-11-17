@@ -25,7 +25,7 @@ import {
 	resolveBatchInputExtensions,
 	CWEBP_DIRECT_EXTENSIONS,
 	CWEBP_PREPROCESS_EXTENSIONS,
-	CWEBP_GIF_EXTENSIONS
+	CWEBP_GIF_EXTENSIONS,
 } from './presets';
 
 // ============================================================
@@ -353,7 +353,7 @@ function buildBashScript(
 	optionParts: string,
 	casePattern: string,
 	outExt: string,
-	options: FFmpegOptions
+	options: FFmpegOptions,
 ): string {
 	const inputOpts = options.input.startTime ? `-ss ${options.input.startTime} ` : '';
 	const lines: string[] = [
@@ -376,7 +376,7 @@ function buildBashScript(
 		'for f in *; do',
 		'  [ -f "$f" ] || continue',
 		'  ext="${f##*.}"',
-		'  ext_lower=$(echo "$ext" | tr \'[:upper:]\' \'[:lower:]\')',
+		"  ext_lower=$(echo \"$ext\" | tr '[:upper:]' '[:lower:]')",
 		`  case "$ext_lower" in`,
 		`    ${casePattern})`,
 		'      base="${f%.*}"',
@@ -389,7 +389,7 @@ function buildBashScript(
 		`      ffmpeg ${inputOpts}-i "$f" ${optionParts} "$out"`,
 		'      ;;',
 		'  esac',
-		'done'
+		'done',
 	];
 
 	return lines.join('\n');
@@ -407,7 +407,7 @@ function buildPowerShellScript(
 	optionParts: string,
 	extensions: string[],
 	outExt: string,
-	options: FFmpegOptions
+	options: FFmpegOptions,
 ): string {
 	const includeFilter = extensions.map((ext) => `"*.${ext}"`).join(', ');
 	const inputOpts = options.input.startTime ? `-ss ${options.input.startTime} ` : '';
@@ -420,11 +420,11 @@ function buildPowerShellScript(
 		'',
 		`Get-ChildItem -Path * -File -Include ${includeFilter} |`,
 		'  ForEach-Object {',
-		'    $inputExt = $_.Extension.TrimStart(\'.\').ToLower()',
+		"    $inputExt = $_.Extension.TrimStart('.').ToLower()",
 		'    $out = Join-Path $outputDir "$($_.BaseName).$outputExt"',
 		'    if (-not $seenBaseNames.Add($_.BaseName)) { $out = Join-Path $outputDir "$($_.BaseName)_$inputExt.$outputExt" }',
 		`    ffmpeg ${inputOpts}-i $_.FullName ${optionParts} $out`,
-		'  }'
+		'  }',
 	];
 
 	return lines.join('\n');
@@ -441,7 +441,7 @@ function buildCmdScript(
 	optionParts: string,
 	extensions: string[],
 	outExt: string,
-	options: FFmpegOptions
+	options: FFmpegOptions,
 ): string {
 	const inputOpts = options.input.startTime ? `-ss ${options.input.startTime} ` : '';
 
@@ -454,7 +454,7 @@ function buildCmdScript(
 		'if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"',
 		'set "SEEN_FILE=%TEMP%\\ffmpeg-batch-seen-%RANDOM%-%RANDOM%.tmp"',
 		'type nul > "%SEEN_FILE%"',
-		''
+		'',
 	];
 
 	// cmd では拡張子ごとに for ループを回す（case-insensitive なので大文字も自動マッチ）
@@ -469,14 +469,11 @@ function buildCmdScript(
 			'    >>"%SEEN_FILE%" echo(',
 			`    ffmpeg ${inputOpts}-i "%%f" ${optionParts} "%OUTPUT_DIR%\\%%~nf.%OUTPUT_EXT%"`,
 			'  )',
-			')'
+			')',
 		);
 	}
 
-	lines.push(
-		'del "%SEEN_FILE%" >nul 2>&1',
-		'exit /b'
-	);
+	lines.push('del "%SEEN_FILE%" >nul 2>&1', 'exit /b');
 
 	// Windows の cmd スクリプトとして標準の CRLF で出力する。
 	return lines.join('\r\n');
@@ -516,7 +513,7 @@ function partitionCwebpExtensions(extensions: string[]): CwebpExtensionGroups {
 	return {
 		direct: extensions.filter((ext) => CWEBP_DIRECT_EXTENSIONS.includes(ext)),
 		preprocess: extensions.filter((ext) => CWEBP_PREPROCESS_EXTENSIONS.includes(ext)),
-		gif: extensions.filter((ext) => CWEBP_GIF_EXTENSIONS.includes(ext))
+		gif: extensions.filter((ext) => CWEBP_GIF_EXTENSIONS.includes(ext)),
 	};
 }
 
@@ -579,7 +576,10 @@ export function buildCwebpCommand(options: FFmpegOptions): string {
  * Bash / PowerShell / cmd の3形式で出力。入力拡張子を direct / preprocess / gif の
  * 3群に分類し、該当拡張子が1つも無い経路のコマンドは出力しない（C6）。
  */
-export function buildCwebpBatchCommand(options: FFmpegOptions, batch: BatchOptions): BatchScript | null {
+export function buildCwebpBatchCommand(
+	options: FFmpegOptions,
+	batch: BatchOptions,
+): BatchScript | null {
 	const outExt = getValidatedOutputExtension(options.output.filename);
 	if (!outExt) return null;
 
@@ -599,7 +599,7 @@ function buildCwebpBashScript(
 	quality: number,
 	resize: CwebpResize,
 	groups: CwebpExtensionGroups,
-	outExt: string
+	outExt: string,
 ): string {
 	const resizeOpts = resize ? ` -resize ${resize.width} ${resize.height}` : '';
 	const casePattern = [...groups.direct, ...groups.preprocess, ...groups.gif].join('|');
@@ -613,7 +613,7 @@ function buildCwebpBashScript(
 			'          tmp="${out%.*}.tmp.png"',
 			`          ffmpeg -nostdin -y -loglevel error -i "$f" "$tmp" && cwebp -q ${quality}${resizeOpts} "$tmp" -o "$out"`,
 			'          rm -f "$tmp"',
-			'          ;;'
+			'          ;;',
 		);
 	}
 
@@ -622,13 +622,17 @@ function buildCwebpBashScript(
 			? [
 					'          tmp="${out%.*}.tmp.gif"',
 					`          ffmpeg -nostdin -y -loglevel error -i "$f" -vf "${cwebpResizeToFfmpegScale(resize)}" "$tmp" && gif2webp "$tmp" -o "$out"`,
-					'          rm -f "$tmp"'
+					'          rm -f "$tmp"',
 				]
 			: ['          gif2webp "$f" -o "$out"'];
 		innerArms.push(`        ${groups.gif.join('|')})`, ...gifBody, '          ;;');
 	}
 
-	innerArms.push('        *)', `          cwebp -q ${quality}${resizeOpts} "$f" -o "$out"`, '          ;;');
+	innerArms.push(
+		'        *)',
+		`          cwebp -q ${quality}${resizeOpts} "$f" -o "$out"`,
+		'          ;;',
+	);
 
 	const lines: string[] = [
 		'#!/bin/bash',
@@ -650,7 +654,7 @@ function buildCwebpBashScript(
 		'for f in *; do',
 		'  [ -f "$f" ] || continue',
 		'  ext="${f##*.}"',
-		'  ext_lower=$(echo "$ext" | tr \'[:upper:]\' \'[:lower:]\')',
+		"  ext_lower=$(echo \"$ext\" | tr '[:upper:]' '[:lower:]')",
 		`  case "$ext_lower" in`,
 		`    ${casePattern})`,
 		'      base="${f%.*}"',
@@ -665,7 +669,7 @@ function buildCwebpBashScript(
 		'      esac',
 		'      ;;',
 		'  esac',
-		'done'
+		'done',
 	];
 
 	return lines.join('\n');
@@ -675,7 +679,7 @@ function buildCwebpPowerShellScript(
 	quality: number,
 	resize: CwebpResize,
 	groups: CwebpExtensionGroups,
-	outExt: string
+	outExt: string,
 ): string {
 	const resizeOpts = resize ? ` -resize ${resize.width} ${resize.height}` : '';
 	const extensions = [...groups.direct, ...groups.preprocess, ...groups.gif];
@@ -693,7 +697,7 @@ function buildCwebpPowerShellScript(
 			'        ffmpeg -nostdin -y -i $file.FullName $tmp',
 			`        if ($LASTEXITCODE -eq 0) { cwebp -q ${quality}${resizeOpts} $tmp -o $out }`,
 			'        Remove-Item -LiteralPath $tmp -Force -ErrorAction SilentlyContinue',
-			'      }'
+			'      }',
 		);
 	}
 
@@ -705,7 +709,7 @@ function buildCwebpPowerShellScript(
 				`        ffmpeg -nostdin -y -i $file.FullName -vf "${cwebpResizeToFfmpegScale(resize)}" $tmp`,
 				'        if ($LASTEXITCODE -eq 0) { gif2webp $tmp -o $out }',
 				'        Remove-Item -LiteralPath $tmp -Force -ErrorAction SilentlyContinue',
-				'      }'
+				'      }',
 			);
 		} else {
 			switchArms.push("      'gif' {", '        gif2webp $file.FullName -o $out', '      }');
@@ -715,7 +719,7 @@ function buildCwebpPowerShellScript(
 	switchArms.push(
 		'      default {',
 		`        cwebp -q ${quality}${resizeOpts} $file.FullName -o $out`,
-		'      }'
+		'      }',
 	);
 
 	const lines: string[] = [
@@ -726,14 +730,14 @@ function buildCwebpPowerShellScript(
 		'',
 		`Get-ChildItem -Path * -File -Include ${includeFilter} |`,
 		'  ForEach-Object {',
-		'    $inputExt = $_.Extension.TrimStart(\'.\').ToLower()',
+		"    $inputExt = $_.Extension.TrimStart('.').ToLower()",
 		'    $out = Join-Path $outputDir "$($_.BaseName).$outputExt"',
 		'    if (-not $seenBaseNames.Add($_.BaseName)) { $out = Join-Path $outputDir "$($_.BaseName)_$inputExt.$outputExt" }',
 		'    $file = $_',
 		'    switch ($inputExt) {',
 		...switchArms,
 		'    }',
-		'  }'
+		'  }',
 	];
 
 	return lines.join('\n');
@@ -745,7 +749,7 @@ function cwebpCmdCommandLines(
 	groups: CwebpExtensionGroups,
 	quality: number,
 	resize: CwebpResize,
-	outBase: string
+	outBase: string,
 ): string[] {
 	const resizeOpts = resize ? ` -resize ${resize.width} ${resize.height}` : '';
 	const out = `"${outBase}.%OUTPUT_EXT%"`;
@@ -754,7 +758,7 @@ function cwebpCmdCommandLines(
 		const tmp = `"${outBase}.tmp.png"`;
 		return [
 			`ffmpeg -nostdin -y -loglevel error -i "%%f" ${tmp} && cwebp -q ${quality}${resizeOpts} ${tmp} -o ${out}`,
-			`del ${tmp} >nul 2>&1`
+			`del ${tmp} >nul 2>&1`,
 		];
 	}
 
@@ -763,7 +767,7 @@ function cwebpCmdCommandLines(
 			const tmp = `"${outBase}.tmp.gif"`;
 			return [
 				`ffmpeg -nostdin -y -loglevel error -i "%%f" -vf "${cwebpResizeToFfmpegScale(resize)}" ${tmp} && gif2webp ${tmp} -o ${out}`,
-				`del ${tmp} >nul 2>&1`
+				`del ${tmp} >nul 2>&1`,
 			];
 		}
 		return [`gif2webp "%%f" -o ${out}`];
@@ -776,7 +780,7 @@ function buildCwebpCmdScript(
 	quality: number,
 	resize: CwebpResize,
 	groups: CwebpExtensionGroups,
-	outExt: string
+	outExt: string,
 ): string {
 	const extensions = [...groups.direct, ...groups.preprocess, ...groups.gif];
 
@@ -789,7 +793,7 @@ function buildCwebpCmdScript(
 		'if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"',
 		'set "SEEN_FILE=%TEMP%\\cwebp-batch-seen-%RANDOM%-%RANDOM%.tmp"',
 		'type nul > "%SEEN_FILE%"',
-		''
+		'',
 	];
 
 	// ffmpeg / gif2webp は必ず if not errorlevel 1 (...) / else (...) の各ブランチ内に置く。
@@ -799,20 +803,21 @@ function buildCwebpCmdScript(
 			`for %%f in (*.${ext}) do (`,
 			'  findstr /l /x /c:"%%~nf" "%SEEN_FILE%" >nul 2>&1',
 			'  if not errorlevel 1 (',
-			...cwebpCmdCommandLines(ext, groups, quality, resize, `%OUTPUT_DIR%\\%%~nf_${ext}`).map((l) => `    ${l}`),
+			...cwebpCmdCommandLines(ext, groups, quality, resize, `%OUTPUT_DIR%\\%%~nf_${ext}`).map(
+				(l) => `    ${l}`,
+			),
 			'  ) else (',
 			'    >>"%SEEN_FILE%" <nul set /p "=%%~nf"',
 			'    >>"%SEEN_FILE%" echo(',
-			...cwebpCmdCommandLines(ext, groups, quality, resize, '%OUTPUT_DIR%\\%%~nf').map((l) => `    ${l}`),
+			...cwebpCmdCommandLines(ext, groups, quality, resize, '%OUTPUT_DIR%\\%%~nf').map(
+				(l) => `    ${l}`,
+			),
 			'  )',
-			')'
+			')',
 		);
 	}
 
-	lines.push(
-		'del "%SEEN_FILE%" >nul 2>&1',
-		'exit /b'
-	);
+	lines.push('del "%SEEN_FILE%" >nul 2>&1', 'exit /b');
 
 	// Windows の cmd スクリプトとして標準の CRLF で出力する。
 	return lines.join('\r\n');

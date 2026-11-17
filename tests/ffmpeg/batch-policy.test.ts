@@ -10,10 +10,15 @@ import {
 	getFileExtension,
 	getValidatedOutputExtension,
 	inferBatchOptions,
-	resolveBatchInputExtensions
+	resolveBatchInputExtensions,
 } from '../../src/lib/ffmpeg/presets';
 import { commandStore } from '../../src/lib/stores/command.svelte';
-import type { BatchOptions, BatchScript, FFmpegOptions, PresetId } from '../../src/lib/ffmpeg/types';
+import type {
+	BatchOptions,
+	BatchScript,
+	FFmpegOptions,
+	PresetId,
+} from '../../src/lib/ffmpeg/types';
 
 function createOptions(outputFilename: string): FFmpegOptions {
 	return {
@@ -22,7 +27,7 @@ function createOptions(outputFilename: string): FFmpegOptions {
 		video: { codec: 'libx264', noVideo: false },
 		audio: { codec: 'aac', noAudio: false },
 		filter: {},
-		misc: { stripMetadata: false, copyStreams: false }
+		misc: { stripMetadata: false, copyStreams: false },
 	};
 }
 
@@ -42,10 +47,7 @@ describe('batch input policy', () => {
 		const script = requireScript(commandStore.batchScript);
 
 		expect(script.bash).toContain(
-			resolveBatchInputExtensions(
-				inferBatchOptions(PRESETS['image-convert']),
-				'avif'
-			).join('|')
+			resolveBatchInputExtensions(inferBatchOptions(PRESETS['image-convert']), 'avif').join('|'),
 		);
 		expect(script.bash).not.toContain('mxf');
 
@@ -55,7 +57,10 @@ describe('batch input policy', () => {
 
 	it('CC2-02 derives the output extension from options.output.filename', () => {
 		const script = requireScript(
-			buildBatchCommand(createOptions('user-selected.MKV'), inferBatchOptions(PRESETS['video-compress']))
+			buildBatchCommand(
+				createOptions('user-selected.MKV'),
+				inferBatchOptions(PRESETS['video-compress']),
+			),
 		);
 		expect(script.bash).toContain('OUTPUT_EXT="mkv"');
 		expect(script.powershell).toContain('$outputExt = "mkv"');
@@ -70,10 +75,10 @@ describe('batch input policy', () => {
 			'result.a b',
 			'result.jp;g',
 			'result.$(id)',
-			'result.toolong'
+			'result.toolong',
 		]) {
 			expect(
-				buildBatchCommand(createOptions(filename), inferBatchOptions(PRESETS['image-convert']))
+				buildBatchCommand(createOptions(filename), inferBatchOptions(PRESETS['image-convert'])),
 			).toBeNull();
 		}
 	});
@@ -81,23 +86,23 @@ describe('batch input policy', () => {
 	it('CC2-04 excludes every member of the selected output format family', () => {
 		const imageBatch = inferBatchOptions(PRESETS['image-convert']);
 		expect(resolveBatchInputExtensions(imageBatch, 'jpg')).not.toEqual(
-			expect.arrayContaining(['jpg', 'jpeg', 'jfif'])
+			expect.arrayContaining(['jpg', 'jpeg', 'jfif']),
 		);
 		expect(resolveBatchInputExtensions(imageBatch, 'tif')).not.toEqual(
-			expect.arrayContaining(['tif', 'tiff'])
+			expect.arrayContaining(['tif', 'tiff']),
 		);
 
 		const audioBatch = inferBatchOptions(PRESETS['audio-convert']);
 		expect(resolveBatchInputExtensions(audioBatch, 'aif')).not.toEqual(
-			expect.arrayContaining(['aif', 'aiff'])
+			expect.arrayContaining(['aif', 'aiff']),
 		);
 		expect(resolveBatchInputExtensions(audioBatch, 'ogg')).not.toEqual(
-			expect.arrayContaining(['ogg', 'oga'])
+			expect.arrayContaining(['ogg', 'oga']),
 		);
 
 		const videoBatch = inferBatchOptions(PRESETS['video-convert']);
 		expect(resolveBatchInputExtensions(videoBatch, 'mpg')).not.toEqual(
-			expect.arrayContaining(['mpg', 'mpeg'])
+			expect.arrayContaining(['mpg', 'mpeg']),
 		);
 		expect(resolveBatchInputExtensions(imageBatch, 'heif')).toContain('heic');
 	});
@@ -110,13 +115,13 @@ describe('batch input policy', () => {
 			'video-convert',
 			'audio-extract',
 			'audio-convert',
-			'gif-generate'
+			'gif-generate',
 		];
 
 		for (const presetId of allowed) {
 			expect(inferBatchOptions(PRESETS[presetId]).allowSameFormatInput).toBe(true);
 			const script = requireScript(
-				buildBatchCommand(createOptions('output.mp4'), inferBatchOptions(PRESETS[presetId]))
+				buildBatchCommand(createOptions('output.mp4'), inferBatchOptions(PRESETS[presetId])),
 			);
 			expect(script.bash).toContain('mp4');
 		}
@@ -127,7 +132,7 @@ describe('batch input policy', () => {
 
 	it('CC2-06 includes HEIC and HEIF in all image-convert shell scripts', () => {
 		const script = requireScript(
-			buildBatchCommand(createOptions('output.avif'), inferBatchOptions(PRESETS['image-convert']))
+			buildBatchCommand(createOptions('output.avif'), inferBatchOptions(PRESETS['image-convert'])),
 		);
 		expect(script.bash).toContain('heic|heif');
 		expect(script.powershell).toContain('"*.heic"');
@@ -140,7 +145,7 @@ describe('batch input policy', () => {
 		const batch = inferBatchOptions(PRESETS['image-webp']);
 		expect(batch.inputExtensions).toEqual(CWEBP_IMAGE_INPUT_EXTENSIONS);
 		expect(batch.inputExtensions).toEqual(
-			expect.arrayContaining(['heic', 'heif', 'avif', 'bmp', 'gif'])
+			expect.arrayContaining(['heic', 'heif', 'avif', 'bmp', 'gif']),
 		);
 
 		const script = requireScript(buildCwebpBatchCommand(createOptions('output.webp'), batch));
@@ -163,14 +168,16 @@ describe('batch input policy', () => {
 
 	it('CC2-08 uses video inputs for audio extraction and audio inputs for audio conversion', () => {
 		expect(inferBatchOptions(PRESETS['audio-extract']).inputExtensions).toEqual(
-			VIDEO_INPUT_EXTENSIONS
+			VIDEO_INPUT_EXTENSIONS,
 		);
 		const audioExtensions = resolveBatchInputExtensions(
 			inferBatchOptions(PRESETS['audio-convert']),
-			'ogg'
+			'ogg',
 		);
 		expect(audioExtensions).not.toEqual(expect.arrayContaining(['ogg', 'oga']));
-		expect(audioExtensions.every((extension) => AUDIO_INPUT_EXTENSIONS.includes(extension))).toBe(true);
+		expect(audioExtensions.every((extension) => AUDIO_INPUT_EXTENSIONS.includes(extension))).toBe(
+			true,
+		);
 	});
 
 	it('CC2-09 handles uppercase, extensionless, and invalid-extension input filenames', () => {
@@ -185,7 +192,7 @@ describe('batch input policy', () => {
 describe('shell consistency', () => {
 	const batch: BatchOptions = {
 		inputExtensions: ['jpg', 'png'],
-		allowSameFormatInput: false
+		allowSameFormatInput: false,
 	};
 	const script = requireScript(buildBatchCommand(createOptions('output.avif'), batch));
 	const cwebpScript = requireScript(buildCwebpBatchCommand(createOptions('output.webp'), batch));
@@ -240,11 +247,11 @@ describe('shell consistency', () => {
 			const generatedScript = requireScript(
 				preset.id === 'image-webp'
 					? buildCwebpBatchCommand(options, batch)
-					: buildBatchCommand(options, batch)
+					: buildBatchCommand(options, batch),
 			);
 			const expectedLoopCount = resolveBatchInputExtensions(
 				batch,
-				getValidatedOutputExtension(options.output.filename) as string
+				getValidatedOutputExtension(options.output.filename) as string,
 			).length;
 
 			expect(generatedScript.cmd).not.toMatch(/\bcall\s+:/i);
