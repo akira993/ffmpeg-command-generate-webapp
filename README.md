@@ -28,15 +28,15 @@ GUIで簡単にFFmpegコマンドを生成するWebアプリ。
 
 | 技術 | バージョン |
 |------|-----------|
-| SvelteKit | 2.x |
+| SvelteKit | 3.x |
 | Svelte | 5.x (Runes) |
 | TypeScript | 6.x |
 | Tailwind CSS | 4.x |
 | Vite | 8.x |
 | UI コンポーネント | 独自実装（CVA + Svelte 5 Runes） |
 | @lucide/svelte | latest |
-| sveltekit-i18n | latest |
-| Vitest | 4.x |
+| sveltekit-i18n | 3.x |
+| Vitest | 5.x |
 | Storybook | 10.x |
 
 > UI コンポーネントは RabeeUI パターン（CVA + Context API）で独自実装しています。bits-ui / shadcn-svelte は使用していません。
@@ -87,7 +87,7 @@ src/
 │   ├── i18n/             # 日英翻訳ファイル
 │   └── a11y/             # WCAG コントラスト比計算ユーティリティ
 ├── routes/               # SvelteKit ルーティング（/, /about-ffmpeg, /privacy）
-├── service-worker.ts     # PWA オフラインキャッシュ
+├── service-worker/       # PWA オフラインキャッシュ
 ├── app.css               # デザイントークン・テーマ・Web フォント定義
 └── app.html              # FOUC防止スクリプト・GA4 Consent Mode
 static/
