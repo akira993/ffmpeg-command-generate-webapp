@@ -13,15 +13,15 @@ import type {
 	BatchOptions,
 	BatchScript,
 	ScriptType
-} from '$lib/ffmpeg/types';
-import { buildCommand, buildBatchCommand, buildCwebpCommand, buildCwebpBatchCommand } from '$lib/ffmpeg/builder';
+} from '#lib/ffmpeg/types.js';
+import { buildCommand, buildBatchCommand, buildCwebpCommand, buildCwebpBatchCommand } from '#lib/ffmpeg/builder.js';
 import {
 	PRESETS,
 	getFileExtension,
 	getValidatedOutputExtension,
 	inferBatchOptions,
 	resolveBatchInputExtensions
-} from '$lib/ffmpeg/presets';
+} from '#lib/ffmpeg/presets.js';
 
 // ============================================================
 // デフォルト値

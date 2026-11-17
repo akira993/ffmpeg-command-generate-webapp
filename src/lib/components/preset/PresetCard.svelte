@@ -5,10 +5,10 @@
   Lucideアイコン + oklch CSSカスタムプロパティでカラフルに。
 -->
 <script lang="ts">
-	import { t } from '$lib/i18n';
-	import type { PresetDefinition } from '$lib/ffmpeg/types';
-	import * as Card from '$lib/components/ui/card';
-	import { compactStore } from '$lib/stores/compact.svelte';
+	import { t } from '#lib/i18n/index.js';
+	import type { PresetDefinition } from '#lib/ffmpeg/types.js';
+	import * as Card from '#lib/components/ui/card/index.js';
+	import { compactStore } from '#lib/stores/compact.svelte.js';
 	import ImageIcon from '@lucide/svelte/icons/image';
 	import GlobeIcon from '@lucide/svelte/icons/globe';
 	import ArchiveIcon from '@lucide/svelte/icons/archive';

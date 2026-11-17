@@ -5,9 +5,9 @@
   値変更でストアをリアルタイム更新 → コマンドが即座に再生成。
 -->
 <script lang="ts">
-	import { t } from '$lib/i18n';
-	import { commandStore } from '$lib/stores/command.svelte';
-	import { PRESETS } from '$lib/ffmpeg/presets';
+	import { t } from '#lib/i18n/index.js';
+	import { commandStore } from '#lib/stores/command.svelte.js';
+	import { PRESETS } from '#lib/ffmpeg/presets.js';
 	import {
 		SVT_AV1_DEFAULTS,
 		H264_DEFAULTS,
@@ -17,14 +17,14 @@
 		CODEC_FORMAT_COMPAT,
 		NON_DEFAULT_VIDEO_CODECS,
 		NON_DEFAULT_AUDIO_CODECS
-	} from '$lib/ffmpeg/codecs';
-	import type { VideoCodec, AudioCodec } from '$lib/ffmpeg/types';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
-	import { Slider } from '$lib/components/ui/slider';
-	import { Separator } from '$lib/components/ui/separator';
-	import * as Select from '$lib/components/ui/select';
-	import { Button } from '$lib/components/ui/button';
+	} from '#lib/ffmpeg/codecs.js';
+	import type { VideoCodec, AudioCodec } from '#lib/ffmpeg/types.js';
+	import { Input } from '#lib/components/ui/input/index.js';
+	import { Label } from '#lib/components/ui/label/index.js';
+	import { Slider } from '#lib/components/ui/slider/index.js';
+	import { Separator } from '#lib/components/ui/separator/index.js';
+	import * as Select from '#lib/components/ui/select/index.js';
+	import { Button } from '#lib/components/ui/button/index.js';
 	import LockIcon from '@lucide/svelte/icons/lock';
 	import UnlockIcon from '@lucide/svelte/icons/lock-open';
 

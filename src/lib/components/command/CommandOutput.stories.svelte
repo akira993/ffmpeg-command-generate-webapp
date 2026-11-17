@@ -1,7 +1,7 @@
 <script module>
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import CommandOutput from './CommandOutput.svelte';
-	import { commandStore } from '$lib/stores/command.svelte';
+	import { commandStore } from '#lib/stores/command.svelte.js';
 	import StorySetup from '../../../../.storybook/StorySetup.svelte';
 
 	const { Story } = defineMeta({

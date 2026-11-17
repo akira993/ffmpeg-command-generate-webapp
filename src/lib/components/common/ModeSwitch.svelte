@@ -5,8 +5,8 @@
   背景ピルがスライドするSegmentedControl風アニメーションを実装。
 -->
 <script lang="ts">
-	import { t } from '$lib/i18n';
-	import { commandStore } from '$lib/stores/command.svelte';
+	import { t } from '#lib/i18n/index.js';
+	import { commandStore } from '#lib/stores/command.svelte.js';
 
 	const options = [
 		{ value: 'preset',   labelKey: 'mode.preset'   },

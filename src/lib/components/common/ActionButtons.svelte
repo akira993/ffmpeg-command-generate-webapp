@@ -5,8 +5,8 @@
   モーダルは含まず、コールバック経由で親コンポーネントに通知する。
 -->
 <script lang="ts">
-	import { t } from '$lib/i18n';
-	import { Button } from '$lib/components/ui/button';
+	import { t } from '#lib/i18n/index.js';
+	import { Button } from '#lib/components/ui/button/index.js';
 	import DownloadIcon from '@lucide/svelte/icons/download';
 	import InfoIcon from '@lucide/svelte/icons/info';
 	import PackagePlusIcon from '@lucide/svelte/icons/package-plus';

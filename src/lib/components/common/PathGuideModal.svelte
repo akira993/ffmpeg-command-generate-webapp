@@ -5,9 +5,9 @@
   ユーザーがコマンドを正しく実行できるようガイドする。
 -->
 <script lang="ts">
-	import { t } from '$lib/i18n';
-	import * as Dialog from '$lib/components/ui/dialog';
-	import { Button } from '$lib/components/ui/button';
+	import { t } from '#lib/i18n/index.js';
+	import * as Dialog from '#lib/components/ui/dialog/index.js';
+	import { Button } from '#lib/components/ui/button/index.js';
 	import DownloadIcon from '@lucide/svelte/icons/download';
 	import InfoIcon from '@lucide/svelte/icons/info';
 

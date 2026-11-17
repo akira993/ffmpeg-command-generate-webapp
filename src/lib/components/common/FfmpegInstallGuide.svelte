@@ -5,10 +5,10 @@
   「実行方法」モーダルからの導線、および単独ボタンとして使用可能。
 -->
 <script lang="ts">
-	import { t } from '$lib/i18n';
-	import * as Dialog from '$lib/components/ui/dialog';
-	import * as Tabs from '$lib/components/ui/tabs';
-	import { Button } from '$lib/components/ui/button';
+	import { t } from '#lib/i18n/index.js';
+	import * as Dialog from '#lib/components/ui/dialog/index.js';
+	import * as Tabs from '#lib/components/ui/tabs/index.js';
+	import { Button } from '#lib/components/ui/button/index.js';
 	import DownloadIcon from '@lucide/svelte/icons/download';
 	import TerminalIcon from '@lucide/svelte/icons/terminal';
 	import CheckCircleIcon from '@lucide/svelte/icons/circle-check';

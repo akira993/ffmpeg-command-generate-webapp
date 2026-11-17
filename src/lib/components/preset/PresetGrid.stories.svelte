@@ -1,8 +1,8 @@
 <script module>
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import PresetGrid from './PresetGrid.svelte';
-	import { commandStore } from '$lib/stores/command.svelte';
-	import { compactStore } from '$lib/stores/compact.svelte';
+	import { commandStore } from '#lib/stores/command.svelte.js';
+	import { compactStore } from '#lib/stores/compact.svelte.js';
 	import StorySetup from '../../../../.storybook/StorySetup.svelte';
 
 	const { Story } = defineMeta({

@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { t } from '$lib/i18n';
-	import ThemeToggle from '$lib/components/common/ThemeToggle.svelte';
-	import LanguageSwitcher from '$lib/components/common/LanguageSwitcher.svelte';
-	import { compactStore } from '$lib/stores/compact.svelte';
+	import { t } from '#lib/i18n/index.js';
+	import ThemeToggle from '#lib/components/common/ThemeToggle.svelte';
+	import LanguageSwitcher from '#lib/components/common/LanguageSwitcher.svelte';
+	import { compactStore } from '#lib/stores/compact.svelte.js';
 	import SmartphoneIcon from '@lucide/svelte/icons/smartphone';
 	import MonitorIcon from '@lucide/svelte/icons/monitor';
 </script>

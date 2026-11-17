@@ -5,7 +5,7 @@
 	import { getContext } from "svelte";
 	import { DIALOG_CTX, type DialogContext } from "./dialog.svelte";
 	import * as Dialog from "./index.js";
-	import { cn, type WithElementRef } from "$lib/utils.js";
+	import { cn, type WithElementRef } from "#lib/utils.js";
 
 	type DialogContentProps = WithElementRef<HTMLAttributes<HTMLDivElement>> & {
 		children?: Snippet;

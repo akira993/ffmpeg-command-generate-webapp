@@ -9,12 +9,12 @@
   - クリックでファイル選択ダイアログも開ける
 -->
 <script lang="ts">
-	import { t } from '$lib/i18n';
-	import { commandStore } from '$lib/stores/command.svelte';
-	import type { FileInfo } from '$lib/ffmpeg/types';
-	import { Badge } from '$lib/components/ui/badge';
+	import { t } from '#lib/i18n/index.js';
+	import { commandStore } from '#lib/stores/command.svelte.js';
+	import type { FileInfo } from '#lib/ffmpeg/types.js';
+	import { Badge } from '#lib/components/ui/badge/index.js';
 	import FolderIcon from '@lucide/svelte/icons/folder';
-	import { Button } from '$lib/components/ui/button';
+	import { Button } from '#lib/components/ui/button/index.js';
 
 	let isDragging = $state(false);
 	let fileInput: HTMLInputElement | undefined = $state();
@@ -239,18 +239,18 @@
 			{#if commandStore.batchFileSummary}
 				<div class="mb-2 text-xs text-muted-foreground">
 					<p>
-						{$t('dropzone.batchTargets')
-							.replace('{{target}}', String(commandStore.batchFileSummary.targetCount))
-							.replace('{{excluded}}', String(commandStore.batchFileSummary.excludedCount))}
+						{$t('dropzone.batchTargets', {
+							target: String(commandStore.batchFileSummary.targetCount),
+							excluded: String(commandStore.batchFileSummary.excludedCount)
+						})}
 					</p>
 					{#if commandStore.batchFileSummary.excludedCount > 0}
 						<p>
-							{$t('dropzone.excludedExtensions').replace(
-								'{{extensions}}',
-								commandStore.batchFileSummary.excludedExtensions
+							{$t('dropzone.excludedExtensions', {
+								extensions: commandStore.batchFileSummary.excludedExtensions
 									.map((extension) => extension ?? $t('dropzone.noExtension'))
 									.join(', ')
-							)}
+							})}
 						</p>
 					{/if}
 				</div>
@@ -264,7 +264,7 @@
 				{/each}
 				{#if commandStore.fileCount > MAX_DISPLAY_FILES}
 					<li class="text-muted-foreground/70">
-						... {$t('dropzone.moreFiles').replace('{{count}}', String(commandStore.fileCount - MAX_DISPLAY_FILES))}
+						... {$t('dropzone.moreFiles', { count: String(commandStore.fileCount - MAX_DISPLAY_FILES) })}
 					</li>
 				{/if}
 			</ul>

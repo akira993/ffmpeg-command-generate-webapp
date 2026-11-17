@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { t } from '$lib/i18n';
-	import { compactStore } from '$lib/stores/compact.svelte';
+	import { t } from '#lib/i18n/index.js';
+	import { compactStore } from '#lib/stores/compact.svelte.js';
 </script>
 
 <footer class="footer-dynamic-pb border-t border-border mt-auto">

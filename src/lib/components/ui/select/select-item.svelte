@@ -1,6 +1,6 @@
 <script lang="ts">
 	import CheckIcon from "@lucide/svelte/icons/check";
-	import { cn, type WithElementRef } from "$lib/utils.js";
+	import { cn, type WithElementRef } from "#lib/utils.js";
 	import type { Snippet } from "svelte";
 	import type { HTMLAttributes } from "svelte/elements";
 	import { getContext } from "svelte";

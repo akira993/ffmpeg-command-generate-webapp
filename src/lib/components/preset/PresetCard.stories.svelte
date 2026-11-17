@@ -1,8 +1,8 @@
 <script module>
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import PresetCard from './PresetCard.svelte';
-	import { PRESETS } from '$lib/ffmpeg/presets';
-	import { compactStore } from '$lib/stores/compact.svelte';
+	import { PRESETS } from '#lib/ffmpeg/presets.js';
+	import { compactStore } from '#lib/stores/compact.svelte.js';
 	import StorySetup from '../../../../.storybook/StorySetup.svelte';
 
 	const { Story } = defineMeta({

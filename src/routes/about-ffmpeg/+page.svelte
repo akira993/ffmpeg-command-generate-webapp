@@ -5,8 +5,8 @@
   日本語/英語で切り替え表示する。8000文字以上のコンテンツ。
 -->
 <script lang="ts">
-	import { locale, t } from '$lib/i18n';
-	import { Button } from '$lib/components/ui/button';
+	import { locale, t } from '#lib/i18n/index.js';
+	import { Button } from '#lib/components/ui/button/index.js';
 	import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left';
 	import ExternalLinkIcon from '@lucide/svelte/icons/external-link';
 </script>

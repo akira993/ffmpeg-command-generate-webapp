@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { locale } from '$lib/i18n';
-	import { Button } from '$lib/components/ui/button';
+	import { locale } from '#lib/i18n/index.js';
+	import { Button } from '#lib/components/ui/button/index.js';
 
 	function toggle() {
 		const next = $locale === 'ja' ? 'en' : 'ja';

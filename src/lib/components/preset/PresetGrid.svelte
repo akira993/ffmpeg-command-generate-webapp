@@ -4,10 +4,10 @@
   全プリセットをカードのグリッドで表示し、選択状態を管理する。
 -->
 <script lang="ts">
-	import { commandStore } from '$lib/stores/command.svelte';
-	import { getAllPresets } from '$lib/ffmpeg/presets';
-	import type { PresetId } from '$lib/ffmpeg/types';
-	import { compactStore } from '$lib/stores/compact.svelte';
+	import { commandStore } from '#lib/stores/command.svelte.js';
+	import { getAllPresets } from '#lib/ffmpeg/presets.js';
+	import type { PresetId } from '#lib/ffmpeg/types.js';
+	import { compactStore } from '#lib/stores/compact.svelte.js';
 	import PresetCard from './PresetCard.svelte';
 
 	const presets = getAllPresets();

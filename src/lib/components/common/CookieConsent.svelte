@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { t } from '$lib/i18n';
-	import { consentStore } from '$lib/stores/consent.svelte';
-	import { Button } from '$lib/components/ui/button';
+	import { t } from '#lib/i18n/index.js';
+	import { consentStore } from '#lib/stores/consent.svelte.js';
+	import { Button } from '#lib/components/ui/button/index.js';
 </script>
 
 {#if consentStore.showBanner}

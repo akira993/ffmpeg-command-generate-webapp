@@ -1,6 +1,6 @@
 <script lang="ts">
 	import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
-	import { cn, type WithElementRef } from "$lib/utils.js";
+	import { cn, type WithElementRef } from "#lib/utils.js";
 	import type { Snippet } from "svelte";
 	import type { HTMLButtonAttributes } from "svelte/elements";
 	import { getContext, onMount } from "svelte";

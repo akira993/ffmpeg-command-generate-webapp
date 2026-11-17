@@ -1,18 +1,13 @@
-/// <reference no-default-lib="true"/>
-/// <reference lib="esnext" />
-/// <reference lib="webworker" />
-/// <reference types="@sveltejs/kit" />
-
-import { build, files, version } from '$service-worker';
-
-const self = globalThis as unknown as ServiceWorkerGlobalScope;
+import { version } from '$app/env';
+import { assets, immutable } from '$app/manifest';
+import { self } from '$app/service-worker';
 
 const CACHE = `cache-${version}`;
 
-const ASSETS = [
-	...build,
-	...files
-];
+// immutable は旧 build、assets は旧 files。パスは base 相対なので、pathname と比較できるよう先頭の / を足す。
+const ASSETS = [...immutable, ...assets].map((file) =>
+	file.path.startsWith('/') ? file.path : `/${file.path}`
+);
 
 self.addEventListener('install', (event) => {
 	async function addFilesToCache() {
@@ -40,7 +35,7 @@ self.addEventListener('fetch', (event) => {
 		const url = new URL(event.request.url);
 		const cache = await caches.open(CACHE);
 
-		// build/files can always be served from cache
+		// 先読みした build と files はキャッシュから返す
 		if (ASSETS.includes(url.pathname)) {
 			const response = await cache.match(url.pathname);
 			if (response) {

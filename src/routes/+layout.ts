@@ -1,5 +1,5 @@
-import { loadTranslations, locale, defaultLocale } from '$lib/i18n';
-import { browser } from '$app/environment';
+import { loadTranslations, locale, defaultLocale } from '#lib/i18n/index.js';
+import { browser } from '$app/env';
 import type { LayoutLoad } from './$types';
 
 export const ssr = true;

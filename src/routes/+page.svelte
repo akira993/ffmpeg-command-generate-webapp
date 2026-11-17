@@ -11,20 +11,20 @@
   7. モバイル固定バー（ActionButtons）
 -->
 <script lang="ts">
-	import { locale, t } from '$lib/i18n';
-	import { commandStore } from '$lib/stores/command.svelte';
-	import DropZone from '$lib/components/common/DropZone.svelte';
-	import ModeSwitch from '$lib/components/common/ModeSwitch.svelte';
-	import PresetGrid from '$lib/components/preset/PresetGrid.svelte';
-	import PresetCustomizer from '$lib/components/preset/PresetCustomizer.svelte';
-	import CommandOutput from '$lib/components/command/CommandOutput.svelte';
-	import ActionButtons from '$lib/components/common/ActionButtons.svelte';
-	import FfmpegInstallGuide from '$lib/components/common/FfmpegInstallGuide.svelte';
-	import PathGuideModal from '$lib/components/common/PathGuideModal.svelte';
-	import LibraryInstallGuide from '$lib/components/common/LibraryInstallGuide.svelte';
-	import { Separator } from '$lib/components/ui/separator';
-	import { compactStore } from '$lib/stores/compact.svelte';
-	import { browser } from '$app/environment';
+	import { locale, t } from '#lib/i18n/index.js';
+	import { commandStore } from '#lib/stores/command.svelte.js';
+	import DropZone from '#lib/components/common/DropZone.svelte';
+	import ModeSwitch from '#lib/components/common/ModeSwitch.svelte';
+	import PresetGrid from '#lib/components/preset/PresetGrid.svelte';
+	import PresetCustomizer from '#lib/components/preset/PresetCustomizer.svelte';
+	import CommandOutput from '#lib/components/command/CommandOutput.svelte';
+	import ActionButtons from '#lib/components/common/ActionButtons.svelte';
+	import FfmpegInstallGuide from '#lib/components/common/FfmpegInstallGuide.svelte';
+	import PathGuideModal from '#lib/components/common/PathGuideModal.svelte';
+	import LibraryInstallGuide from '#lib/components/common/LibraryInstallGuide.svelte';
+	import { Separator } from '#lib/components/ui/separator/index.js';
+	import { compactStore } from '#lib/stores/compact.svelte.js';
+	import { browser } from '$app/env';
 	import { onMount } from 'svelte';
 	import { slide } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';

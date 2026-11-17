@@ -3,7 +3,7 @@
 	import type { HTMLButtonAttributes } from "svelte/elements";
 	import { getContext } from "svelte";
 	import { DIALOG_CTX, type DialogContext } from "./dialog.svelte";
-	import { cn, type WithElementRef } from "$lib/utils.js";
+	import { cn, type WithElementRef } from "#lib/utils.js";
 
 	let {
 		ref = $bindable(null),

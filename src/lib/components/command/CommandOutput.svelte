@@ -7,11 +7,11 @@
   - ワンクリックコピー
 -->
 <script lang="ts">
-	import { t } from '$lib/i18n';
-	import { commandStore } from '$lib/stores/command.svelte';
-	import type { ScriptType } from '$lib/ffmpeg/types';
-	import * as Tabs from '$lib/components/ui/tabs';
-	import { Button } from '$lib/components/ui/button';
+	import { t } from '#lib/i18n/index.js';
+	import { commandStore } from '#lib/stores/command.svelte.js';
+	import type { ScriptType } from '#lib/ffmpeg/types.js';
+	import * as Tabs from '#lib/components/ui/tabs/index.js';
+	import { Button } from '#lib/components/ui/button/index.js';
 	import InfoIcon from '@lucide/svelte/icons/info';
 	import {
 		PRESETS,
@@ -22,7 +22,7 @@
 		getValidatedOutputExtension,
 		inferBatchOptions,
 		resolveBatchInputExtensions
-	} from '$lib/ffmpeg/presets';
+	} from '#lib/ffmpeg/presets.js';
 
 	let copied = $state(false);
 
