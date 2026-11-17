@@ -16,13 +16,13 @@ GUIで簡単にFFmpegコマンドを生成するWebアプリ。
 - **FFmpeg紹介ページ**: `/about-ffmpeg` — FFmpegの歴史・設計思想・ユースケース・圧縮比較表（JA/EN対応）
 - **ダーク/ライトテーマ**: ペールトーン(Light) / サイバーパンク(Dark)
 - **PWA**: インストール可能、オフライン対応（Service Worker によるアセットキャッシュ）
-- **コンパクトモード**: PWA standalone 起動時に 1:3 縦長リサイズ + UI 圧縮を自動適用
+- **コンパクトモード**: PWA standalone 起動時に、ボタンで 1:3 縦長リサイズ + UI 圧縮を切り替え
 - **SEO**: SSR + OGP / Twitter Cards + JSON-LD 構造化データ + sitemap.xml + GA4
 - **Cookie同意 + GA4 Consent Mode v2**: GDPR/CCPA対応のプライバシー管理
 - **プライバシーポリシー**: `/privacy` — GDPR/CCPA 対応、お問い合わせフォーム付き
 - **Web フォント**: Noto Sans JP（日本語）/ Inter（英語）を woff2 でセルフホスト（言語別切替）
 - **CSS Subgrid**: プリセットカードのアイコン・タイトル・説明文を行単位で揃える
-- **Storybook**: 15コンポーネント / 58ストーリーのUIカタログ
+- **Storybook**: UI コンポーネントのカタログ
 
 ## Tech Stack
 
