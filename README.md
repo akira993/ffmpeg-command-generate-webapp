@@ -34,7 +34,7 @@ GUIで簡単にFFmpegコマンドを生成するWebアプリ。
 | Tailwind CSS | 4.x |
 | Vite | 8.x |
 | UI コンポーネント | 独自実装（CVA + Svelte 5 Runes） |
-| @lucide/svelte | latest |
+| @lucide/svelte | 1.x |
 | sveltekit-i18n | 3.x |
 | Vitest | 5.x |
 | Storybook | 10.x |
