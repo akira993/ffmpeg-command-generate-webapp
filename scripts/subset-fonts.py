@@ -86,18 +86,13 @@ def extract_jp_chars_from_app():
             chars.update(c for c in text if "\u4e00" <= c <= "\u9fff")
 
     # Svelte ファイルから日本語テキストを抽出
-    svelte_dirs = [
-        os.path.join(PROJECT_ROOT, "src", "routes", "privacy"),
-        os.path.join(PROJECT_ROOT, "src", "routes", "about-ffmpeg"),
-    ]
-    for d in svelte_dirs:
-        if not os.path.isdir(d):
-            continue
-        for fname in os.listdir(d):
+    for directory, _, filenames in os.walk(os.path.join(PROJECT_ROOT, "src")):
+        for fname in filenames:
             if fname.endswith(".svelte"):
-                fpath = os.path.join(d, fname)
+                fpath = os.path.join(directory, fname)
                 with open(fpath, "r", encoding="utf-8") as f:
                     text = f.read()
+                    text = re.sub(r"<!--.*?-->|/\*.*?\*/|(?<!\S)//[^\r\n]*", "", text, flags=re.DOTALL)
                     chars.update(c for c in text if "\u4e00" <= c <= "\u9fff")
 
     return chars
