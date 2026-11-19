@@ -114,7 +114,7 @@ scripts/
 
 ## Deployment
 
-**`main` push → GitHub Actions CI（型チェック・CSS lint・build・Storybook build）→ Vercel 本番自動デプロイ**
+**`main` push → GitHub Actions CI（書式の確認・CSS lint・ユニットテスト・型チェック・build・Storybook build）→ Vercel 本番自動デプロイ**
 
 | プロジェクト | URL | ビルドコマンド |
 |-------------|-----|---------------|
