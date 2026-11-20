@@ -24,7 +24,7 @@
 <div
 	class="bg-muted text-muted-foreground relative inline-grid h-9 grid-cols-2 items-center rounded-lg p-[0.1875rem]"
 	role="tablist"
-	aria-label="mode switch"
+	aria-label={$t('mode.switchLabel')}
 >
 	<!-- スライドする背景ピル: TabsTrigger の active 状態と同じ bg-background / rounded-md / shadow-sm -->
 	<span

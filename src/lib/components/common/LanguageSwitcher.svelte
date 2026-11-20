@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { locale } from '#lib/i18n/index.js';
+	import { locale, t } from '#lib/i18n/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 
 	function toggle() {
@@ -9,6 +9,6 @@
 	}
 </script>
 
-<Button variant="ghost" size="sm" onclick={toggle} aria-label="Switch language">
+<Button variant="ghost" size="sm" onclick={toggle} aria-label={$t('common.switchLanguage')}>
 	{$locale === 'ja' ? 'EN' : 'JA'}
 </Button>

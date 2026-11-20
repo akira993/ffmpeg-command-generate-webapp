@@ -2,11 +2,13 @@
 	import { t } from '#lib/i18n/index.js';
 	import { consentStore } from '#lib/stores/consent.svelte.js';
 	import { Button } from '#lib/components/ui/button/index.js';
+
+	let { aboveMobileBar = false }: { aboveMobileBar?: boolean } = $props();
 </script>
 
 {#if consentStore.showBanner}
 	<div
-		class="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card p-4 shadow-lg"
+		class="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card p-4 shadow-lg {aboveMobileBar ? 'max-sm:bottom-[var(--mobile-bar-h,0rem)]' : ''}"
 	>
 		<div
 			class="container mx-auto flex flex-col items-center gap-3 sm:flex-row sm:justify-between"

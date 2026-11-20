@@ -28,6 +28,10 @@
 
 	/** WebP プリセット時は cwebp を使用 */
 	const isCwebpMode = $derived(commandStore.selectedPreset === 'image-webp');
+	const showWebpPresetNote = $derived(
+		commandStore.selectedPreset === 'image-convert' &&
+			getFileExtension(commandStore.options.output.filename) === 'webp'
+	);
 
 	/**
 	 * cwebp モード時、入力形式に応じてどの経路の注記を出すか
@@ -152,6 +156,10 @@
 				{/if}
 			</div>
 		</div>
+	{/if}
+
+	{#if showWebpPresetNote}
+		<p class="text-sm text-muted-foreground">{$t('command.useWebpPreset')}</p>
 	{/if}
 
 	<!-- コマンド表示エリア -->

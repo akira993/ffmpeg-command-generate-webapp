@@ -24,6 +24,7 @@
 		disabled = false,
 		type: _type,
 		class: className,
+		"aria-labelledby": labelledBy,
 		onValueChange,
 		...restProps
 	}: SliderProps = $props();
@@ -130,6 +131,7 @@
 		data-slot="slider-thumb"
 		role="slider"
 		tabindex={disabled ? -1 : 0}
+		aria-labelledby={labelledBy}
 		aria-valuenow={value}
 		aria-valuemin={min}
 		aria-valuemax={max}

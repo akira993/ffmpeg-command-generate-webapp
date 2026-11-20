@@ -68,7 +68,7 @@
 	<meta name="twitter:card" content="summary_large_image" />
 	{#if $locale === 'ja'}
 		<title>FFmpegコマンドジェネレーター — 動画・音声・画像変換コマンドを簡単生成</title>
-		<meta name="description" content="FFmpegのコマンドをGUIで簡単生成。動画圧縮（H.264/AV1）、音声抽出、画像変換（AVIF/WebP）、GIF生成など7つのプリセットでワンクリック設定。ドラッグ＆ドロップ対応。" />
+		<meta name="description" content="FFmpegのコマンドをGUIで簡単生成。動画圧縮（H.264/AV1）、音声抽出、画像変換（AVIF/WebP）、GIF生成などのプリセットでワンクリック設定。ドラッグ＆ドロップ対応。" />
 		<meta property="og:title" content="FFmpegコマンドジェネレーター" />
 		<meta property="og:description" content="GUIで直感的にFFmpegコマンドを生成。動画圧縮・音声抽出・画像変換・GIF生成をワンクリックで。" />
 		<meta property="og:image" content="https://www.cmd-gen.com/og-home-ja.png?v=2" />
@@ -168,7 +168,7 @@
 		<!-- アドバンスドモード（後日実装） -->
 		<section class="rounded-lg border border-dashed border-muted-foreground/25 p-8 text-center">
 			<p class="text-sm text-muted-foreground">
-				{$t('mode.advanced')} — Coming Soon
+				{$t('mode.advanced')} — {$t('mode.comingSoon')}
 			</p>
 		</section>
 	{/if}

@@ -186,7 +186,7 @@
 							value={currentFormat}
 							onValueChange={(v) => { if (v) handleFormatChange(v); }}
 						>
-							<Select.Trigger class="w-full">
+							<Select.Trigger id={field} class="w-full">
 								{currentFormat || '—'}
 							</Select.Trigger>
 							<Select.Content>
@@ -204,7 +204,7 @@
 							value={String(getOptionValue(field) ?? '')}
 							onValueChange={(v) => { if (v) handleCodecChange(field, v); }}
 						>
-							<Select.Trigger class="w-full">
+							<Select.Trigger id={field} class="w-full">
 								{videoCodecLabels[getOptionValue(field) as VideoCodec] ?? String(getOptionValue(field) ?? '—')}
 							</Select.Trigger>
 							<Select.Content>
@@ -227,7 +227,7 @@
 							value={String(getOptionValue(field) ?? '')}
 							onValueChange={(v) => { if (v) handleCodecChange(field, v); }}
 						>
-							<Select.Trigger class="w-full">
+							<Select.Trigger id={field} class="w-full">
 								{audioCodecLabels[getOptionValue(field) as AudioCodec] ?? String(getOptionValue(field) ?? '—')}
 							</Select.Trigger>
 							<Select.Content>
@@ -244,11 +244,12 @@
 
 					<!-- CRFスライダー -->
 					{:else if field === 'video.crf'}
-						<Label for={field}>
-							{$t('form.crf')}: {getOptionValue(field) ?? 0}
-						</Label>
+						<span id={field} class="block text-sm leading-none font-medium select-none">
+							{$t('form.crf')}<span aria-hidden="true">: {getOptionValue(field) ?? 0}</span>
+						</span>
 						<Slider
 							type="single"
+							aria-labelledby={field}
 							value={Number(getOptionValue(field) ?? 30)}
 							min={crfRange.min}
 							max={crfRange.max}
@@ -261,11 +262,12 @@
 
 					<!-- WebP Qualityスライダー -->
 					{:else if field === 'video.quality'}
-						<Label for={field}>
-							{$t('form.quality')}: {getOptionValue(field) ?? 75}
-						</Label>
+						<span id={field} class="block text-sm leading-none font-medium select-none">
+							{$t('form.quality')}<span aria-hidden="true">: {getOptionValue(field) ?? 75}</span>
+						</span>
 						<Slider
 							type="single"
+							aria-labelledby={field}
 							value={Number(getOptionValue(field) ?? 75)}
 							min={WEBP_DEFAULTS.qualityRange.min}
 							max={WEBP_DEFAULTS.qualityRange.max}
@@ -278,11 +280,12 @@
 
 					<!-- SVT-AV1 プリセットスライダー -->
 					{:else if field === 'video.svtav1Preset'}
-						<Label for={field}>
-							{$t('form.encoderSpeed')}: {getOptionValue(field) ?? 6}
-						</Label>
+						<span id={field} class="block text-sm leading-none font-medium select-none">
+							{$t('form.encoderSpeed')}<span aria-hidden="true">: {getOptionValue(field) ?? 6}</span>
+						</span>
 						<Slider
 							type="single"
+							aria-labelledby={field}
 							value={Number(getOptionValue(field) ?? 6)}
 							min={SVT_AV1_DEFAULTS.presetRange.min}
 							max={SVT_AV1_DEFAULTS.presetRange.max}
@@ -301,7 +304,7 @@
 							value={String(getOptionValue(field) ?? '128k')}
 							onValueChange={(v) => { if (v) handleInputChange(field, v); }}
 						>
-							<Select.Trigger class="w-full">
+							<Select.Trigger id={field} class="w-full">
 								{String(getOptionValue(field) ?? '128k')}
 							</Select.Trigger>
 							<Select.Content>
@@ -334,7 +337,7 @@
 								class="h-9 w-9 p-0"
 								onclick={toggleAspectLock}
 								disabled={scaleDisabled}
-								title={commandStore.aspectRatioLocked ? 'Unlock aspect ratio' : 'Lock aspect ratio'}
+								title={$t(commandStore.aspectRatioLocked ? 'form.unlockAspectRatio' : 'form.lockAspectRatio')}
 							>
 								{#if commandStore.aspectRatioLocked}
 									<LockIcon size={14} />

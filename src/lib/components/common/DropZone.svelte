@@ -3,9 +3,9 @@
 
   機能:
   - ファイル・フォルダの両方をD&D受付
-  - webkitGetAsEntry() でフォルダ内を再帰的に読み取り
+  - webkitGetAsEntry() でフォルダ直下のファイルだけを読み取り
   - ファイル名（＋相対パス）をストアに反映
-  - 1ファイルなら個別モード、複数 or フォルダなら一括モードに自動切替
+  - 1ファイルなら個別モード、2ファイル以上なら一括モードに自動切替
   - クリックでファイル選択ダイアログも開ける
 -->
 <script lang="ts">
@@ -15,6 +15,7 @@
 	import { Badge } from '#lib/components/ui/badge/index.js';
 	import FolderIcon from '@lucide/svelte/icons/folder';
 	import { Button } from '#lib/components/ui/button/index.js';
+	import { collectDirectFileEntries } from './drop-entries.js';
 
 	let isDragging = $state(false);
 	let fileInput: HTMLInputElement | undefined = $state();
@@ -69,26 +70,24 @@
 
 		if (!e.dataTransfer?.items) return;
 
+		const droppedItems = Array.from(e.dataTransfer.items)
+			.filter((item) => item.kind === 'file')
+			.map((item) => item.webkitGetAsEntry?.() ?? item.getAsFile());
 		const files: FileInfo[] = [];
 
-		for (const item of Array.from(e.dataTransfer.items)) {
-			if (item.kind !== 'file') continue;
-
-			// webkitGetAsEntry でフォルダ対応
-			const entry = item.webkitGetAsEntry?.();
-			if (entry) {
-				await readEntry(entry, files, '');
-			} else {
-				// フォールバック: 通常のファイル取得
-				const file = item.getAsFile();
-				if (file) {
-					const dims = await getMediaDimensions(file);
-					files.push({
-						name: file.name,
-						size: file.size,
-						type: file.type,
-						...(dims ? { width: dims.width, height: dims.height } : {})
-					});
+		for (const item of droppedItems) {
+			if (!item) continue;
+			if (item instanceof File) {
+				files.push(await getDroppedFileInfo(item));
+			} else if (item.isFile) {
+				const file = await getFile(item as FileSystemFileEntry);
+				files.push(await getDroppedFileInfo(file));
+			} else if (item.isDirectory) {
+				const directory = item as FileSystemDirectoryEntry;
+				const entries = await collectDirectFileEntries(directory);
+				for (const entry of entries) {
+					const file = await getFile(entry as FileSystemFileEntry);
+					files.push(await getDroppedFileInfo(file, directory.name));
 				}
 			}
 		}
@@ -98,57 +97,21 @@
 		}
 	}
 
-	/**
-	 * FileSystemEntry を再帰的に読み取り、ファイル情報を収集する
-	 */
-	async function readEntry(entry: FileSystemEntry, files: FileInfo[], parentPath: string): Promise<void> {
-		if (entry.isFile) {
-			const fileEntry = entry as FileSystemFileEntry;
-			const file = await getFile(fileEntry);
-			const dims = await getMediaDimensions(file);
-			files.push({
-				name: file.name,
-				relativePath: parentPath ? `${parentPath}/${file.name}` : undefined,
-				size: file.size,
-				type: file.type,
-				...(dims ? { width: dims.width, height: dims.height } : {})
-			});
-		} else if (entry.isDirectory) {
-			const dirEntry = entry as FileSystemDirectoryEntry;
-			const reader = dirEntry.createReader();
-			const entries = await readAllEntries(reader);
-			const currentPath = parentPath ? `${parentPath}/${entry.name}` : entry.name;
-
-			for (const childEntry of entries) {
-				await readEntry(childEntry, files, currentPath);
-			}
-		}
+	async function getDroppedFileInfo(file: File, folderName?: string): Promise<FileInfo> {
+		const dims = await getMediaDimensions(file);
+		return {
+			name: file.name,
+			...(folderName ? { relativePath: `${folderName}/${file.name}` } : {}),
+			size: file.size,
+			type: file.type,
+			...(dims ? { width: dims.width, height: dims.height } : {})
+		};
 	}
 
 	/** FileSystemFileEntry からFileオブジェクトを取得 */
 	function getFile(entry: FileSystemFileEntry): Promise<File> {
 		return new Promise((resolve, reject) => {
 			entry.file(resolve, reject);
-		});
-	}
-
-	/** DirectoryReader から全エントリを取得（readEntries は100件ずつ返す） */
-	function readAllEntries(reader: FileSystemDirectoryReader): Promise<FileSystemEntry[]> {
-		return new Promise((resolve, reject) => {
-			const allEntries: FileSystemEntry[] = [];
-
-			function readBatch() {
-				reader.readEntries((entries) => {
-					if (entries.length === 0) {
-						resolve(allEntries);
-					} else {
-						allEntries.push(...entries);
-						readBatch(); // 再帰的に全件取得
-					}
-				}, reject);
-			}
-
-			readBatch();
 		});
 	}
 

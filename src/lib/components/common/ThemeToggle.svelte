@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { t } from '#lib/i18n/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import SunIcon from '@lucide/svelte/icons/sun';
 	import MoonIcon from '@lucide/svelte/icons/moon';
@@ -22,7 +23,7 @@
 	}
 </script>
 
-<Button variant="ghost" size="icon" onclick={toggle} aria-label="Toggle theme">
+<Button variant="ghost" size="icon" onclick={toggle} aria-label={$t('common.toggleTheme')}>
 	{#if dark}
 		<SunIcon size={20} />
 	{:else}

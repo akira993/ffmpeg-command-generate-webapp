@@ -6,6 +6,7 @@
 	import CookieConsent from '#lib/components/common/CookieConsent.svelte';
 	import { locale } from '#lib/i18n/index.js';
 	import { browser } from '$app/env';
+	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 	import { consentStore } from '#lib/stores/consent.svelte.js';
 	import { compactStore } from '#lib/stores/compact.svelte.js';
@@ -36,4 +37,4 @@
 	</main>
 	<Footer />
 </div>
-<CookieConsent />
+<CookieConsent aboveMobileBar={page.route.id === '/'} />

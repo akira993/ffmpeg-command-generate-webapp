@@ -6,7 +6,10 @@
 		"input": "入力",
 		"output": "出力",
 		"apply": "適用",
-		"settings": "設定"
+		"settings": "設定",
+		"close": "閉じる",
+		"switchLanguage": "言語を切り替え",
+		"toggleTheme": "テーマを切り替え"
 	},
 	"header": {
 		"title": "FFmpeg コマンドジェネレーター",
@@ -16,7 +19,9 @@
 	},
 	"mode": {
 		"preset": "プリセット",
-		"advanced": "アドバンスド"
+		"advanced": "アドバンスド",
+		"comingSoon": "近日公開",
+		"switchLabel": "モードの切り替え"
 	},
 	"preset": {
 		"videoConvert": {
@@ -86,12 +91,15 @@
 		"scaleHeight": "高さ（px）",
 		"quality": "品質",
 		"codecCopy": "コピー（再エンコードなし）",
-		"codecPcmUncompressed": "PCM（非圧縮）"
+		"codecPcmUncompressed": "PCM（非圧縮）",
+		"lockAspectRatio": "縦横比を固定",
+		"unlockAspectRatio": "縦横比の固定を解除"
 	},
 	"command": {
 		"generated": "生成されたコマンド",
 		"empty": "プリセットを選択するか、オプションを設定してください",
 		"copied": "コマンドをコピーしました",
+		"useWebpPreset": "WebP に変換するには、「画像圧縮（WebP）」のプリセットを使ってください。",
 		"cwebpNote": "※ この変換は cwebp（WebP公式ツール）を使用します",
 		"cwebpInstallMac": "brew install webp",
 		"cwebpInstallLinux": "sudo apt install webp",

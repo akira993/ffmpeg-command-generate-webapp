@@ -6,7 +6,10 @@
 		"input": "Input",
 		"output": "Output",
 		"apply": "Apply",
-		"settings": "Settings"
+		"settings": "Settings",
+		"close": "Close",
+		"switchLanguage": "Switch language",
+		"toggleTheme": "Toggle theme"
 	},
 	"header": {
 		"title": "FFmpeg Command Generator",
@@ -16,7 +19,9 @@
 	},
 	"mode": {
 		"preset": "Preset",
-		"advanced": "Advanced"
+		"advanced": "Advanced",
+		"comingSoon": "Coming Soon",
+		"switchLabel": "Mode switch"
 	},
 	"preset": {
 		"videoConvert": {
@@ -86,12 +91,15 @@
 		"scaleHeight": "Height (px)",
 		"quality": "Quality",
 		"codecCopy": "Copy (no re-encoding)",
-		"codecPcmUncompressed": "PCM (Uncompressed)"
+		"codecPcmUncompressed": "PCM (Uncompressed)",
+		"lockAspectRatio": "Lock aspect ratio",
+		"unlockAspectRatio": "Unlock aspect ratio"
 	},
 	"command": {
 		"generated": "Generated Command",
 		"empty": "Select a preset or configure options to generate a command",
 		"copied": "Command copied to clipboard",
+		"useWebpPreset": "To convert to WebP, use the \"Image Compression (WebP)\" preset.",
 		"cwebpNote": "Uses cwebp (official WebP tool by Google)",
 		"cwebpInstallMac": "brew install webp",
 		"cwebpInstallLinux": "sudo apt install webp",

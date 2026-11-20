@@ -6,6 +6,7 @@
 	import { DIALOG_CTX, type DialogContext } from "./dialog.svelte";
 	import * as Dialog from "./index.js";
 	import { cn, type WithElementRef } from "#lib/utils.js";
+	import { t } from "#lib/i18n/index.js";
 
 	type DialogContentProps = WithElementRef<HTMLAttributes<HTMLDivElement>> & {
 		children?: Snippet;
@@ -69,7 +70,7 @@
 				onclick={() => ctx.setOpen(false)}
 			>
 				<XIcon />
-				<span class="sr-only">Close</span>
+				<span class="sr-only">{$t('common.close')}</span>
 			</button>
 		{/if}
 	</div>
