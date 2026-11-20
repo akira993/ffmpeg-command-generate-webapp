@@ -30,6 +30,9 @@ jobs:
       - name: CSS lint (oklch enforcement)
         run: bash scripts/lint-css.sh
 
+      - name: Font subset check
+        run: python3 -B scripts/subset-fonts.py --check
+
       - name: Unit tests
         run: npm run test
 
