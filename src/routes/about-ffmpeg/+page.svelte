@@ -123,7 +123,7 @@
 			<header class="space-y-3">
 				<h1 class="text-3xl font-bold tracking-tight">FFmpegとは？</h1>
 				<p class="text-lg text-muted-foreground">
-					25年以上の歴史を持つ、世界で最も使われているオープンソースのマルチメディア処理フレームワーク
+					25年以上の歴史を持つ、広く使われているオープンソースのマルチメディア処理フレームワーク
 				</p>
 			</header>
 
@@ -141,7 +141,8 @@
 					事実上のマルチメディア処理の標準ツールとして広く利用されています。
 				</p>
 				<p class="text-sm leading-relaxed text-muted-foreground">
-					LGPLおよびGPLライセンスで公開されており、誰でも無料で利用・改変・再配布が可能です。
+					既定ではLGPL 2.1以降で公開されており、GPLの部品を有効にするとGPLが適用されます。
+					無料で利用・改変・再配布できますが、再配布にはライセンスの条件があります。
 					対応するコーデック・フォーマット数は数百にのぼり、その網羅性は他に類を見ません。
 				</p>
 			</section>
@@ -158,8 +159,8 @@
 				<p class="text-sm leading-relaxed text-muted-foreground">
 					2004年にMichael Niedermayerがリードメンテナーを引き継ぎ、
 					プロジェクトの安定化とコーデック対応の拡大を推進しました。
-					2011年にはプロジェクトの方向性を巡る議論からLibavがフォークされましたが、
-					2015年に多くの開発者がFFmpegに戻り、再びメインプロジェクトとして統合的な開発が続いています。
+					2011年にはプロジェクトの方向性を巡る議論から、一部の開発者がLibavとして分岐しました。
+					2015年には、DebianがLibavからFFmpegへ戻すと発表しました。
 				</p>
 				<p class="text-sm leading-relaxed text-muted-foreground">
 					2024〜2025年にかけてはFFmpeg 7.x系がリリースされ、AV1エンコーダーの最適化、
@@ -174,9 +175,7 @@
 			<section class="space-y-3">
 				<h2 class="text-xl font-semibold border-b border-border pb-2">設計思想とアーキテクチャ</h2>
 				<p class="text-sm leading-relaxed text-muted-foreground">
-					FFmpegの設計は「Unixの哲学」に強く影響されています。
-					一つのツールが一つのことを極めてうまくやる、という原則に従い、
-					コマンドラインインターフェースを通じて柔軟なパイプライン処理を実現しています。
+					FFmpegはコマンドラインのツールと、ほかのソフトウェアから使えるライブラリの両方で提供されています。
 				</p>
 				<p class="text-sm leading-relaxed text-muted-foreground">
 					FFmpegプロジェクトは複数のコンポーネントで構成されています：
@@ -194,8 +193,7 @@
 				<p class="text-sm leading-relaxed text-muted-foreground">
 					このモジュール構造により、FFmpegは単なるコマンドラインツールではなく、
 					他のソフトウェアに組み込み可能な強力なライブラリ群としても機能します。
-					VLCやChromium、Androidのメディアフレームワークなど、
-					多くのプロジェクトがlibavcodecやlibavformatを直接利用しています。
+					VLCやChromiumなど、多くのプロジェクトがlibavcodecやlibavformatを直接利用しています。
 				</p>
 			</section>
 
@@ -426,8 +424,8 @@
 					オプションの多さが障壁になることがあります。
 				</p>
 				<p class="text-sm leading-relaxed text-muted-foreground">
-					このWebアプリ「FFmpegコマンドジェネレーター」は、GUIで直感的にオプションを選択するだけで
-					最適なFFmpegコマンドを自動生成します。
+					このWebアプリ「FFmpegコマンドジェネレーター」は、GUIで直感的にオプションを選択するだけで、
+					FFmpegのコマンドを自動生成します。
 					プリセット機能により、動画圧縮（AV1）、画像圧縮（AVIF/WebP）、音声抽出、
 					GIF生成など、よくあるユースケースをワンクリックで設定できます。
 				</p>
@@ -494,7 +492,7 @@
 			<header class="space-y-3">
 				<h1 class="text-3xl font-bold tracking-tight">What is FFmpeg?</h1>
 				<p class="text-lg text-muted-foreground">
-					The world's most widely used open-source multimedia processing framework, with over 25 years of history
+					A widely used open-source multimedia processing framework with over 25 years of history
 				</p>
 			</header>
 
@@ -512,7 +510,8 @@
 					It is the de facto standard tool for multimedia processing worldwide.
 				</p>
 				<p class="text-sm leading-relaxed text-muted-foreground">
-					Released under LGPL and GPL licenses, FFmpeg is free for anyone to use, modify, and redistribute.
+					FFmpeg is licensed under the LGPL 2.1 or later by default, and the GPL applies when optional GPL components are enabled.
+					It is free to use, modify, and redistribute, but redistribution must follow the license terms.
 					It supports hundreds of codecs and formats — an unparalleled level of coverage.
 				</p>
 			</section>
@@ -528,8 +527,8 @@
 				</p>
 				<p class="text-sm leading-relaxed text-muted-foreground">
 					In 2004, Michael Niedermayer took over as lead maintainer, driving project stabilization
-					and codec expansion. In 2011, a disagreement over project direction led to the Libav fork,
-					but by 2015 most developers returned to FFmpeg, which continues as the unified main project.
+					and codec expansion. In 2011, a disagreement over project direction led some developers to fork the project as Libav.
+					In 2015, Debian announced that it would switch from Libav back to FFmpeg.
 				</p>
 				<p class="text-sm leading-relaxed text-muted-foreground">
 					In 2024–2025, FFmpeg 7.x series was released with AV1 encoder optimizations,
@@ -543,9 +542,7 @@
 			<section class="space-y-3">
 				<h2 class="text-xl font-semibold border-b border-border pb-2">Design Philosophy and Architecture</h2>
 				<p class="text-sm leading-relaxed text-muted-foreground">
-					FFmpeg's design is strongly influenced by the Unix philosophy: each tool does one thing
-					and does it extremely well. Through its command-line interface, it enables flexible
-					pipeline processing for complex multimedia workflows.
+					FFmpeg is provided both as command-line tools and as libraries that other software can use.
 				</p>
 				<p class="text-sm leading-relaxed text-muted-foreground">
 					The FFmpeg project consists of several components:
@@ -562,8 +559,7 @@
 				</ul>
 				<p class="text-sm leading-relaxed text-muted-foreground">
 					This modular architecture means FFmpeg isn't just a CLI tool — it's a powerful set of
-					libraries that can be embedded in other software. VLC, Chromium, and Android's media
-					framework all directly use libavcodec and libavformat.
+					libraries that can be embedded in other software. Many projects, such as VLC and Chromium, directly use libavcodec and libavformat.
 				</p>
 			</section>
 
@@ -796,7 +792,7 @@
 					for users unfamiliar with command-line tools.
 				</p>
 				<p class="text-sm leading-relaxed text-muted-foreground">
-					This web app, "FFmpeg Command Generator," automatically generates optimal FFmpeg commands
+					This web app, "FFmpeg Command Generator," automatically generates FFmpeg commands
 					through an intuitive GUI. Preset features let you configure common use cases with one click:
 					video compression (AV1), image compression (AVIF/WebP), audio extraction, GIF generation, and more.
 				</p>
