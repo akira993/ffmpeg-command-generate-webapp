@@ -24,6 +24,9 @@ jobs:
       - name: Format check
         run: npm run format:check
 
+      - name: Lint
+        run: npm run lint
+
       - name: CSS lint (oklch enforcement)
         run: bash scripts/lint-css.sh
 
