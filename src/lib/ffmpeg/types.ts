@@ -224,13 +224,6 @@ export interface PresetDefinition {
 	category: PresetCategory;
 }
 
-/** バリデーション結果 */
-export interface ValidationResult {
-	valid: boolean;
-	/** エラーメッセージ（i18nキー） */
-	message?: string;
-}
-
 // ============================================================
 // アプリケーション状態型
 // ============================================================

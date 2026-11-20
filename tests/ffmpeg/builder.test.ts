@@ -696,6 +696,61 @@ describe('buildBatchCommand', () => {
 		}
 	});
 
+	it('#6 一括 GIF は排他設定に関係なく個別と同じ2パスを生成し、パレットを消す', () => {
+		const options = createDefaultOptions({
+			input: { startTime: '00:00:05' },
+			output: { filename: 'output.GIF' },
+			video: { noVideo: true },
+			audio: { noAudio: true },
+			filter: { fps: 12, scale: { width: 480, height: 270 } },
+			misc: { copyStreams: true, duration: '3', endTime: '00:00:12' },
+		});
+		const script = requireBatchScript(
+			buildBatchCommand(options, { inputExtensions: ['mp4'], allowSameFormatInput: false }),
+		);
+		const individualFilters = buildCommand(options)
+			.split('\n')
+			.map((line) => line.match(/ -(?:vf|lavfi) "[^"]+"/)?.[0]);
+		const cleanup = {
+			bash: 'rm -f "$palette"',
+			powershell: 'Remove-Item -LiteralPath $palette -Force',
+			cmd: 'del "%OUTPUT_DIR%\\%%~nxf.palette.png"',
+		};
+
+		for (const shell of batchShells) {
+			const ffmpegLines = script[shell]
+				.split(/\r?\n/)
+				.map((line) => line.trimStart())
+				.filter((line) => line.startsWith('ffmpeg '));
+			expect(ffmpegLines).toHaveLength(2);
+			const commands =
+				shell === 'cmd' ? ffmpegLines.flatMap((line) => line.split(' && ')) : ffmpegLines;
+			expect(commands).toHaveLength(shell === 'cmd' ? 4 : 2);
+			for (const [index, command] of commands.entries()) {
+				expect(command).toMatch(/^ffmpeg -nostdin -y -ss 00:00:05 -i /);
+				expect(command).toContain(' -t 3 ');
+				expect(command).not.toMatch(/ -c copy| -vn| -an| -to /);
+				expect(command).toContain(index % 2 === 0 ? ',palettegen"' : '[x][1:v] paletteuse"');
+				expect(command.match(/ -(?:vf|lavfi) "[^"]+"/)?.[0]).toBe(individualFilters[index % 2]);
+			}
+			expect(script[shell]).toContain(cleanup[shell]);
+		}
+
+		expect(script.bash).toContain('palette="$OUTPUT_DIR/${f}.palette.png"');
+		expect(script.bash).toContain(' || FAILURES=$((FAILURES + 1))\n');
+		expect(script.bash.endsWith('  (exit 1)\nfi')).toBe(true);
+		expect(script.powershell).toContain('$palette = Join-Path $outputDir "$($_.Name).palette.png"');
+		expect(script.powershell.match(/^ +\$global:LASTEXITCODE = 1\n +ffmpeg /gm)).toHaveLength(2);
+		expect(script.powershell).toContain(
+			'    if ($global:LASTEXITCODE -eq 0) {\n      $global:LASTEXITCODE = 1\n      ffmpeg ',
+		);
+		expect(script.powershell).toContain('    if ($global:LASTEXITCODE -ne 0) { $failures++ }');
+		expect(script.powershell.endsWith('  throw "Failed conversions: $failures"\n}')).toBe(true);
+		expect(script.powershell).not.toMatch(/^\s*exit\b/m);
+		expect(script.cmd).not.toMatch(/\^\r\n/);
+		expect(script.cmd.match(/ \|\| set \/a "FAILURES\+=1" >nul\r\n    del /g)).toHaveLength(2);
+	});
+
 	it('Bash / PowerShell / cmd の3形式を返す', () => {
 		const opts = createDefaultOptions({
 			video: { codec: 'libx264', crf: 23, noVideo: false },

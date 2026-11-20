@@ -40,7 +40,12 @@ import {
 export function buildCommand(options: FFmpegOptions): string {
 	// GIF生成の特殊処理
 	if (isGifOutput(options)) {
-		return buildGifCommands(options);
+		return buildGifCommands(
+			options,
+			quoteFilename(options.input.filename),
+			'palette.png',
+			quoteFilename(options.output.filename),
+		).join('\n');
 	}
 
 	const parts: string[] = ['ffmpeg'];
@@ -92,8 +97,8 @@ export function buildBatchCommand(options: FFmpegOptions, batch: BatchOptions): 
 	const outExt = getValidatedOutputExtension(options.output.filename);
 	if (!outExt) return null;
 
-	// コマンドのオプション部分を生成（入力/出力ファイル名は変数に置換）
-	const optionParts = buildOptionParts(options);
+	// GIF では通常のオプションを組み立てず、各シェルで2パスのコマンドを生成する。
+	const optionParts = outExt === 'gif' ? null : buildOptionParts(options);
 	const extensions = resolveBatchInputExtensions(batch, outExt);
 
 	// case パターン文字列（Bash / cmd 用）
@@ -287,9 +292,12 @@ function isGifOutput(options: FFmpegOptions): boolean {
  *
  * パレット付きで高品質なGIFを生成するための標準手法。
  */
-function buildGifCommands(options: FFmpegOptions): string {
-	const input = quoteFilename(options.input.filename);
-	const output = quoteFilename(options.output.filename);
+function buildGifCommands(
+	options: FFmpegOptions,
+	input: string,
+	palette: string,
+	output: string,
+): [string, string] {
 	const fps = options.filter.fps ?? 10;
 	const scaleW = options.filter.scale?.width ?? 320;
 	const scaleH = options.filter.scale?.height ?? -1;
@@ -303,12 +311,12 @@ function buildGifCommands(options: FFmpegOptions): string {
 	// パス1: パレット生成
 	// -nostdin: 2コマンドをまとめてコピペ実行した際、2行目を標準入力として
 	// 読み捨ててしまい無言で失敗する事故を防ぐ（複数コマンドを返す経路のみ付与）
-	const pass1 = `ffmpeg -nostdin ${overwrite}${inputOpts}-i ${input}${durationOpt} -vf "${filterBase},palettegen" palette.png`;
+	const pass1 = `ffmpeg -nostdin ${overwrite}${inputOpts}-i ${input}${durationOpt} -vf "${filterBase},palettegen" ${palette}`;
 
 	// パス2: GIF生成（パレット使用）
-	const pass2 = `ffmpeg -nostdin ${overwrite}${inputOpts}-i ${input} -i palette.png${durationOpt} -lavfi "${filterBase} [x]; [x][1:v] paletteuse" ${output}`;
+	const pass2 = `ffmpeg -nostdin ${overwrite}${inputOpts}-i ${input} -i ${palette}${durationOpt} -lavfi "${filterBase} [x]; [x][1:v] paletteuse" ${output}`;
 
-	return `${pass1}\n${pass2}`;
+	return [pass1, pass2];
 }
 
 // ============================================================
@@ -352,12 +360,26 @@ function buildOptionParts(options: FFmpegOptions): string {
  * - 出力先フォルダを自動作成
  */
 function buildBashScript(
-	optionParts: string,
+	optionParts: string | null,
 	casePattern: string,
 	outExt: string,
 	options: FFmpegOptions,
 ): string {
 	const inputOpts = options.input.startTime ? `-ss ${options.input.startTime} ` : '';
+	const conversionLines: string[] = [];
+	if (optionParts === null) {
+		const [palettegen, paletteuse] = buildGifCommands(options, '"$f"', '"$palette"', '"$out"');
+		conversionLines.push(
+			'      palette="$OUTPUT_DIR/${f}.palette.png"',
+			`      ${palettegen} &&`,
+			`        ${paletteuse} || FAILURES=$((FAILURES + 1))`,
+			'      rm -f "$palette"',
+		);
+	} else {
+		conversionLines.push(
+			`      ffmpeg -nostdin ${inputOpts}-i "$f" ${optionParts} "$out" || FAILURES=$((FAILURES + 1))`,
+		);
+	}
 	const lines: string[] = [
 		'#!/bin/bash',
 		'',
@@ -389,7 +411,7 @@ function buildBashScript(
 		'      else',
 		'        SEEN_BASES="${SEEN_BASES}\nx${base}"',
 		'      fi',
-		`      ffmpeg -nostdin ${inputOpts}-i "$f" ${optionParts} "$out" || FAILURES=$((FAILURES + 1))`,
+		...conversionLines,
 		'      ;;',
 		'  esac',
 		'done',
@@ -412,13 +434,32 @@ function buildBashScript(
  * - 出力先フォルダを自動作成
  */
 function buildPowerShellScript(
-	optionParts: string,
+	optionParts: string | null,
 	extensions: string[],
 	outExt: string,
 	options: FFmpegOptions,
 ): string {
 	const includeFilter = extensions.map((ext) => `"*.${ext}"`).join(', ');
 	const inputOpts = options.input.startTime ? `-ss ${options.input.startTime} ` : '';
+	const conversionLines: string[] = [];
+	if (optionParts === null) {
+		const [palettegen, paletteuse] = buildGifCommands(options, '$_.FullName', '$palette', '$out');
+		conversionLines.push(
+			'    $palette = Join-Path $outputDir "$($_.Name).palette.png"',
+			'    $global:LASTEXITCODE = 1',
+			`    ${palettegen}`,
+			'    if ($global:LASTEXITCODE -eq 0) {',
+			'      $global:LASTEXITCODE = 1',
+			`      ${paletteuse}`,
+			'    }',
+			'    Remove-Item -LiteralPath $palette -Force -ErrorAction SilentlyContinue',
+		);
+	} else {
+		conversionLines.push(
+			'    $global:LASTEXITCODE = 1',
+			`    ffmpeg -nostdin ${inputOpts}-i $_.FullName ${optionParts} $out`,
+		);
+	}
 
 	const lines: string[] = [
 		`$outputExt = "${outExt}"`,
@@ -432,8 +473,7 @@ function buildPowerShellScript(
 		"    $inputExt = $_.Extension.TrimStart('.').ToLower()",
 		'    $out = Join-Path $outputDir "$($_.BaseName).$outputExt"',
 		'    if (-not $seenBaseNames.Add($_.BaseName)) { $out = Join-Path $outputDir "$($_.BaseName)_$inputExt.$outputExt" }',
-		'    $global:LASTEXITCODE = 1',
-		`    ffmpeg -nostdin ${inputOpts}-i $_.FullName ${optionParts} $out`,
+		...conversionLines,
 		'    if ($global:LASTEXITCODE -ne 0) { $failures++ }',
 		'  }',
 		'',
@@ -445,6 +485,26 @@ function buildPowerShellScript(
 	return lines.join('\n');
 }
 
+function ffmpegCmdConversionLines(
+	options: FFmpegOptions,
+	optionParts: string | null,
+	outputPath: string,
+): string[] {
+	const output = `"${outputPath}"`;
+	if (optionParts === null) {
+		const palette = '"%OUTPUT_DIR%\\%%~nxf.palette.png"';
+		const [palettegen, paletteuse] = buildGifCommands(options, '"%%f"', palette, output);
+		return [
+			`${palettegen} && ${paletteuse} || set /a "FAILURES+=1" >nul`,
+			`del ${palette} >nul 2>&1`,
+		];
+	}
+	const inputOpts = options.input.startTime ? `-ss ${options.input.startTime} ` : '';
+	return [
+		`ffmpeg -nostdin ${inputOpts}-i "%%f" ${optionParts} ${output} || set /a "FAILURES+=1" >nul`,
+	];
+}
+
 /**
  * cmd スクリプト生成（Windows バッチ）
  *
@@ -453,13 +513,11 @@ function buildPowerShellScript(
  * - 出力先フォルダを自動作成
  */
 function buildCmdScript(
-	optionParts: string,
+	optionParts: string | null,
 	extensions: string[],
 	outExt: string,
 	options: FFmpegOptions,
 ): string {
-	const inputOpts = options.input.startTime ? `-ss ${options.input.startTime} ` : '';
-
 	const lines: string[] = [
 		'@echo off',
 		'setlocal DisableDelayedExpansion',
@@ -479,11 +537,17 @@ function buildCmdScript(
 			`for %%f in (*.${ext}) do (`,
 			'  findstr /l /x /c:"%%~nf" "%SEEN_FILE%" >nul 2>&1',
 			'  if not errorlevel 1 (',
-			`    ffmpeg -nostdin ${inputOpts}-i "%%f" ${optionParts} "%OUTPUT_DIR%\\%%~nf_${ext}.%OUTPUT_EXT%" || set /a "FAILURES+=1" >nul`,
+			...ffmpegCmdConversionLines(
+				options,
+				optionParts,
+				`%OUTPUT_DIR%\\%%~nf_${ext}.%OUTPUT_EXT%`,
+			).map((line) => `    ${line}`),
 			'  ) else (',
 			'    >>"%SEEN_FILE%" <nul set /p "=%%~nf"',
 			'    >>"%SEEN_FILE%" echo(',
-			`    ffmpeg -nostdin ${inputOpts}-i "%%f" ${optionParts} "%OUTPUT_DIR%\\%%~nf.%OUTPUT_EXT%" || set /a "FAILURES+=1" >nul`,
+			...ffmpegCmdConversionLines(options, optionParts, '%OUTPUT_DIR%\\%%~nf.%OUTPUT_EXT%').map(
+				(line) => `    ${line}`,
+			),
 			'  )',
 			')',
 		);

@@ -11,7 +11,7 @@ import {
 	writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { basename, delimiter, join } from 'node:path';
+import { basename, delimiter, extname, join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { buildBatchCommand, buildCwebpBatchCommand } from '../../src/lib/ffmpeg/builder';
@@ -96,6 +96,8 @@ for arg in "$@"; do
   previous="$arg"
 done
 case "\${input##*/}" in
+  fail-ffmpeg-palette*) : > "$out"; exit 7 ;;
+  fail-ffmpeg-gif-output-*) [[ "$out" == *.gif ]] && exit 7 ;;
   *"fail-$tool-"*) exit 7 ;;
 esac
 mkdir -p "$(dirname "$out")"
@@ -193,7 +195,18 @@ const missingCwebpCase = {
 	presetId: 'image-webp',
 	resize: false,
 	failingInputs: ['photo.heic', 'photo-direct.jpg'],
-	successfulInput: 'zz-good!.gif',
+	successfulInput: 'a-good.gif',
+} as const;
+
+const gifFailureCases = [
+	{ pass: 'palettegen', failingInput: 'fail-ffmpeg-palette.mp4', expectedCalls: 1 },
+	{ pass: 'paletteuse', failingInput: 'fail-ffmpeg-gif-output-clip.mp4', expectedCalls: 2 },
+] as const;
+
+const gifFixtureOptions = {
+	presetId: 'gif-generate',
+	resize: false,
+	successfulInput: 'zz-good!.mov',
 } as const;
 
 function createFailureFixture(testCase: {
@@ -223,9 +236,22 @@ function createFailureFixture(testCase: {
 	return { fixture, script, outputExtension };
 }
 
-function expectFailureFixtureOutputs(fixture: string, outputExtension: string | null): void {
+function expectFailureFixtureOutputs(
+	fixture: string,
+	outputExtension: string | null,
+	successfulInput: string,
+): void {
 	const outputDirectory = join(fixture, `${basename(fixture)}_${outputExtension}`);
-	expect(readdirSync(outputDirectory)).toEqual([`zz-good!.${outputExtension}`]);
+	const base = basename(successfulInput, extname(successfulInput));
+	expect(readdirSync(outputDirectory)).toEqual([`${base}.${outputExtension}`]);
+}
+
+function expectGifFailureCalls(calls: string[], testCase: (typeof gifFailureCases)[number]): void {
+	const failedCalls = calls.filter((call) => call.includes(testCase.failingInput));
+	expect(failedCalls).toHaveLength(testCase.expectedCalls);
+	expect(failedCalls[0]).toContain('palettegen');
+	expect(failedCalls[failedCalls.length - 1]).toContain(testCase.pass);
+	expect(calls).toHaveLength(testCase.expectedCalls + 2);
 }
 
 function expectFailedGifPreprocessing(calls: string[]): void {
@@ -293,17 +319,50 @@ function expectCategoryOutputs(
 	expect(outputs).not.toContain(`inside.${outputExtension}`);
 }
 
-/** cwebp 経路では②（ffmpeg+cwebp）だけ拡張子1つにつき2回バイナリが呼ばれる */
-function expectedInvocationCount(tool: 'cwebp' | 'ffmpeg', category: FixtureCategory): number {
+/** GIF の2パスと ffmpeg 前処理が必要な WebP 変換は、入力1件につき2回呼び出す。 */
+function expectedInvocationCount(
+	tool: 'cwebp' | 'ffmpeg',
+	category: FixtureCategory,
+	presetId: PresetId,
+): number {
 	const extensions = fixtureExtensions[category];
 	const perFileCalls = extensions.reduce((total, extension) => {
-		if (tool === 'ffmpeg') return total + 1;
+		if (tool === 'ffmpeg') return total + (presetId === 'gif-generate' ? 2 : 1);
 		return total + (CWEBP_PREPROCESS_EXTENSIONS.includes(extension) ? 2 : 1);
 	}, 0);
 	return perFileCalls * 2; // 'sample' と 'my holiday' の2 baseName分
 }
 
 describe('generated bash scripts', () => {
+	it('#6 converts each input with its own palette and only leaves GIFs in Bash', () => {
+		const { fixture, script } = createFailureFixture({ ...gifFixtureOptions, failingInputs: [] });
+		writeFileSync(join(fixture, 'zz-good!.mp4'), '');
+
+		const calls = runBashScript(fixture, script.bash, 'gif-batch.sh');
+		expect(calls).toHaveLength(4);
+		expect(calls[0]).toMatch(/palettegen.*zz-good!\.mov\.palette\.png$/);
+		expect(calls[1]).toMatch(/-i .*zz-good!\.mov\.palette\.png .*paletteuse/);
+		expect(calls[2]).toMatch(/palettegen.*zz-good!\.mp4\.palette\.png$/);
+		expect(calls[3]).toMatch(/-i .*zz-good!\.mp4\.palette\.png .*paletteuse/);
+		expect(readdirSync(join(fixture, `${basename(fixture)}_gif`)).sort()).toEqual([
+			'zz-good!.gif',
+			'zz-good!_mp4.gif',
+		]);
+	});
+
+	it.each(gifFailureCases)(
+		'#6 counts one GIF failure at $pass and continues in Bash',
+		(testCase) => {
+			const { fixture, script, outputExtension } = createFailureFixture({
+				...gifFixtureOptions,
+				failingInputs: [testCase.failingInput],
+			});
+			const calls = runBashScript(fixture, script.bash, 'gif-failure.sh', 1);
+			expectGifFailureCalls(calls, testCase);
+			expectFailureFixtureOutputs(fixture, outputExtension, gifFixtureOptions.successfulInput);
+		},
+	);
+
 	it.each([failureCases[0], failureCases[1]])(
 		'#15 $name reports its status without exiting the shell when sourced',
 		(testCase) => {
@@ -317,7 +376,7 @@ describe('generated bash scripts', () => {
 				});
 				expect(result.status, result.stderr).toBe(0);
 				expect(result.stdout).toBe(`alive:${expectedStatus}\n`);
-				expectFailureFixtureOutputs(fixture, outputExtension);
+				expectFailureFixtureOutputs(fixture, outputExtension, testCase.successfulInput);
 			}
 		},
 	);
@@ -329,7 +388,7 @@ describe('generated bash scripts', () => {
 		});
 		expect(result.status, result.stderr).toBe(1);
 		expect(result.stderr).toContain(`Failed conversions: ${missingCwebpCase.failingInputs.length}`);
-		expectFailureFixtureOutputs(fixture, outputExtension);
+		expectFailureFixtureOutputs(fixture, outputExtension, missingCwebpCase.successfulInput);
 	});
 
 	it.each(failureCases)(
@@ -344,7 +403,7 @@ describe('generated bash scripts', () => {
 			);
 			expect(calls[calls.length - 1]).toContain(`zz-good!.${outputExtension}`);
 			if (testCase.resize) expectFailedGifPreprocessing(calls);
-			expectFailureFixtureOutputs(fixture, outputExtension);
+			expectFailureFixtureOutputs(fixture, outputExtension, testCase.successfulInput);
 		},
 	);
 
@@ -520,12 +579,19 @@ public static class FakeMediaTool
         int inputFlag = Array.IndexOf(args, "-i");
         string tool = Path.GetFileNameWithoutExtension(Environment.GetCommandLineArgs()[0]);
         string input = inputFlag >= 0 ? args[inputFlag + 1] : args[outputFlag - 1];
-        if (Path.GetFileName(input).Contains("fail-" + tool + "-"))
+        string output = outputFlag >= 0 ? args[outputFlag + 1] : args[args.Length - 1];
+        string inputName = Path.GetFileName(input);
+        if (inputName.StartsWith("fail-ffmpeg-palette"))
+        {
+            File.WriteAllText(output, "");
+            return 7;
+        }
+        if (inputName.Contains("fail-" + tool + "-") &&
+            (!inputName.StartsWith("fail-ffmpeg-gif-output-") || Path.GetExtension(output) == ".gif"))
         {
             return 7;
         }
 
-        string output = outputFlag >= 0 ? args[outputFlag + 1] : args[args.Length - 1];
         string directory = Path.GetDirectoryName(output);
         if (!string.IsNullOrEmpty(directory))
         {
@@ -631,7 +697,7 @@ Add-Type -TypeDefinition $source -OutputAssembly $OutputPath -OutputType Console
 				expect(result.status, diagnostics).toBe(0);
 				expect(existsSync(fakeLog), diagnostics).toBe(true);
 				expect(readFileSync(fakeLog, 'utf8').trim().split(/\r?\n/), diagnostics).toHaveLength(
-					expectedInvocationCount(tool, fixtureCategory),
+					expectedInvocationCount(tool, fixtureCategory, id),
 				);
 				expectCategoryOutputs(fixture, outputExtension, fixtureCategory);
 			},
@@ -662,7 +728,7 @@ Add-Type -TypeDefinition $source -OutputAssembly $OutputPath -OutputType Console
 				if (testCase.resize) {
 					expectFailedGifPreprocessing(readFileSync(fakeLog, 'utf8').split(/\r?\n/));
 				}
-				expectFailureFixtureOutputs(fixture, outputExtension);
+				expectFailureFixtureOutputs(fixture, outputExtension, testCase.successfulInput);
 			},
 			windowsTestTimeout,
 		);
@@ -676,7 +742,32 @@ Add-Type -TypeDefinition $source -OutputAssembly $OutputPath -OutputType Console
 				expect(result.stderr).toContain(
 					`Failed conversions: ${missingCwebpCase.failingInputs.length}`,
 				);
-				expectFailureFixtureOutputs(fixture, outputExtension);
+				expectFailureFixtureOutputs(fixture, outputExtension, missingCwebpCase.successfulInput);
+			},
+			windowsTestTimeout,
+		);
+
+		it.each(
+			gifFailureCases.flatMap((testCase) =>
+				(['powershell', 'cmd'] as const).map((shell) => ({ ...testCase, shell })),
+			),
+		)(
+			'CC4-04 #6 GIF [$shell] counts one failure at $pass and continues',
+			(testCase) => {
+				const { fixture, script, outputExtension } = createFailureFixture({
+					...gifFixtureOptions,
+					failingInputs: [testCase.failingInput],
+				});
+				const { result, fakeLog } = runWindowsScript(
+					fixture,
+					script,
+					testCase.shell,
+					`gif-failure-${testCase.pass}-${testCase.shell}`,
+				);
+				expect(result.status, result.stderr).toBe(1);
+				expect(result.stderr).toContain('Failed conversions: 1');
+				expectGifFailureCalls(readFileSync(fakeLog, 'utf8').trim().split(/\r?\n/), testCase);
+				expectFailureFixtureOutputs(fixture, outputExtension, gifFixtureOptions.successfulInput);
 			},
 			windowsTestTimeout,
 		);
