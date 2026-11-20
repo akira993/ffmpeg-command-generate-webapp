@@ -112,7 +112,9 @@
 						<span class="text-lg">{preset.icon}</span>
 					{/if}
 				</div>
-				<Card.Title class="self-center text-sm">{$t(preset.nameKey)}</Card.Title>
+				<Card.Title class="self-center text-sm leading-(--text-sm--line-height)">
+					{$t(preset.nameKey)}
+				</Card.Title>
 			</Card.Header>
 			<Card.Content>
 				<p class="text-xs text-muted-foreground">

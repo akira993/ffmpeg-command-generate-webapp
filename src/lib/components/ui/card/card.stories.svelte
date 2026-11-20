@@ -67,7 +67,7 @@
 					>
 						<span class="text-lg">🎬</span>
 					</div>
-					<Card.Title class="text-sm">Video Convert</Card.Title>
+					<Card.Title class="text-sm leading-(--text-sm--line-height)">Video Convert</Card.Title>
 				</div>
 			</Card.Header>
 			<Card.Content>
