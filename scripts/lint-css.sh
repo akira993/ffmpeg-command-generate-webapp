@@ -63,7 +63,7 @@ fi
 # --- Result ---
 if [ "$ERRORS" -gt 0 ]; then
   echo "FAILED: $ERRORS rule violation(s) found."
-  echo "See docs/css-design.md for the design system rules."
+  echo 'See the "CSS Rules (Enforced by CI)" section of README.md for the design system rules.'
   exit 1
 else
   echo "PASSED: All CSS design rules satisfied."
