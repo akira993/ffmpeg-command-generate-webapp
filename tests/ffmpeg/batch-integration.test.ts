@@ -7,6 +7,7 @@ import {
 	readFileSync,
 	readdirSync,
 	rmSync,
+	symlinkSync,
 	writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -75,42 +76,162 @@ function createFixture(): string {
 	return fixture;
 }
 
-function installFakePosixBinaries(root: string): string {
+function installFakePosixBinaries(root: string, withoutCwebp: boolean): string {
 	const binDirectory = join(root, 'bin');
 	mkdirSync(binDirectory, { recursive: true });
 	const fakeBinary = `#!/bin/bash
 printf '%s\\n' "$*" >> "$FAKE_LOG"
 out="\${!#}"
+tool="\${0##*/}"
+previous=''
+for arg in "$@"; do
+  if [[ "$tool" == ffmpeg && "$previous" == -i ]]; then
+    input="$arg"
+    break
+  fi
+  if [[ "$tool" != ffmpeg && "$arg" == -o ]]; then
+    input="$previous"
+    break
+  fi
+  previous="$arg"
+done
+case "\${input##*/}" in
+  *"fail-$tool-"*) exit 7 ;;
+esac
 mkdir -p "$(dirname "$out")"
 : > "$out"
 `;
 
 	for (const name of ['ffmpeg', 'cwebp', 'gif2webp']) {
+		if (withoutCwebp && name === 'cwebp') continue;
 		const path = join(binDirectory, name);
 		writeFileSync(path, fakeBinary);
 		chmodSync(path, 0o755);
 	}
+	if (withoutCwebp) {
+		for (const name of ['bash', 'basename', 'dirname', 'mkdir', 'rm', 'tr']) {
+			const executable = ['/bin', '/usr/bin']
+				.map((directory) => join(directory, name))
+				.find(existsSync);
+			if (!executable) throw new Error(`Missing test utility: ${name}`);
+			symlinkSync(executable, join(binDirectory, name));
+		}
+	}
 	return binDirectory;
 }
 
-function runBashScript(fixture: string, script: string, filename: string): string[] {
+function spawnBatchBash(
+	fixture: string,
+	script: string,
+	filename: string,
+	{ sourced = false, withoutCwebp = false } = {},
+) {
 	const root = join(fixture, '..');
-	const binDirectory = installFakePosixBinaries(root);
+	const binDirectory = installFakePosixBinaries(root, withoutCwebp);
 	const logPath = join(root, `${filename}.log`);
 	const scriptPath = join(root, filename);
 	writeFileSync(scriptPath, script);
 
-	const result = spawnSync('bash', [scriptPath], {
+	const args = sourced ? ['-c', '. "$1"; echo "alive:$?"', 'bash', scriptPath] : [scriptPath];
+	const result = spawnSync('bash', args, {
 		cwd: fixture,
 		encoding: 'utf8',
 		env: {
 			...process.env,
-			PATH: `${binDirectory}${delimiter}${process.env.PATH ?? ''}`,
+			PATH: withoutCwebp ? binDirectory : `${binDirectory}${delimiter}${process.env.PATH ?? ''}`,
 			FAKE_LOG: logPath,
 		},
 	});
-	expect(result.status, result.stderr).toBe(0);
+	return { result, logPath };
+}
+
+function runBashScript(
+	fixture: string,
+	script: string,
+	filename: string,
+	expectedFailures = 0,
+): string[] {
+	const { result, logPath } = spawnBatchBash(fixture, script, filename);
+	expect(result.status, result.stderr).toBe(expectedFailures > 0 ? 1 : 0);
+	if (expectedFailures > 0) {
+		expect(result.stderr.trim()).toBe(`Failed conversions: ${expectedFailures}`);
+	}
 	return readFileSync(logPath, 'utf8').trim().split('\n');
+}
+
+const failureCases = [
+	{
+		name: 'ffmpeg',
+		presetId: 'video-convert',
+		resize: false,
+		failingInputs: ['fail-ffmpeg-video.mp4', 'fail-ffmpeg-video.mov'],
+		successfulInput: 'zz-good!.avi',
+	},
+	{
+		name: 'WebP with resize',
+		presetId: 'image-webp',
+		resize: true,
+		failingInputs: [
+			'fail-ffmpeg-photo.heic',
+			'fail-cwebp-photo.bmp',
+			'fail-cwebp-photo.jpg',
+			'fail-ffmpeg-animation.gif',
+			'fail-gif2webp-animation.gif',
+		],
+		successfulInput: 'zz-good!.gif',
+	},
+	{
+		name: 'WebP without resize',
+		presetId: 'image-webp',
+		resize: false,
+		failingInputs: ['fail-gif2webp-animation.gif'],
+		successfulInput: 'zz-good!.gif',
+	},
+] as const;
+
+const missingCwebpCase = {
+	presetId: 'image-webp',
+	resize: false,
+	failingInputs: ['photo.heic', 'photo-direct.jpg'],
+	successfulInput: 'zz-good!.gif',
+} as const;
+
+function createFailureFixture(testCase: {
+	presetId: PresetId;
+	resize: boolean;
+	failingInputs: readonly string[];
+	successfulInput: string;
+}) {
+	const root = mkdtempSync(join(tmpdir(), 'ffmpeg-batch-failure-'));
+	temporaryDirectories.push(root);
+	const fixture = join(root, 'fixture');
+	mkdirSync(fixture);
+	for (const input of [...testCase.failingInputs, testCase.successfulInput]) {
+		writeFileSync(join(fixture, input), '');
+	}
+
+	const preset = PRESETS[testCase.presetId];
+	const options = getPresetOptions(testCase.presetId);
+	if (testCase.resize) options.filter = { scale: { width: 320 } };
+	const batch = inferBatchOptions(preset);
+	const script = requireScript(
+		testCase.presetId === 'image-webp'
+			? buildCwebpBatchCommand(options, batch)
+			: buildBatchCommand(options, batch),
+	);
+	const outputExtension = getValidatedOutputExtension(options.output.filename);
+	return { fixture, script, outputExtension };
+}
+
+function expectFailureFixtureOutputs(fixture: string, outputExtension: string | null): void {
+	const outputDirectory = join(fixture, `${basename(fixture)}_${outputExtension}`);
+	expect(readdirSync(outputDirectory)).toEqual([`zz-good!.${outputExtension}`]);
+}
+
+function expectFailedGifPreprocessing(calls: string[]): void {
+	const gifCalls = calls.filter((call) => call.includes('fail-ffmpeg-animation'));
+	expect(gifCalls).toHaveLength(1);
+	expect(gifCalls[0]).toMatch(/-i .*fail-ffmpeg-animation\.gif\b/);
 }
 
 function expectImageOutputs(fixture: string, outputExtension: string): void {
@@ -183,6 +304,50 @@ function expectedInvocationCount(tool: 'cwebp' | 'ffmpeg', category: FixtureCate
 }
 
 describe('generated bash scripts', () => {
+	it.each([failureCases[0], failureCases[1]])(
+		'#15 $name reports its status without exiting the shell when sourced',
+		(testCase) => {
+			for (const expectedStatus of [0, 1]) {
+				const { fixture, script, outputExtension } = createFailureFixture({
+					...testCase,
+					failingInputs: testCase.failingInputs.slice(0, expectedStatus),
+				});
+				const { result } = spawnBatchBash(fixture, script.bash, 'source-batch.sh', {
+					sourced: true,
+				});
+				expect(result.status, result.stderr).toBe(0);
+				expect(result.stdout).toBe(`alive:${expectedStatus}\n`);
+				expectFailureFixtureOutputs(fixture, outputExtension);
+			}
+		},
+	);
+
+	it('#15 WebP counts conversions whose cwebp executable is missing in Bash', () => {
+		const { fixture, script, outputExtension } = createFailureFixture(missingCwebpCase);
+		const { result } = spawnBatchBash(fixture, script.bash, 'missing-cwebp.sh', {
+			withoutCwebp: true,
+		});
+		expect(result.status, result.stderr).toBe(1);
+		expect(result.stderr).toContain(`Failed conversions: ${missingCwebpCase.failingInputs.length}`);
+		expectFailureFixtureOutputs(fixture, outputExtension);
+	});
+
+	it.each(failureCases)(
+		'#15 $name counts failed files and keeps converting in Bash',
+		(testCase) => {
+			const { fixture, script, outputExtension } = createFailureFixture(testCase);
+			const calls = runBashScript(
+				fixture,
+				script.bash,
+				'failures.sh',
+				testCase.failingInputs.length,
+			);
+			expect(calls[calls.length - 1]).toContain(`zz-good!.${outputExtension}`);
+			if (testCase.resize) expectFailedGifPreprocessing(calls);
+			expectFailureFixtureOutputs(fixture, outputExtension);
+		},
+	);
+
 	it('CC4-02 passes bash -n syntax validation', () => {
 		const ffmpegScript = requireScript(
 			buildBatchCommand(createOptions('output.avif'), inferBatchOptions(PRESETS['image-convert'])),
@@ -352,6 +517,14 @@ public static class FakeMediaTool
         );
 
         int outputFlag = Array.IndexOf(args, "-o");
+        int inputFlag = Array.IndexOf(args, "-i");
+        string tool = Path.GetFileNameWithoutExtension(Environment.GetCommandLineArgs()[0]);
+        string input = inputFlag >= 0 ? args[inputFlag + 1] : args[outputFlag - 1];
+        if (Path.GetFileName(input).Contains("fail-" + tool + "-"))
+        {
+            return 7;
+        }
+
         string output = outputFlag >= 0 ? args[outputFlag + 1] : args[args.Length - 1];
         string directory = Path.GetDirectoryName(output);
         if (!string.IsNullOrEmpty(directory))
@@ -394,6 +567,46 @@ Add-Type -TypeDefinition $source -OutputAssembly $OutputPath -OutputType Console
 			rmSync(root, { recursive: true, force: true });
 		});
 
+		function runWindowsScript(
+			fixture: string,
+			script: BatchScript,
+			shell: 'powershell' | 'cmd',
+			name: string,
+			withoutCwebp = false,
+		) {
+			const fakeLog = join(root, `${name}.log`);
+			const scriptPath = join(root, `${name}.${shell === 'powershell' ? 'ps1' : 'cmd'}`);
+			writeFileSync(scriptPath, script[shell]);
+			const systemDirectory = join(process.env.SystemRoot ?? 'C:\\Windows', 'System32');
+			const command =
+				shell === 'powershell'
+					? join(systemDirectory, 'WindowsPowerShell', 'v1.0', 'powershell.exe')
+					: join(systemDirectory, 'cmd.exe');
+			let toolPath = `${binDirectory}${delimiter}${process.env.PATH ?? ''}`;
+			if (withoutCwebp) {
+				const isolatedBin = join(root, `${name}-bin`);
+				mkdirSync(isolatedBin);
+				for (const tool of ['ffmpeg.exe', 'gif2webp.exe']) {
+					copyFileSync(join(binDirectory, tool), join(isolatedBin, tool));
+				}
+				toolPath = `${isolatedBin}${delimiter}${systemDirectory}`;
+			}
+			const args =
+				shell === 'powershell'
+					? ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', scriptPath]
+					: ['/d', '/c', scriptPath];
+			const result = spawnSync(command, args, {
+				cwd: fixture,
+				encoding: 'utf8',
+				env: {
+					...process.env,
+					PATH: toolPath,
+					FAKE_LOG: fakeLog,
+				},
+			});
+			return { result, fakeLog };
+		}
+
 		it.each(testCases)(
 			'CC4-04 $id [$shell] executes generated script on Windows',
 			({ id, fixtureCategory, tool, shell }) => {
@@ -406,23 +619,7 @@ Add-Type -TypeDefinition $source -OutputAssembly $OutputPath -OutputType Console
 						: buildBatchCommand(options, inferBatchOptions(preset)),
 				);
 				const fixture = createCategoryFixture(root, `${id}-${shell}`, fixtureCategory);
-				const fakeLog = join(root, `${id}-${shell}.log`);
-				const scriptPath = join(root, `${id}-${shell}.${shell === 'powershell' ? 'ps1' : 'cmd'}`);
-				writeFileSync(scriptPath, script[shell]);
-				const command = shell === 'powershell' ? 'powershell.exe' : 'cmd.exe';
-				const args =
-					shell === 'powershell'
-						? ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', scriptPath]
-						: ['/d', '/c', scriptPath];
-				const result = spawnSync(command, args, {
-					cwd: fixture,
-					encoding: 'utf8',
-					env: {
-						...process.env,
-						PATH: `${binDirectory}${delimiter}${process.env.PATH ?? ''}`,
-						FAKE_LOG: fakeLog,
-					},
-				});
+				const { result, fakeLog } = runWindowsScript(fixture, script, shell, `${id}-${shell}`);
 				const diagnostics = JSON.stringify({
 					preset: id,
 					shell,
@@ -437,6 +634,49 @@ Add-Type -TypeDefinition $source -OutputAssembly $OutputPath -OutputType Console
 					expectedInvocationCount(tool, fixtureCategory),
 				);
 				expectCategoryOutputs(fixture, outputExtension, fixtureCategory);
+			},
+			windowsTestTimeout,
+		);
+
+		it.each(
+			failureCases.flatMap((testCase, index) =>
+				(['powershell', 'cmd'] as const).map((shell) => ({ ...testCase, index, shell })),
+			),
+		)(
+			'CC4-04 #15 $name [$shell] counts failed files and keeps converting on Windows',
+			(testCase) => {
+				const { fixture, script, outputExtension } = createFailureFixture(testCase);
+				const { result, fakeLog } = runWindowsScript(
+					fixture,
+					script,
+					testCase.shell,
+					`failure-${testCase.index}-${testCase.shell}`,
+				);
+				expect(result.status, result.stderr).toBe(1);
+				const summary = `Failed conversions: ${testCase.failingInputs.length}`;
+				if (testCase.shell === 'powershell') {
+					expect(result.stderr).toContain(summary);
+				} else {
+					expect(result.stderr.split(/\r?\n/)).toEqual([summary, '']);
+				}
+				if (testCase.resize) {
+					expectFailedGifPreprocessing(readFileSync(fakeLog, 'utf8').split(/\r?\n/));
+				}
+				expectFailureFixtureOutputs(fixture, outputExtension);
+			},
+			windowsTestTimeout,
+		);
+
+		it.each(['powershell', 'cmd'] as const)(
+			'CC4-04 #15 WebP [%s] counts conversions whose cwebp executable is missing',
+			(shell) => {
+				const { fixture, script, outputExtension } = createFailureFixture(missingCwebpCase);
+				const { result } = runWindowsScript(fixture, script, shell, `missing-cwebp-${shell}`, true);
+				expect(result.status, result.stderr).toBe(1);
+				expect(result.stderr).toContain(
+					`Failed conversions: ${missingCwebpCase.failingInputs.length}`,
+				);
+				expectFailureFixtureOutputs(fixture, outputExtension);
 			},
 			windowsTestTimeout,
 		);

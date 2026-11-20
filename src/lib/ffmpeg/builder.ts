@@ -365,6 +365,7 @@ function buildBashScript(
 		`OUTPUT_DIR="$(basename "$(pwd)")_\${OUTPUT_EXT}"`,
 		'mkdir -p "$OUTPUT_DIR"',
 		"SEEN_BASES=''",
+		'FAILURES=0',
 		'',
 		'has_seen_base() {',
 		'  while IFS= read -r seen_base; do',
@@ -388,10 +389,15 @@ function buildBashScript(
 		'      else',
 		'        SEEN_BASES="${SEEN_BASES}\nx${base}"',
 		'      fi',
-		`      ffmpeg -nostdin ${inputOpts}-i "$f" ${optionParts} "$out"`,
+		`      ffmpeg -nostdin ${inputOpts}-i "$f" ${optionParts} "$out" || FAILURES=$((FAILURES + 1))`,
 		'      ;;',
 		'  esac',
 		'done',
+		'',
+		'if [ "$FAILURES" -gt 0 ]; then',
+		'  echo "Failed conversions: $FAILURES" >&2',
+		'  (exit 1)',
+		'fi',
 	];
 
 	return lines.join('\n');
@@ -419,14 +425,21 @@ function buildPowerShellScript(
 		`$outputDir = "$(Split-Path -Leaf (Get-Location))_$outputExt"`,
 		'New-Item -ItemType Directory -Force -Path $outputDir | Out-Null',
 		'$seenBaseNames = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)',
+		'$failures = 0',
 		'',
 		`Get-ChildItem -Path * -File -Include ${includeFilter} |`,
 		'  ForEach-Object {',
 		"    $inputExt = $_.Extension.TrimStart('.').ToLower()",
 		'    $out = Join-Path $outputDir "$($_.BaseName).$outputExt"',
 		'    if (-not $seenBaseNames.Add($_.BaseName)) { $out = Join-Path $outputDir "$($_.BaseName)_$inputExt.$outputExt" }',
+		'    $global:LASTEXITCODE = 1',
 		`    ffmpeg -nostdin ${inputOpts}-i $_.FullName ${optionParts} $out`,
+		'    if ($global:LASTEXITCODE -ne 0) { $failures++ }',
 		'  }',
+		'',
+		'if ($failures -gt 0) {',
+		'  throw "Failed conversions: $failures"',
+		'}',
 	];
 
 	return lines.join('\n');
@@ -456,6 +469,7 @@ function buildCmdScript(
 		'if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"',
 		'set "SEEN_FILE=%TEMP%\\ffmpeg-batch-seen-%RANDOM%-%RANDOM%.tmp"',
 		'type nul > "%SEEN_FILE%"',
+		'set "FAILURES=0"',
 		'',
 	];
 
@@ -465,17 +479,24 @@ function buildCmdScript(
 			`for %%f in (*.${ext}) do (`,
 			'  findstr /l /x /c:"%%~nf" "%SEEN_FILE%" >nul 2>&1',
 			'  if not errorlevel 1 (',
-			`    ffmpeg -nostdin ${inputOpts}-i "%%f" ${optionParts} "%OUTPUT_DIR%\\%%~nf_${ext}.%OUTPUT_EXT%"`,
+			`    ffmpeg -nostdin ${inputOpts}-i "%%f" ${optionParts} "%OUTPUT_DIR%\\%%~nf_${ext}.%OUTPUT_EXT%" || set /a "FAILURES+=1" >nul`,
 			'  ) else (',
 			'    >>"%SEEN_FILE%" <nul set /p "=%%~nf"',
 			'    >>"%SEEN_FILE%" echo(',
-			`    ffmpeg -nostdin ${inputOpts}-i "%%f" ${optionParts} "%OUTPUT_DIR%\\%%~nf.%OUTPUT_EXT%"`,
+			`    ffmpeg -nostdin ${inputOpts}-i "%%f" ${optionParts} "%OUTPUT_DIR%\\%%~nf.%OUTPUT_EXT%" || set /a "FAILURES+=1" >nul`,
 			'  )',
 			')',
 		);
 	}
 
-	lines.push('del "%SEEN_FILE%" >nul 2>&1', 'exit /b');
+	lines.push(
+		'del "%SEEN_FILE%" >nul 2>&1',
+		'if %FAILURES% GTR 0 (',
+		'  1>&2 echo Failed conversions: %FAILURES%',
+		'  exit /b 1',
+		')',
+		'exit /b 0',
+	);
 
 	// Windows の cmd スクリプトとして標準の CRLF で出力する。
 	return lines.join('\r\n');
@@ -613,7 +634,7 @@ function buildCwebpBashScript(
 		innerArms.push(
 			`        ${groups.preprocess.join('|')})`,
 			'          tmp="${out%.*}.tmp.png"',
-			`          ffmpeg -nostdin -y -loglevel error -i "$f" "$tmp" && cwebp -q ${quality}${resizeOpts} "$tmp" -o "$out"`,
+			`          ffmpeg -nostdin -y -loglevel error -i "$f" "$tmp" && cwebp -q ${quality}${resizeOpts} "$tmp" -o "$out" || FAILURES=$((FAILURES + 1))`,
 			'          rm -f "$tmp"',
 			'          ;;',
 		);
@@ -623,16 +644,16 @@ function buildCwebpBashScript(
 		const gifBody = resize
 			? [
 					'          tmp="${out%.*}.tmp.gif"',
-					`          ffmpeg -nostdin -y -loglevel error -i "$f" -vf "${cwebpResizeToFfmpegScale(resize)}" "$tmp" && gif2webp "$tmp" -o "$out"`,
+					`          ffmpeg -nostdin -y -loglevel error -i "$f" -vf "${cwebpResizeToFfmpegScale(resize)}" "$tmp" && gif2webp "$tmp" -o "$out" || FAILURES=$((FAILURES + 1))`,
 					'          rm -f "$tmp"',
 				]
-			: ['          gif2webp "$f" -o "$out"'];
+			: ['          gif2webp "$f" -o "$out" || FAILURES=$((FAILURES + 1))'];
 		innerArms.push(`        ${groups.gif.join('|')})`, ...gifBody, '          ;;');
 	}
 
 	innerArms.push(
 		'        *)',
-		`          cwebp -q ${quality}${resizeOpts} "$f" -o "$out"`,
+		`          cwebp -q ${quality}${resizeOpts} "$f" -o "$out" || FAILURES=$((FAILURES + 1))`,
 		'          ;;',
 	);
 
@@ -643,6 +664,7 @@ function buildCwebpBashScript(
 		`OUTPUT_DIR="$(basename "$(pwd)")_\${OUTPUT_EXT}"`,
 		'mkdir -p "$OUTPUT_DIR"',
 		"SEEN_BASES=''",
+		'FAILURES=0',
 		'',
 		'has_seen_base() {',
 		'  while IFS= read -r seen_base; do',
@@ -672,6 +694,11 @@ function buildCwebpBashScript(
 		'      ;;',
 		'  esac',
 		'done',
+		'',
+		'if [ "$FAILURES" -gt 0 ]; then',
+		'  echo "Failed conversions: $FAILURES" >&2',
+		'  (exit 1)',
+		'fi',
 	];
 
 	return lines.join('\n');
@@ -689,6 +716,8 @@ function buildCwebpPowerShellScript(
 
 	// switch ($inputExt) の中では $_ は switch の入力値（文字列）を指し、パイプラインの
 	// FileInfo ではなくなるため、switch の前に $file = $_ を捕獲してアーム内で使う（D6）
+	// コマンドが見つからないと $global:LASTEXITCODE は更新されないので、外部コマンドの直前に 1 を入れる。
+	// Remove-Item はその値を変えないため、switch の後で結果を1回だけ数える。
 	const switchArms: string[] = [];
 
 	if (groups.preprocess.length > 0) {
@@ -696,8 +725,12 @@ function buildCwebpPowerShellScript(
 		switchArms.push(
 			`      { ${pattern} -contains $_ } {`,
 			'        $tmp = $out -replace "\\.$outputExt$", \'.tmp.png\'',
+			'        $global:LASTEXITCODE = 1',
 			'        ffmpeg -nostdin -y -i $file.FullName $tmp',
-			`        if ($LASTEXITCODE -eq 0) { cwebp -q ${quality}${resizeOpts} $tmp -o $out }`,
+			'        if ($global:LASTEXITCODE -eq 0) {',
+			'          $global:LASTEXITCODE = 1',
+			`          cwebp -q ${quality}${resizeOpts} $tmp -o $out`,
+			'        }',
 			'        Remove-Item -LiteralPath $tmp -Force -ErrorAction SilentlyContinue',
 			'      }',
 		);
@@ -708,18 +741,28 @@ function buildCwebpPowerShellScript(
 			switchArms.push(
 				"      'gif' {",
 				'        $tmp = $out -replace "\\.$outputExt$", \'.tmp.gif\'',
+				'        $global:LASTEXITCODE = 1',
 				`        ffmpeg -nostdin -y -i $file.FullName -vf "${cwebpResizeToFfmpegScale(resize)}" $tmp`,
-				'        if ($LASTEXITCODE -eq 0) { gif2webp $tmp -o $out }',
+				'        if ($global:LASTEXITCODE -eq 0) {',
+				'          $global:LASTEXITCODE = 1',
+				'          gif2webp $tmp -o $out',
+				'        }',
 				'        Remove-Item -LiteralPath $tmp -Force -ErrorAction SilentlyContinue',
 				'      }',
 			);
 		} else {
-			switchArms.push("      'gif' {", '        gif2webp $file.FullName -o $out', '      }');
+			switchArms.push(
+				"      'gif' {",
+				'        $global:LASTEXITCODE = 1',
+				'        gif2webp $file.FullName -o $out',
+				'      }',
+			);
 		}
 	}
 
 	switchArms.push(
 		'      default {',
+		'        $global:LASTEXITCODE = 1',
 		`        cwebp -q ${quality}${resizeOpts} $file.FullName -o $out`,
 		'      }',
 	);
@@ -729,6 +772,7 @@ function buildCwebpPowerShellScript(
 		`$outputDir = "$(Split-Path -Leaf (Get-Location))_$outputExt"`,
 		'New-Item -ItemType Directory -Force -Path $outputDir | Out-Null',
 		'$seenBaseNames = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)',
+		'$failures = 0',
 		'',
 		`Get-ChildItem -Path * -File -Include ${includeFilter} |`,
 		'  ForEach-Object {',
@@ -739,7 +783,12 @@ function buildCwebpPowerShellScript(
 		'    switch ($inputExt) {',
 		...switchArms,
 		'    }',
+		'    if ($global:LASTEXITCODE -ne 0) { $failures++ }',
 		'  }',
+		'',
+		'if ($failures -gt 0) {',
+		'  throw "Failed conversions: $failures"',
+		'}',
 	];
 
 	return lines.join('\n');
@@ -759,7 +808,7 @@ function cwebpCmdCommandLines(
 	if (groups.preprocess.includes(ext)) {
 		const tmp = `"${outBase}.tmp.png"`;
 		return [
-			`ffmpeg -nostdin -y -loglevel error -i "%%f" ${tmp} && cwebp -q ${quality}${resizeOpts} ${tmp} -o ${out}`,
+			`ffmpeg -nostdin -y -loglevel error -i "%%f" ${tmp} && cwebp -q ${quality}${resizeOpts} ${tmp} -o ${out} || set /a "FAILURES+=1" >nul`,
 			`del ${tmp} >nul 2>&1`,
 		];
 	}
@@ -768,14 +817,14 @@ function cwebpCmdCommandLines(
 		if (resize) {
 			const tmp = `"${outBase}.tmp.gif"`;
 			return [
-				`ffmpeg -nostdin -y -loglevel error -i "%%f" -vf "${cwebpResizeToFfmpegScale(resize)}" ${tmp} && gif2webp ${tmp} -o ${out}`,
+				`ffmpeg -nostdin -y -loglevel error -i "%%f" -vf "${cwebpResizeToFfmpegScale(resize)}" ${tmp} && gif2webp ${tmp} -o ${out} || set /a "FAILURES+=1" >nul`,
 				`del ${tmp} >nul 2>&1`,
 			];
 		}
-		return [`gif2webp "%%f" -o ${out}`];
+		return [`gif2webp "%%f" -o ${out} || set /a "FAILURES+=1" >nul`];
 	}
 
-	return [`cwebp -q ${quality}${resizeOpts} "%%f" -o ${out}`];
+	return [`cwebp -q ${quality}${resizeOpts} "%%f" -o ${out} || set /a "FAILURES+=1" >nul`];
 }
 
 function buildCwebpCmdScript(
@@ -795,6 +844,7 @@ function buildCwebpCmdScript(
 		'if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"',
 		'set "SEEN_FILE=%TEMP%\\cwebp-batch-seen-%RANDOM%-%RANDOM%.tmp"',
 		'type nul > "%SEEN_FILE%"',
+		'set "FAILURES=0"',
 		'',
 	];
 
@@ -819,7 +869,14 @@ function buildCwebpCmdScript(
 		);
 	}
 
-	lines.push('del "%SEEN_FILE%" >nul 2>&1', 'exit /b');
+	lines.push(
+		'del "%SEEN_FILE%" >nul 2>&1',
+		'if %FAILURES% GTR 0 (',
+		'  1>&2 echo Failed conversions: %FAILURES%',
+		'  exit /b 1',
+		')',
+		'exit /b 0',
+	);
 
 	// Windows の cmd スクリプトとして標準の CRLF で出力する。
 	return lines.join('\r\n');

@@ -26,7 +26,9 @@ import {
 	CWEBP_PREPROCESS_EXTENSIONS,
 	CWEBP_GIF_EXTENSIONS,
 	PRESETS,
+	getValidatedOutputExtension,
 	inferBatchOptions,
+	resolveBatchInputExtensions,
 } from '../../src/lib/ffmpeg/presets';
 import type {
 	FFmpegOptions,
@@ -624,7 +626,9 @@ describe('buildBatchCommand', () => {
 		const options = createDefaultOptions(preset.defaults);
 		const batchOptions = inferBatchOptions(preset);
 		const script = requireBatchScript(buildBatchCommand(options, batchOptions));
-		const inputCount = batchOptions.inputExtensions.filter((ext) => ext !== 'webm').length;
+		const outputExtension = getValidatedOutputExtension(options.output.filename);
+		if (!outputExtension) throw new Error('Expected a valid output extension');
+		const inputCount = resolveBatchInputExtensions(batchOptions, outputExtension).length;
 
 		for (const shell of batchShells) {
 			const lines = script[shell].split(/\r?\n/).map((line) => line.trimStart());
@@ -663,6 +667,20 @@ describe('buildBatchCommand', () => {
 			expect(command).toContain('-c:v libx265');
 			expect(command).toContain('-preset slow');
 			expect(command).not.toContain('-preset ' + svtOptions.video.svtav1Preset);
+			expect(command).not.toContain('-svtav1-params');
+		}
+
+		const x264Options: FFmpegOptions = {
+			...svtOptions,
+			video: { ...svtOptions.video, codec: 'libx264' },
+		};
+		const x264Script = requireBatchScript(buildBatchCommand(x264Options, batchOptions));
+		for (const command of [
+			buildCommand(x264Options),
+			...batchShells.map((shell) => x264Script[shell]),
+		]) {
+			expect(command).toContain('-c:v libx264');
+			expect(command).not.toContain('-preset');
 			expect(command).not.toContain('-svtav1-params');
 		}
 	});
@@ -744,6 +762,62 @@ describe('buildBatchCommand', () => {
 		expect(result.powershell).toContain('-ss 00:01:00');
 		expect(result.cmd).toContain('-ss 00:01:00');
 	});
+});
+
+it.each(['ffmpeg', 'WebP'] as const)('#15 %s の一括スクリプトが失敗件数と終了値を出す', (tool) => {
+	const isWebp = tool === 'WebP';
+	const options = createDefaultOptions({
+		output: { filename: isWebp ? 'output.webp' : 'output.avif' },
+		filter: { scale: { width: 320 } },
+	});
+	const batch: BatchOptions = {
+		inputExtensions: ['jpg', 'heic', 'gif'],
+		allowSameFormatInput: false,
+	};
+	const script = requireBatchScript(
+		isWebp ? buildCwebpBatchCommand(options, batch) : buildBatchCommand(options, batch),
+	);
+	expect(script.bash).toContain('FAILURES=0');
+	expect(script.bash.match(/ \|\| FAILURES=\$\(\(FAILURES \+ 1\)\)/g)).toHaveLength(isWebp ? 3 : 1);
+	expect(script.bash.endsWith('  (exit 1)\nfi')).toBe(true);
+	expect(script.powershell).toContain('$failures = 0');
+	expect(script.powershell).toContain('    if ($global:LASTEXITCODE -ne 0) { $failures++ }\n  }');
+	expect(script.powershell.endsWith('  throw "Failed conversions: $failures"\n}')).toBe(true);
+	expect(script.powershell).not.toMatch(/^\s*exit\b/m);
+
+	const psLines = script.powershell.split('\n').map((line) => line.trim());
+	const nativeCommands = psLines.filter((line) => /^(ffmpeg|cwebp|gif2webp) /.test(line));
+	expect(nativeCommands).toHaveLength(isWebp ? 5 : 1);
+	for (const command of nativeCommands) {
+		expect(psLines[psLines.indexOf(command) - 1]).toBe('$global:LASTEXITCODE = 1');
+	}
+	if (isWebp) {
+		expect(script.powershell.match(/if \(\$global:LASTEXITCODE -eq 0\)/g)).toHaveLength(2);
+	}
+	expect(script.cmd).toContain('set "FAILURES=0"');
+	expect(script.cmd.match(/ \|\| set \/a "FAILURES\+=1" >nul/g)).toHaveLength(6);
+	expect(script.cmd).toContain(
+		'  1>&2 echo Failed conversions: %FAILURES%\r\n  exit /b 1\r\n)\r\nexit /b 0',
+	);
+});
+
+it('#15 リサイズなしの GIF は3シェルで gif2webp の失敗を数える', () => {
+	const options = createDefaultOptions({ output: { filename: 'output.webp' } });
+	const script = requireBatchScript(
+		buildCwebpBatchCommand(options, { inputExtensions: ['gif'], allowSameFormatInput: false }),
+	);
+
+	expect(script.bash).toContain('gif2webp "$f" -o "$out" || FAILURES=$((FAILURES + 1))\n');
+	expect(script.powershell).toContain(
+		'        $global:LASTEXITCODE = 1\n        gif2webp $file.FullName -o $out',
+	);
+	const gifCommands = script.cmd
+		.split('\r\n')
+		.filter((line) => line.trimStart().startsWith('gif2webp "%%f"'));
+	expect(gifCommands).toHaveLength(2);
+	for (const command of gifCommands) {
+		expect(command).toMatch(/ \|\| set \/a "FAILURES\+=1" >nul$/);
+	}
 });
 
 describe('buildCwebpBatchCommand', () => {
