@@ -25,6 +25,8 @@ import {
 	CWEBP_DIRECT_EXTENSIONS,
 	CWEBP_PREPROCESS_EXTENSIONS,
 	CWEBP_GIF_EXTENSIONS,
+	PRESETS,
+	inferBatchOptions,
 } from '../../src/lib/ffmpeg/presets';
 import type {
 	FFmpegOptions,
@@ -59,6 +61,8 @@ function requireBatchScript(script: BatchScript | null): BatchScript {
 	expect(script).not.toBeNull();
 	return script as BatchScript;
 }
+
+const batchShells = ['bash', 'powershell', 'cmd'] as const;
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 1. buildCommand() 基本コマンド生成
@@ -615,6 +619,65 @@ describe('buildBatchCommand', () => {
 		allowSameFormatInput: true,
 	};
 
+	it('#23 一括処理の全 ffmpeg 行に -nostdin を付け、単一コマンドでは省く', () => {
+		const preset = PRESETS['video-convert'];
+		const options = createDefaultOptions(preset.defaults);
+		const batchOptions = inferBatchOptions(preset);
+		const script = requireBatchScript(buildBatchCommand(options, batchOptions));
+		const inputCount = batchOptions.inputExtensions.filter((ext) => ext !== 'webm').length;
+
+		for (const shell of batchShells) {
+			const lines = script[shell].split(/\r?\n/).map((line) => line.trimStart());
+			const ffmpegLines = lines.filter((line) => line.startsWith('ffmpeg '));
+			expect(ffmpegLines).toHaveLength(shell === 'cmd' ? inputCount * 2 : 1);
+			for (const line of ffmpegLines) {
+				expect(line).toMatch(/^ffmpeg -nostdin /);
+			}
+		}
+		expect(buildCommand(options)).not.toContain('-nostdin');
+	});
+
+	it('#28 個別と一括の SVT-AV1 専用オプションは libsvtav1 でのみ出力する', () => {
+		const preset = PRESETS['video-compress'];
+		const svtOptions = createDefaultOptions(preset.defaults);
+		const x265Options: FFmpegOptions = {
+			...svtOptions,
+			video: { ...svtOptions.video, codec: 'libx265', preset: 'slow' },
+		};
+		const batchOptions = inferBatchOptions(preset);
+		const svtScript = requireBatchScript(buildBatchCommand(svtOptions, batchOptions));
+		const x265Script = requireBatchScript(buildBatchCommand(x265Options, batchOptions));
+
+		for (const command of [
+			buildCommand(svtOptions),
+			...batchShells.map((shell) => svtScript[shell]),
+		]) {
+			expect(command).toContain('-c:v libsvtav1');
+			expect(command).toContain('-preset ' + svtOptions.video.svtav1Preset);
+			expect(command).toContain('-svtav1-params ' + svtOptions.video.svtav1Params);
+		}
+		for (const command of [
+			buildCommand(x265Options),
+			...batchShells.map((shell) => x265Script[shell]),
+		]) {
+			expect(command).toContain('-c:v libx265');
+			expect(command).toContain('-preset slow');
+			expect(command).not.toContain('-preset ' + svtOptions.video.svtav1Preset);
+			expect(command).not.toContain('-svtav1-params');
+		}
+	});
+
+	it('#7 一括処理で copyStreams が有効なときは幅を指定しても -vf を出力しない', () => {
+		const preset = PRESETS['video-trim'];
+		const options = createDefaultOptions({ ...preset.defaults, filter: { scale: { width: 320 } } });
+		const script = requireBatchScript(buildBatchCommand(options, inferBatchOptions(preset)));
+
+		for (const shell of batchShells) {
+			expect(script[shell]).toContain('-c copy');
+			expect(script[shell]).not.toContain('-vf');
+		}
+	});
+
 	it('Bash / PowerShell / cmd の3形式を返す', () => {
 		const opts = createDefaultOptions({
 			video: { codec: 'libx264', crf: 23, noVideo: false },
@@ -830,6 +893,24 @@ describe('buildCwebpBatchCommand の3経路振り分け', () => {
 		});
 		return requireBatchScript(buildCwebpBatchCommand(opts, fullBatch));
 	}
+
+	it('#11 一括 WebP 変換の全 ffmpeg 前処理行に -map を含めない', () => {
+		const script = buildFullScript({ filter: { scale: { width: 480, height: -1 } } });
+		for (const shell of batchShells) {
+			const lines = script[shell].split(/\r?\n/).map((line) => line.trimStart());
+			const ffmpegLines = lines.filter((line) => line.startsWith('ffmpeg '));
+			const branches = shell === 'cmd' ? 2 : 1;
+			const preprocessCount = shell === 'cmd' ? CWEBP_PREPROCESS_EXTENSIONS.length : 1;
+
+			expect(ffmpegLines).toHaveLength((preprocessCount + 1) * branches);
+			expect(ffmpegLines.filter((line) => line.includes('-vf "scale=480:-1"'))).toHaveLength(
+				branches,
+			);
+			for (const line of ffmpegLines) {
+				expect(line).not.toContain('-map');
+			}
+		}
+	});
 
 	it('bash は入れ子 case で3経路すべてを含む', () => {
 		const script = buildFullScript();

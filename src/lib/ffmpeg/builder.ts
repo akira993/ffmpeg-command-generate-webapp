@@ -162,14 +162,16 @@ function buildVideoOptions(options: FFmpegOptions): string[] {
 		parts.push('-preset', v.preset);
 	}
 
-	// SVT-AV1 プリセット
-	if (v.svtav1Preset !== undefined) {
-		parts.push('-preset', String(v.svtav1Preset));
-	}
+	if (v.codec === 'libsvtav1') {
+		// SVT-AV1 プリセット
+		if (v.svtav1Preset !== undefined) {
+			parts.push('-preset', String(v.svtav1Preset));
+		}
 
-	// SVT-AV1 追加パラメータ
-	if (v.svtav1Params) {
-		parts.push('-svtav1-params', v.svtav1Params);
+		// SVT-AV1 追加パラメータ
+		if (v.svtav1Params) {
+			parts.push('-svtav1-params', v.svtav1Params);
+		}
 	}
 
 	// libwebp quality
@@ -328,11 +330,11 @@ function buildOptionParts(options: FFmpegOptions): string {
 	} else {
 		parts.push(...buildVideoOptions(options));
 		parts.push(...buildAudioOptions(options));
-	}
 
-	const filterStr = buildVideoFilter(options.filter);
-	if (filterStr) {
-		parts.push('-vf', `"${filterStr}"`);
+		const filterStr = buildVideoFilter(options.filter);
+		if (filterStr) {
+			parts.push('-vf', `"${filterStr}"`);
+		}
 	}
 
 	parts.push(...buildMiscOptions(options));
@@ -386,7 +388,7 @@ function buildBashScript(
 		'      else',
 		'        SEEN_BASES="${SEEN_BASES}\nx${base}"',
 		'      fi',
-		`      ffmpeg ${inputOpts}-i "$f" ${optionParts} "$out"`,
+		`      ffmpeg -nostdin ${inputOpts}-i "$f" ${optionParts} "$out"`,
 		'      ;;',
 		'  esac',
 		'done',
@@ -423,7 +425,7 @@ function buildPowerShellScript(
 		"    $inputExt = $_.Extension.TrimStart('.').ToLower()",
 		'    $out = Join-Path $outputDir "$($_.BaseName).$outputExt"',
 		'    if (-not $seenBaseNames.Add($_.BaseName)) { $out = Join-Path $outputDir "$($_.BaseName)_$inputExt.$outputExt" }',
-		`    ffmpeg ${inputOpts}-i $_.FullName ${optionParts} $out`,
+		`    ffmpeg -nostdin ${inputOpts}-i $_.FullName ${optionParts} $out`,
 		'  }',
 	];
 
@@ -463,11 +465,11 @@ function buildCmdScript(
 			`for %%f in (*.${ext}) do (`,
 			'  findstr /l /x /c:"%%~nf" "%SEEN_FILE%" >nul 2>&1',
 			'  if not errorlevel 1 (',
-			`    ffmpeg ${inputOpts}-i "%%f" ${optionParts} "%OUTPUT_DIR%\\%%~nf_${ext}.%OUTPUT_EXT%"`,
+			`    ffmpeg -nostdin ${inputOpts}-i "%%f" ${optionParts} "%OUTPUT_DIR%\\%%~nf_${ext}.%OUTPUT_EXT%"`,
 			'  ) else (',
 			'    >>"%SEEN_FILE%" <nul set /p "=%%~nf"',
 			'    >>"%SEEN_FILE%" echo(',
-			`    ffmpeg ${inputOpts}-i "%%f" ${optionParts} "%OUTPUT_DIR%\\%%~nf.%OUTPUT_EXT%"`,
+			`    ffmpeg -nostdin ${inputOpts}-i "%%f" ${optionParts} "%OUTPUT_DIR%\\%%~nf.%OUTPUT_EXT%"`,
 			'  )',
 			')',
 		);
